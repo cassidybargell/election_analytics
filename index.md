@@ -1,7 +1,7 @@
 # 2020 Presidential Election Predictions
 ### Cassidy Bargell, Gov 1347
 
-# [Past Presidential Elections] (https://github.com/cassidybargell/election_analytics/master/posts/week_1.md)
+# [Past Presidential Elections] (https://github.com/cassidybargell/election_analytics/blob/master/posts/week_1.md)
 
 You can use the [editor on GitHub](https://github.com/cassidybargell/election_analytics/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
