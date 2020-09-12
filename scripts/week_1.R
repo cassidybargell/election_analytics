@@ -47,7 +47,8 @@ ggplot(popvote, aes(x = year, y = pv2p, colour = party)) +
           subtitle = "Two-Party Vote Share") + 
   scale_x_continuous(breaks = seq(from = 1948, to = 2016, by = 4)) +
   my_line_theme + 
-  theme(plot.subtitle = element_text(size = 13, hjust = 0.5))
+  theme(plot.subtitle = element_text(size = 13, hjust = 0.5),
+        panel.background = element_blank()) 
 
 ggsave("figures/pv2p_histline.png", height = 4, width = 8)
 
