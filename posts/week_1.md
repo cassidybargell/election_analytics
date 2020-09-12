@@ -4,3 +4,8 @@
 ## 9/14/20
 
 In this blog post I will talk about past presidential elections. 
+
+![](../figures/pv2p_diff_histline.png)
+
+
+
