@@ -9,6 +9,7 @@
 library(tidyverse)
 library(usmap)
 library(ggplot2)
+library(ggrepel)
 
 # Read in data
 popvote <- read_csv("data/popvote_1948-2016.csv")
@@ -49,8 +50,8 @@ ggplot(popvote, aes(x = year, y = pv2p, colour = party)) +
 ggsave("figures/pv2p_histline.png", height = 4, width = 8)
 
 # Pivot data wider to have column with just the difference between two-party
-# vote share. Negative values are Republican loss, positive values are
-# Democratic loss, win indicates winner of popular vote.
+# vote share. Negative values are Republican win, positive values are
+# Democratic win, win indicates winner of popular vote.
 pv2p_diff_df <- popvote %>%
   select(year, party, pv2p) %>%
   pivot_wider(names_from = party, values_from = pv2p) %>%
@@ -58,7 +59,7 @@ pv2p_diff_df <- popvote %>%
   mutate(win = case_when(diff > 0 ~ "democrat",
                          TRUE ~ "republican"))
 
-# Plot different in two-party popular vote share 
+# Plot differences in two-party popular vote share 
 ggplot(pv2p_diff_df, aes(x = year, y = diff)) + 
   geom_line() + 
   geom_point(aes(color = win)) + 
@@ -77,6 +78,44 @@ ggsave("figures/pv2p_diff_histline.png", height = 4, width = 8)
 #### Plot 2 - States map with percentages of popular vote share -- purple quote.
 #### labels = TRUE
 
+pv_margins_map <- pvstate %>%
+  filter(year >= 2000) %>%
+  mutate(win_margin = (R_pv2p-D_pv2p))
+
+pv_margins_map_16 <- pvstate %>%
+  filter(year == 2016) %>%
+  mutate(win_margin = (R_pv2p-D_pv2p))
+
+plot_usmap(data = pv_margins_map_16, regions = "states", values = "win_margin") +
+  scale_fill_gradient2(
+    high = "red", 
+    mid = scales::muted("purple"), ##TODO: purple or white better?
+    # mid = "white",
+    low = "blue", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,52),
+    name = "win margin"
+  ) +
+  theme_void()
+
+# this works
+plot_usmap(
+  data = pv_margins_map,
+  regions = "states",
+  values = "win_margin",
+  color = "white"
+) +
+  facet_wrap(facets = year ~ .) + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "red", 
+    mid = scales::muted("purple"),
+    low = "blue", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-55,60),
+    name = "win margin")
+
 #### Plot 3 - Swing states decide because of electoral college. Do swing state
 #### extension option gganimate showing swing states over time? predict same as
-#### 2020 except for states you designated as "swing"
+#### 2020 except for states you designated as "swing". Map of swing states and
+#### exclude all other states?
