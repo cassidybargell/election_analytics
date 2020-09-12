@@ -14,7 +14,6 @@ library(gt)
 # Read in data
 popvote <- read_csv("data/popvote_1948-2016.csv")
 pvstate <- read_csv("data/popvote_bystate_1948-2016.csv")
-ec <- read_csv("data/ec_1952-2020.csv")
 
 # Create states map
 states_map <- usmap::us_map()
