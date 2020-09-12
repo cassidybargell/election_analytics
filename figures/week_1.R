@@ -127,6 +127,28 @@ plot_usmap(
     limits = c(-55,60),
     name = "win margin")
 
+#### Plot actual winners, mostly code from section 
+
+# add winners to state popular vote data, use 2000 and higher because that is
+# what I have done so far for swing state data
+pv_map_grid <- pvstate %>%
+  filter(year >= 1980) %>%
+  mutate(winner = ifelse(R > D, "Republican", "Democrat"))
+  
+# Plot with facet wrap by year to show historical trends
+plot_usmap(data = pv_map_grid, regions = "states", 
+           values = "winner", color = "white") +
+  facet_wrap(facets = year ~.) + 
+  scale_fill_manual(values = c("blue", "red"), name = "PV winner") +
+  theme_void() +
+  theme(strip.text = element_text(size = 12),
+        aspect.ratio=1) + 
+  labs(title = "Presidential Popular Vote Winner from 1980-2016") + 
+  theme(plot.title = element_text(size = 12, hjust = 0.5, vjust = 5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5, vjust = 5))
+
+ggsave("figures/historical_pv_win.png")
+
 #### Extension 3 - Swing states over time
 
 # Create 'swing' value, which is D_pv2p(y) - D_pv2p(y-4). Positive value is
@@ -157,7 +179,6 @@ swing_skim <- skim(D_swingstate_margin) %>%
   cols_label(skim_variable = "variable") %>%
   tab_source_note("values rounded to 3 decimal places")
 
-  
 # save skim data as an image
 swing_skim %>% gtsave("figures/gt_swing.png")
 
@@ -197,7 +218,7 @@ D_swingstate_margin$year <- as.double(D_swingstate_margin$year)
 
 # Left join to keep only states in which 2 party pop vote share was between
 # 48-52, but add margin. Could have done this with a mutate but oh well. 
-small_margin_pv2p <- small_margin_pv2p %>%
+small_margin_pv2p16 <- small_margin_pv2p %>%
   left_join(D_swingstate_margin) %>%
   filter(year == 2016) %>%
   select(state, swing)
@@ -206,7 +227,7 @@ small_margin_pv2p <- small_margin_pv2p %>%
 # was won with less than a 2% margin. Annotate for states Clinton won despite
 # swing right in 2016 election compared to 2012 election.
 plot_usmap(
-  data = small_margin_pv2p,
+  data = small_margin_pv2p16,
   regions = "states",
   include = c("MI", "FL", "NH", "PA", "WI", "MN"),
   values = "swing",
@@ -236,16 +257,6 @@ plot_usmap(
 
 ggsave("figures/swing_state_margins16.png")
 
-#### Electoral College 
-
-ec <- read_csv("data/ElectoralCollegePost1948.csv") %>%
-  filter(! is.na(X1)) %>%
-  select(X1, `2016`)
-
 # Look at states that are typically closely contested. Define swing states.
 # https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/graphics/politics/2016-election/swing-state-margins/
 
-#### Plot 3 - Swing states decide because of electoral college. Do swing state
-#### extension option gganimate showing swing states over time? predict same as
-#### 2020 except for states you designated as "swing". Map of swing states and
-#### exclude all other states?
