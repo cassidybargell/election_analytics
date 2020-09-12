@@ -50,7 +50,7 @@ ggplot(popvote, aes(x = year, y = pv2p, colour = party)) +
   theme(plot.subtitle = element_text(size = 13, hjust = 0.5),
         panel.background = element_blank()) 
 
-ggsave("figures/pv2p_histline.png", height = 4, width = 8)
+ggsave("figures/pv2p_histline_blank.png", height = 4, width = 8)
 
 # Pivot data wider to have column with just the difference between two-party
 # vote share. Negative values are Republican win, positive values are
