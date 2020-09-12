@@ -5,7 +5,7 @@
 
 In this blog post I will talk about past presidential elections. 
 
-![](../figures/pv2p_diff_histline.png)
+![](../figures/pv2p_diff_histline_blank.png)
 
 ![](../figures/historical_pv_win.png)
 
