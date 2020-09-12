@@ -10,6 +10,8 @@ library(tidyverse)
 library(usmap)
 library(ggplot2)
 library(ggrepel)
+library(skimr)
+library(gt)
 
 # Read in data
 popvote <- read_csv("data/popvote_1948-2016.csv")
@@ -23,7 +25,7 @@ unique(states_map$abbr)
 #### but showing decreasing differences through time, elections getting closer
 #### in popular vote
 
-# My line plot theme snippet, copied from section
+# My line plot theme snippet, copied from section with subtitle addition
 my_line_theme <- theme_bw() + 
   theme(panel.border = element_blank(),
     plot.title   = element_text(size = 15, hjust = 0.5), 
@@ -35,6 +37,7 @@ my_line_theme <- theme_bw() +
     legend.text = element_text(size = 12),
     plot.subtitle = element_text(size = 13, hjust = 0.5))
 
+# lineplot from section to change slightly alter
 ggplot(popvote, aes(x = year, y = pv2p, colour = party)) +
   geom_line(stat = "identity") +
   scale_color_manual(values = c("blue", "red"), name = "", 
@@ -76,29 +79,33 @@ ggplot(pv2p_diff_df, aes(x = year, y = diff)) +
 ggsave("figures/pv2p_diff_histline.png", height = 4, width = 8)
 
 #### Plot 2 - States map with percentages of popular vote share -- purple quote.
-#### labels = TRUE
+# labels = TRUE?
 
+# mutate to add win margin, positive is democratic win, negative republican win
 pv_margins_map <- pvstate %>%
   filter(year >= 2000) %>%
-  mutate(win_margin = (R_pv2p-D_pv2p))
+  mutate(win_margin = (D_pv2p-R_pv2p))
 
+# filter for just most recent presidential election
 pv_margins_map_16 <- pvstate %>%
   filter(year == 2016) %>%
-  mutate(win_margin = (R_pv2p-D_pv2p))
+  mutate(win_margin = (D_pv2p-R_pv2p))
 
+# Plot 2016 win margin map, adjust scale limits to include color for Wyoming.
+# Chose a purple mid scale as I feel like the white implies emptiness, when in
+# reality the purple states are important for understanding and analysis.
 plot_usmap(data = pv_margins_map_16, regions = "states", values = "win_margin") +
   scale_fill_gradient2(
-    high = "red", 
-    mid = scales::muted("purple"), ##TODO: purple or white better?
-    # mid = "white",
-    low = "blue", 
+    high = "blue", 
+    mid = scales::muted("purple"),
+    low = "red", 
     breaks = c(-50,-25,0,25,50), 
-    limits = c(-50,52),
+    limits = c(-52,50),
     name = "win margin"
   ) +
   theme_void()
 
-# this works
+# grid map of win_margins from 1980-2016 elections
 plot_usmap(
   data = pv_margins_map,
   regions = "states",
@@ -108,14 +115,18 @@ plot_usmap(
   facet_wrap(facets = year ~ .) + 
   theme_void() +
   scale_fill_gradient2(
-    high = "red", 
+    high = "blue", 
     mid = scales::muted("purple"),
-    low = "blue", 
+    low = "red", 
     breaks = c(-50,-25,0,25,50), 
     limits = c(-55,60),
     name = "win margin")
 
-# Negative value is swing republican, positive value is move democratic
+#### Extension 3 - Swing states over time
+
+# Create 'swing' value, which is D_pv2p(y) - D_pv2p(y-4). Positive value is
+# swing democratic from previous election, negative value is swing republican
+# from previous election.
 D_swingstate_margin <- pvstate %>%
   filter(year >= 1980) %>%
   select(state, year, D_pv2p) %>%
@@ -129,45 +140,99 @@ D_swingstate_margin <- pvstate %>%
   pivot_longer(cols = c(`2000`, `2004`, `2008`, `2012`, `2016`),
                names_to = "year",
                values_to = "swing")
+
+# Summary of data about swing values from 2000-2016. Two standard deviations
+# away from the mean is -10.52 and 8.24
+swing_skim <- skim(D_swingstate_margin) %>%
+  yank("numeric") %>%
+  select(skim_variable, mean, sd, p0, p25, p50, p75, p100, hist) %>%
+  gt() %>%
+  fmt_number(columns = vars(mean, sd, p0, p25, p50, p75, p100), 
+             decimals = 3) %>%
+  cols_label(skim_variable = "variable") %>%
+  tab_source_note("values rounded to 3 decimal places")
+
   
+# save skim data as an image
+swing_skim %>% gtsave("figures/gt_swing.png")
+
+# grid map for 2000-2016 showing swing in popular vote from previous election
 plot_usmap(
   data = D_swingstate_margin,
   regions = "states",
   values = "swing",
-  color = "white"
+  color = "black"
 ) +
   facet_wrap(facets = year ~ .) + 
   theme_void() +
   scale_fill_gradient2(
     high = "blue", 
-    mid = scales::muted("purple"),
+    mid = "white", 
+    # mid = scales::muted("purple"),
     low = "red", 
-    breaks = c(-10,-10,0,10,20), 
+    breaks = c(-10,0,10,20), 
     limits = c(-15,20),
-    name = "win margin")
+    name = "Swing") + 
+  labs(title = "Swing Margins between Presidential Elections from 2000-2016",
+       subtitle = "Two-party popular vote share",
+       caption = "Swing is the difference in 2-party popular vote share 
+       from the previous election.") + 
+  theme(plot.title = element_text(size = 12, hjust = 0.5, vjust = 5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5, vjust = 5))
 
+ggsave("historical_swing.png")
 
-# Large swings in popular vote
-large <- D_swingstate_margin %>%
-  filter(swing >= 10 | swing <= -10)
+# states with popular vote margin between 48-52 in 2016
+small_margin_pv2p <- pv_margins_map %>%
+  filter(win_margin >= -2 & win_margin <= 2) 
 
+# Edit D_swingstate_margin year column type to left_join with small margin state
+# win dataframe
+D_swingstate_margin$year <- as.double(D_swingstate_margin$year)
+
+# Left join to keep only states in which 2 party pop vote share was between
+# 48-52, but add margin. Could have done this with a mutate but oh well. 
+small_margin_pv2p <- small_margin_pv2p %>%
+  left_join(D_swingstate_margin) %>%
+  filter(year == 2016) %>%
+  select(state, swing)
+
+# Plot map showing swing margin for states in which two party popular vote share
+# was won with less than a 2% margin. Annotate for states Clinton won despite
+# swing right in 2016 election compared to 2012 election.
 plot_usmap(
-  data = large,
+  data = small_margin_pv2p,
   regions = "states",
+  include = c("MI", "FL", "NH", "PA", "WI", "MN"),
   values = "swing",
-  color = "white"
-) +
-  facet_wrap(facets = year ~ .) + 
+  color = "grey",
+  labels = TRUE,
+  label_color = "black"
+) + 
   theme_void() +
   scale_fill_gradient2(
     high = "blue", 
-    mid = scales::muted("purple"),
+    mid = "white", 
+    # mid = scales::muted("purple"),
     low = "red", 
-    breaks = c(-10,-10,0,10,20), 
-    limits = c(-15,20),
-    name = "win margin")
+    breaks = c(-5,0,5), 
+    limits = c(-5,5),
+    name = "Swing") + 
+  labs(title = "2016 States Won by a Margin <2%",
+       caption = "Swing is the difference in 2-party popular vote share 
+       from the previous election (2012).") + 
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        plot.subtitle = element_text(size = 13, hjust = 0.5)) + 
+  geom_text(x = 2150000, y = 100000, label = "NH - Clinton win", size = 2.5, 
+            color = "blue", fontface = "plain") + 
+  geom_text(x = 420000, y = -240000, label = "MN - Clinton win", size = 2.5, 
+            color = "blue", fontface = "plain")
 
-# Look at states that are typically closely contested. Define swing states. 
+ggsave("figures/swing_state_margins16.png")
+
+
+# Look at states that are typically closely contested. Define swing states.
+# https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/graphics/politics/2016-election/swing-state-margins/
 
 #### Plot 3 - Swing states decide because of electoral college. Do swing state
 #### extension option gganimate showing swing states over time? predict same as
