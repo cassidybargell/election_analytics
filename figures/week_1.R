@@ -78,4 +78,5 @@ ggsave("figures/pv2p_diff_histline.png", height = 4, width = 8)
 #### labels = TRUE
 
 #### Plot 3 - Swing states decide because of electoral college. Do swing state
-#### extension option gganimate showing swing states over time?
+#### extension option gganimate showing swing states over time? predict same as
+#### 2020 except for states you designated as "swing"
