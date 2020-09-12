@@ -115,6 +115,60 @@ plot_usmap(
     limits = c(-55,60),
     name = "win margin")
 
+# Negative value is swing republican, positive value is move democratic
+D_swingstate_margin <- pvstate %>%
+  filter(year >= 1980) %>%
+  select(state, year, D_pv2p) %>%
+  pivot_wider(names_from = year, values_from = D_pv2p) %>%
+  mutate(`2016` = (`2016` - `2012`),
+         `2012` = (`2012` - `2008`),
+         `2008` = (`2008` - `2004`),
+         `2004` = (`2004` - `2000`),
+         `2000` = (`2000` - `1996`)) %>%
+  select(state, `2000`, `2004`, `2008`, `2012`, `2016`) %>%
+  pivot_longer(cols = c(`2000`, `2004`, `2008`, `2012`, `2016`),
+               names_to = "year",
+               values_to = "swing")
+  
+plot_usmap(
+  data = D_swingstate_margin,
+  regions = "states",
+  values = "swing",
+  color = "white"
+) +
+  facet_wrap(facets = year ~ .) + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = scales::muted("purple"),
+    low = "red", 
+    breaks = c(-10,-10,0,10,20), 
+    limits = c(-15,20),
+    name = "win margin")
+
+
+# Large swings in popular vote
+large <- D_swingstate_margin %>%
+  filter(swing >= 10 | swing <= -10)
+
+plot_usmap(
+  data = large,
+  regions = "states",
+  values = "swing",
+  color = "white"
+) +
+  facet_wrap(facets = year ~ .) + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = scales::muted("purple"),
+    low = "red", 
+    breaks = c(-10,-10,0,10,20), 
+    limits = c(-15,20),
+    name = "win margin")
+
+# Look at states that are typically closely contested. Define swing states. 
+
 #### Plot 3 - Swing states decide because of electoral college. Do swing state
 #### extension option gganimate showing swing states over time? predict same as
 #### 2020 except for states you designated as "swing". Map of swing states and
