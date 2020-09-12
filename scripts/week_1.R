@@ -212,8 +212,8 @@ ggsave("figures/historical_swing.png")
 small_margin_pv2p <- pv_margins_map %>%
   filter(win_margin >= -2 & win_margin <= 2) 
 
-# Edit D_swingstate_margin year column type to left_join with small margin state
-# win dataframe
+# Edit D_swing state_margin year column type to left_join with small margin state
+# win data frame
 D_swingstate_margin$year <- as.double(D_swingstate_margin$year)
 
 # Left join to keep only states in which 2 party pop vote share was between
