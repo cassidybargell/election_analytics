@@ -54,9 +54,9 @@ ggsave("figures/pv2p_histline.png", height = 4, width = 8)
 pv2p_diff_df <- popvote %>%
   select(year, party, pv2p) %>%
   pivot_wider(names_from = party, values_from = pv2p) %>%
-  mutate(diff = (republican - democrat)) %>%
-  mutate(win = case_when(diff > 0 ~ "republican",
-                         TRUE ~ "democrat"))
+  mutate(diff = (democrat - republican)) %>%
+  mutate(win = case_when(diff > 0 ~ "democrat",
+                         TRUE ~ "republican"))
 
 # Plot different in two-party popular vote share 
 ggplot(pv2p_diff_df, aes(x = year, y = diff)) + 
