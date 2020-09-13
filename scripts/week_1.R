@@ -72,8 +72,13 @@ ggplot(pv2p_diff_df, aes(x = year, y = diff)) +
   labs(title = "Difference in Presidential Popular Vote (1948-2016)",
        subtitle = "Two-Party Vote Share") + 
   scale_x_continuous(breaks = seq(from = 1948, to = 2016, by = 4)) +
+  scale_y_continuous(breaks = seq(from = -25, to = 25, by = 5), 
+                     labels = c("25%", "20", "15", "10", "5", "0",
+                                "5", "10", "15", "20", "25%")) + 
   geom_hline(yintercept = 0, linetype = "dashed", size = .3) + 
-  my_line_theme  
+  my_line_theme  + 
+  geom_text(x = 1954, y = -23, label = "Republican win", color = "red", size = 3) + 
+  geom_text(x = 1954, y = 23, label = "Democrat win", color = "blue", size = 3)
   
 ggsave("figures/pv2p_diff_histline.png", height = 4, width = 8)
 
