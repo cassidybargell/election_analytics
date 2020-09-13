@@ -249,7 +249,7 @@ plot_usmap(
     breaks = c(-5,0,5), 
     limits = c(-5,5),
     name = "Swing") + 
-  labs(title = "States Won by a Popular Vote Margin <4% (2016)",
+  labs(title = "States Won by a Popular Vote Margin <2% (2016)",
        subtitle = "Swing in comparison to 2012 Presidential Election",
        caption = "Swing is the difference in two-party popular vote share 
        from the previous election (2012).") + 
@@ -261,6 +261,15 @@ plot_usmap(
             color = "blue", fontface = "plain")
 
 ggsave("figures/swing_state_margins16.png")
+
+# margin swing combine to find states whose swing value in 2016 was greater than
+# the win margin
+margin_swing <- pv_margins_map %>%
+  left_join(D_swingstate_margin) %>%
+  filter(year == 2016) %>%
+  select(state, win_margin, swing) %>%
+  mutate(sw = ifelse((abs(swing) - abs(win_margin)) >= 0, TRUE, FALSE)) %>%
+  filter(sw == TRUE)
 
 # Look at states that are typically closely contested. Define swing states.
 # https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/graphics/politics/2016-election/swing-state-margins/
