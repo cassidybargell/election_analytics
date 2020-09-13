@@ -229,7 +229,7 @@ small_margin_pv2p16 <- small_margin_pv2p %>%
   select(state, swing)
 
 # Plot map showing swing margin for states in which two party popular vote share
-# was won with less than a 2% margin. Annotate for states Clinton won despite
+# was won with less than a 4% margin. Annotate for states Clinton won despite
 # swing right in 2016 election compared to 2012 election.
 plot_usmap(
   data = small_margin_pv2p16,
@@ -249,12 +249,12 @@ plot_usmap(
     breaks = c(-5,0,5), 
     limits = c(-5,5),
     name = "Swing") + 
-  labs(title = "2016 States Won by a Margin <2%",
+  labs(title = "States Won by a Popular Vote Margin <4% (2016)",
        subtitle = "Swing in comparison to 2012 Presidential Election",
-       caption = "Swing is the difference in 2-party popular vote share 
+       caption = "Swing is the difference in two-party popular vote share 
        from the previous election (2012).") + 
-  theme(plot.title = element_text(size = 15, hjust = 0.5),
-        plot.subtitle = element_text(size = 13, hjust = 0.5)) + 
+  theme(plot.title = element_text(size = 13, hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5)) + 
   geom_text(x = 2150000, y = 100000, label = "NH - Clinton win", size = 2.5, 
             color = "blue", fontface = "plain") + 
   geom_text(x = 420000, y = -240000, label = "MN - Clinton win", size = 2.5, 
