@@ -5,4 +5,6 @@
 
 ![](../figures/gdp_v_pv2p.png)
 ![](../figures/unemployment_lm.png)
+![](../figures/rdpi_lm.png)
+![](../figures/inflate_lm.png)
 ![](../figures/swing_lm.png)

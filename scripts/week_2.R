@@ -1,12 +1,10 @@
 ## Week Two - Figures
 ## 9/21/20
 
-#### Set-up ####
-# Plot quarters and find best model 
-# Show why can't use Trump quarters that we have so far
-# Predict using a Trump good quarter? 
-# Other economic sources - real disposable income, 
-# etc. https://fred.stlouisfed.org/series/DSPIC96
+#### Set-up #### Plot quarters and find best model Trump quarters in 2020 are
+#extrapolation that we have so far, predict using a Trump old quarter/yearly
+#average Other economic sources - real disposable income, etc.
+#https://fred.stlouisfed.org/series/DSPIC96
 
 # Load necessary packages
 library(tidyverse)
@@ -17,11 +15,14 @@ library(skimr)
 library(gt)
 
 # Read in data
+# FRED.org for resources
 popvote <- read_csv("data/popvote_1948-2016.csv")
 pvstate <- read_csv("data/popvote_bystate_1948-2016.csv")
 econ <- read_csv("data/econ.csv")
 local_econ <- read_csv("data/local.csv")
-rdpi <- read_csv("data/DSPIC96.csv")
+rdpi <- read_csv("data/DSPIC96.csv") #FRED
+unrate <- read_csv("data/UNRATE (1).csv") #FRED
+inflate <- read_csv("data/FPCPITOTLZGUSA.csv") # FRED
 
 # Create states map
 states_map <- usmap::us_map()
@@ -41,14 +42,22 @@ dat <- econ %>%
   filter(! is.na(winner)) %>%
   mutate(winner = ifelse(winner == "?", NA, winner))
 
-# Create tibble with differences from quarter to quarter to the next
+# Create tibble with differences for RDI
 changes <- dat %>%
-  mutate(unemploy_rate = (unemployment - lag(unemployment, n = 1))) %>%
-  mutate(inflation_rate = (inflation - lag(inflation, n = 1))) %>%
-  mutate(rdi_rate = (RDI - lag(RDI, n = 1))) %>%
+  mutate(rdi_rate = ((RDI - lag(RDI, n = 1))/ lag(RDI, n = 1))) %>%
   filter(year != 2017 & year != 2018 & year != 2019 )
 
-# Create real disposable personal income averages by year
+# Create tibble with inflation rates and pv2p
+inflate_popvote <- inflate %>%
+  mutate(date = as.character(DATE)) %>%
+  mutate(year = substr(date, 1, 4)) %>%
+  mutate(year = as.double(year)) %>%
+  rename(inflation_rate = "FPCPITOTLZGUSA") %>%
+  select(year, inflation_rate) %>%
+  right_join(popvote) %>%
+  filter(incumbent_party == TRUE)
+
+# Create real disposable personal income averages by year, make a rate column
 rdpi1 <- rdpi %>% 
   mutate(date = as.character(DATE)) %>%
   mutate(date = substr(date, 1, 4)) %>%
@@ -56,11 +65,26 @@ rdpi1 <- rdpi %>%
   summarize(yr_rdpi = mean(DSPIC96)) %>%
   mutate(year = as.double(date)) %>%
   select(year, yr_rdpi) %>%
-  mutate(rdpi_rate = (yr_rdpi - lag(yr_rdpi, n = 1))) 
+  mutate(rdpi_rate = (100 * (yr_rdpi - lag(yr_rdpi, n = 1))/lag(yr_rdpi, n = 1)))
 
 # Join with popvote percentage for potential later use
 rdpi_popvote <- popvote %>%
   left_join(rdpi1) %>%
+  filter(incumbent_party == TRUE)
+
+# Do the same for unemployment rate, same FRED source
+unrate <- unrate %>%
+  mutate(date = as.character(DATE)) %>%
+  mutate(quarter = substr(date, 6, 7)) %>%
+  filter(quarter == "04") %>%
+  mutate(year = substr(date, 1, 4)) %>%
+  rename(unrate = "UNRATE") %>%
+  mutate(year = as.double(year)) %>%
+  select(year, unrate)
+
+# Join with popvote percentage for potential later use
+unrate_popvote <- popvote %>%
+  left_join(unrate) %>%
   filter(incumbent_party == TRUE)
 
 #### Figure 1 - GDP Quarterly Growth vs. Incumbent party share
@@ -143,6 +167,7 @@ outsamp_errors <- sapply(1:1000, function(i){
   outsamp_true <- q2$pv2p[q2$year %in% years_outsamp]
   mean(outsamp_pred - outsamp_true)
 })
+
 mean_outsample_q2 <- mean(abs(outsamp_errors))
 
 outsamp_errors_yr <- sapply(1:1000, function(i){
@@ -256,8 +281,7 @@ econ %>%
 
 #### Real Disposable Personal Income 
 
-# Don't think I can use the data because I don't think it was adjusted
-# historically for real personal disposable income
+# Units are 2012 Billions of Chained 2012 Dollars, Seasonally Adjusted Annual Rate
 rdpi_popvote %>%
   subset(!is.na(rdpi_rate)) %>%
   ggplot(aes(x=year, y=rdpi_rate,
@@ -284,12 +308,110 @@ rdpi_popvote %>%
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
+ggsave("figures/rdpi_lm.png")
+
+# Build linear model
+rdpi2 <- rdpi_popvote %>%
+  filter(! is.na(rdpi_rate)) %>%
+  filter(! is.na(pv2p))
+
+lm_rdpi <- lm(pv2p ~ rdpi_rate, data = rdpi2)
+summary(lm_rdpi)
+# t value of 4.036 for slope
+
+# RDPI Predict for 2020
+inflate_new <- rdpi_popvote %>%
+  filter(year == 2020) %>%
+  select(rdpi_rate)
+
+rdpi_predict <- predict(lm_rdpi, rdpi2)
+
+# out-of-sample cross-validation
+outsamp_errors_rdpi <- sapply(1:1000, function(i){
+  years_outsamp <- sample(rdpi2$year, 8)
+  outsamp_mod <- lm(pv2p ~ rdpi_rate,
+                    
+                    rdpi2[!(rdpi2$year %in% years_outsamp),])
+  
+  outsamp_pred <- predict(outsamp_mod,
+                          
+                          newdata = rdpi2[rdpi2$year %in% years_outsamp,])
+  outsamp_true <- rdpi2$pv2p[rdpi2$year %in% years_outsamp]
+  mean(outsamp_pred - outsamp_true)
+})
+mean_outsample_rdpi <- mean(abs(outsamp_errors_rdpi))
+
+#### Inflation Plot and Prediction
+
+inflate_popvote %>%
+  select(year, inflation_rate) %>%
+  filter(!is.na(inflation_rate)) %>%
+  ggplot(aes(x=year, y=inflation_rate,
+             fill = (inflation_rate > 0))) +
+  geom_col() +
+  xlab("Year") +
+  ylab("Inflation Rate (%)") +
+  ggtitle("Historical Quarter 2 Inflation Rates") +
+  theme_bw() +
+  theme(legend.position="none",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  face="bold"))
+# Plot relationship
+inflate_popvote %>%
+  filter(! is.na(inflation_rate)) %>%
+  ggplot(aes(x=inflation_rate, y=pv2p, label = year)) +
+  geom_text(size = 1.8) +
+  geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) + 
+  xlab("Inflation Rate (%)") +
+  ylab("Incumbent party's two-party popular vote share") +
+  labs(title = "Incumbent Party Vote Share vs. Inflation Rate") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_bw()
+
+ggsave("figures/inflate_lm.png")
+
+# Build linear model
+yr_inflate <- inflate_popvote %>%
+  filter(! is.na(inflation_rate)) %>%
+  filter(! is.na(pv2p))
+
+lm_inflate <- lm(pv2p ~ inflation_rate, data = yr_inflate)
+summary(lm_inflate)
+# t value of -1.045 for slope
+
+# Inflation Predict for 2020 using 2019, as its the most recent data I have for
+# inflation rate
+inflate_new <- inflate%>%
+  mutate(date = as.character(DATE)) %>%
+  mutate(year = substr(date, 1, 4)) %>%
+  mutate(year = as.double(year)) %>%
+  rename(inflation_rate = "FPCPITOTLZGUSA") %>%
+  filter(year == 2019)
+
+inflate_predict <- predict(lm_inflate, inflate_new)
+
+# out-of-sample cross-validation
+outsamp_errors_inflate <- sapply(1:1000, function(i){
+  years_outsamp <- sample(yr_inflate$year, 8)
+  outsamp_mod <- lm(pv2p ~ inflation_rate,
+                    
+                    yr_inflate[!(yr_inflate$year %in% years_outsamp),])
+  
+  outsamp_pred <- predict(outsamp_mod,
+                          
+                          newdata = yr_inflate[yr_inflate$year %in% years_outsamp,])
+  outsamp_true <- yr_inflate$pv2p[yr_inflate$year %in% years_outsamp]
+  mean(outsamp_pred - outsamp_true)
+})
+mean_outsample_inflate <- mean(abs(outsamp_errors_inflate))
+
 #### Unemployment Plot and Prediction
 
-changes %>%
-  subset(quarter == 2 & !is.na(unemploy_rate)) %>%
-  ggplot(aes(x=year, y=unemploy_rate,
-             fill = (unemploy_rate > 0))) +
+unrate_popvote %>%
+  ggplot(aes(x=year, y=unrate,
+             fill = (unrate > 0))) +
   geom_col() +
   xlab("Year") +
   ylab("Unemployment Rate Change from  Growth (Second Quarter)") +
@@ -301,17 +423,14 @@ changes %>%
                                   face="bold"))
 
 # Plot relationship
-changes %>%
-  slice(1:72) %>%
-  filter(quarter == 2) %>%
-  ggplot(aes(x=unemploy_rate, y=pv2p, label = year)) +
-  geom_text(size = 1.8) +
+unrate_popvote %>%
+  ggplot(aes(x=unrate, y=pv2p, label = year)) +
+  geom_text(size = 3) +
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
-  geom_hline(yintercept=50, lty=2) +
-  geom_vline(xintercept=0.01, lty=2) + # median
-  xlab("Change in Unemployment Rate from Previous Presidential Election Year") +
+  geom_hline(yintercept=50, lty=2) + 
+  xlab("Quarter 2 Estimated Unemployment Rate") +
   ylab("Incumbent party's two-party popular vote share") +
-  labs(title = "Incumbent Party Vote Share vs. Unemployment Rate Change") + 
+  labs(title = "Incumbent Party Vote Share vs. Unemployment Rate") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
@@ -319,20 +438,19 @@ ggsave("figures/unemployment_lm.png")
 
 # Build linear model
 
-q2_unemploy <- changes %>%
-  filter(quarter == 2) %>%
-  filter(! is.na(unemploy_rate)) %>%
+q2_unemploy <- unrate_popvote %>%
+  filter(! is.na(unrate)) %>%
   filter(! is.na(pv2p))
 
-lm_unemploy <- lm(pv2p ~ unemploy_rate, data = q2_unemploy)
+lm_unemploy <- lm(pv2p ~ unrate, data = q2_unemploy)
 summary(lm_unemploy)
-# t value of -2.447 for slope
+# t value of 0.027 for slope
 
 # Cross validation out-of-sample test
 # Around same mean outsample error in comparison to yearly GDP model
 outsamp_errors_unemploy <- sapply(1:1000, function(i){
   years_outsamp <- sample(q2_unemploy$year, 8)
-  outsamp_mod <- lm(pv2p ~ unemploy_rate,
+  outsamp_mod <- lm(pv2p ~ unrate,
                     
                     q2_unemploy[!(q2_unemploy$year %in% years_outsamp),])
   
@@ -342,14 +460,13 @@ outsamp_errors_unemploy <- sapply(1:1000, function(i){
   outsamp_true <- q2_unemploy$pv2p[q2_unemploy$year %in% years_outsamp]
   mean(outsamp_pred - outsamp_true)
 })
-mean_outsample_unemploy <- mean(abs(outsamp_errors))
-
+mean_outsample_unemploy <- mean(abs(outsamp_errors_unemploy))
 
 
 # Q2 Unemployment Predict for 2020
-unemploy_new <- changes %>%
-  subset(year == 2020 & quarter == 2) %>%
-  select(unemploy_rate)
+unemploy_new <- unrate %>%
+  subset(year == 2020) %>%
+  select(unrate)
 
 unemploy_predict <- predict(lm_unemploy, unemploy_new)
 
@@ -383,7 +500,7 @@ local %>%
            state == "Pennsylvania" |
            state == "North Carolina" | 
            state == "Georgia" |
-           state == "Ohio") 
+           state == "Ohio") %>%
   ggplot(aes(x=local_unemploy, y=R_pv2p, label = year)) + 
   facet_wrap(facets = state ~ .) +
   geom_text(size = 1.8) +
