@@ -241,7 +241,7 @@ rdpi_popvote %>%
 
 rdpi_popvote %>%
   ggplot(aes(x=rdpi_rate, y=pv2p, label = year)) +
-  geom_text(size = 1.8) +
+  geom_text(size = 3) +
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.0, lty=2) +
@@ -305,7 +305,7 @@ inflate_popvote %>%
 inflate_popvote %>%
   filter(! is.na(inflation_rate)) %>%
   ggplot(aes(x=inflation_rate, y=pv2p, label = year)) +
-  geom_text(size = 1.8) +
+  geom_text(size = 3) +
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
   geom_hline(yintercept=50, lty=2) + 
   xlab("Inflation Rate (%)") +
