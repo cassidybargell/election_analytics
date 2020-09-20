@@ -99,7 +99,7 @@ dat %>%
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
-  xlab("Quarterly GDP growth") +
+  xlab("Quarter GDP growth") +
   ylab("Incumbent party's two-party popular vote share") +
   labs(title = "Incumbent Party Vote Share vs. Quarterly GDP Growth") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -222,63 +222,6 @@ GDP_trump_yr <- econ %>%
 # coronavirus.
 trumpGDPyr_predict <- predict(lm_yr, GDP_trump_yr)
 
-#### Visualizing other economic factors
-econ %>%
-  subset(quarter == 2 & !is.na(GDP_growth_qt)) %>%
-  ggplot(aes(x=year, y=GDP_growth_qt,
-             fill = (GDP_growth_qt > 0))) +
-  geom_col() +
-  xlab("Year") +
-  ylab("GDP Growth (Second Quarter)") +
-  ggtitle("The percentage decrease in G.D.P. is by far the biggest on record.") +
-  theme_bw() +
-  theme(legend.position="none",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  face="bold"))
-
-econ %>%
-  subset(quarter == 2 & !is.na(inflation)) %>%
-  ggplot(aes(x=year, y=inflation,
-             fill = (inflation > 0))) +
-  geom_col() +
-  xlab("Year") +
-  ylab("Inflation (Second Quarter)") +
-  ggtitle("Historical Second Quarter Inflation Rates") +
-  theme_bw() +
-  theme(legend.position="none",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  face="bold"))
-
-econ %>%
-  subset(quarter == 2 & !is.na(unemployment)) %>%
-  ggplot(aes(x=year, y=unemployment,
-             fill = (unemployment > 0))) +
-  geom_col() +
-  xlab("Year") +
-  ylab("Unemployment Rates (Second Quarter)") +
-  ggtitle("Historical Quarter 2 Unemployment Rates") +
-  theme_bw() +
-  theme(legend.position="none",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  face="bold"))
-
-econ %>%
-  subset(quarter == 2 & !is.na(RDI_growth)) %>%
-  ggplot(aes(x=year, y=RDI_growth,
-             fill = (RDI_growth > 0))) +
-  geom_col() +
-  xlab("Year") +
-  ylab("RDI Growth (Second Quarter)") +
-  ggtitle("Historical Quarter 2 RDI Growth Rates") +
-  theme_bw() +
-  theme(legend.position="none",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  face="bold"))
-
 #### Real Disposable Personal Income 
 
 # Units are 2012 Billions of Chained 2012 Dollars, Seasonally Adjusted Annual Rate
@@ -301,10 +244,11 @@ rdpi_popvote %>%
   geom_text(size = 1.8) +
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
   geom_hline(yintercept=50, lty=2) +
-  geom_vline(xintercept=0.01, lty=2) + # median
-  xlab("Quarterly GDP growth") +
+  geom_vline(xintercept=0.0, lty=2) +
+  xlab("Change (%) in Real Disposable Personal Income from Previous Year") +
   ylab("Incumbent party's two-party popular vote share") +
-  labs(title = "Incumbent Party Vote Share vs. Change in Real Disposable Income") + 
+  labs(title = "Incumbent Party Vote Share vs. Change in Real Disposable Income",
+       caption = "Source: https://fred.stlouisfed.org/series/DSPIC96") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
@@ -366,7 +310,8 @@ inflate_popvote %>%
   geom_hline(yintercept=50, lty=2) + 
   xlab("Inflation Rate (%)") +
   ylab("Incumbent party's two-party popular vote share") +
-  labs(title = "Incumbent Party Vote Share vs. Inflation Rate") + 
+  labs(title = "Incumbent Party Vote Share vs. Inflation Rate",
+       caption = "Source = https://fred.stlouisfed.org/series/FPCPITOTLZGUSA") +
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
@@ -430,7 +375,8 @@ unrate_popvote %>%
   geom_hline(yintercept=50, lty=2) + 
   xlab("Quarter 2 Estimated Unemployment Rate") +
   ylab("Incumbent party's two-party popular vote share") +
-  labs(title = "Incumbent Party Vote Share vs. Unemployment Rate") + 
+  labs(title = "Incumbent Party Vote Share vs. Unemployment Rate", 
+       caption = "Source: https://fred.stlouisfed.org/series/UNRATE") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
