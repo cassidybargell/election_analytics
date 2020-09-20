@@ -264,11 +264,11 @@ summary(lm_rdpi)
 # t value of 4.036 for slope
 
 # RDPI Predict for 2020
-inflate_new <- rdpi_popvote %>%
+rdpi_new <- rdpi1 %>%
   filter(year == 2020) %>%
   select(rdpi_rate)
 
-rdpi_predict <- predict(lm_rdpi, rdpi2)
+rdpi_predict <- predict(lm_rdpi, rdpi_new)
 
 # out-of-sample cross-validation
 outsamp_errors_rdpi <- sapply(1:1000, function(i){
