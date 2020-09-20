@@ -1,4 +1,4 @@
-## Week Tw0 - Figures
+## Week Two - Figures
 ## 9/21/20
 
 #### Set-up ####
@@ -41,6 +41,13 @@ dat <- econ %>%
   filter(! is.na(winner)) %>%
   mutate(winner = ifelse(winner == "?", NA, winner))
 
+# Create tibble with differences from quarter to quarter to the next
+changes <- dat %>%
+  mutate(unemploy_rate = (unemployment - lag(unemployment, n = 1))) %>%
+  mutate(inflation_rate = (inflation - lag(inflation, n = 1))) %>%
+  mutate(rdi_rate = (RDI - lag(RDI, n = 1))) %>%
+  filter(year != 2017 & year != 2018 & year != 2019 )
+
 # Create real disposable personal income averages by year
 rdpi1 <- rdpi %>% 
   mutate(date = as.character(DATE)) %>%
@@ -48,10 +55,13 @@ rdpi1 <- rdpi %>%
   group_by(date) %>%
   summarize(yr_rdpi = mean(DSPIC96)) %>%
   mutate(year = as.double(date)) %>%
-  select(year, yr_rdpi)
+  select(year, yr_rdpi) %>%
+  mutate(rdpi_rate = (yr_rdpi - lag(yr_rdpi, n = 1))) 
 
+# Join with popvote percentage for potential later use
 rdpi_popvote <- popvote %>%
-  left_join(rdpi1)
+  left_join(rdpi1) %>%
+  filter(incumbent_party == TRUE)
 
 #### Figure 1 - GDP Quarterly Growth vs. Incumbent party share
 # Plot scatterplot for all quarters
@@ -187,7 +197,7 @@ GDP_trump_yr <- econ %>%
 # coronavirus.
 trumpGDPyr_predict <- predict(lm_yr, GDP_trump_yr)
 
-#### Compare other economic predictors
+#### Visualizing other economic factors
 econ %>%
   subset(quarter == 2 & !is.na(GDP_growth_qt)) %>%
   ggplot(aes(x=year, y=GDP_growth_qt,
@@ -244,9 +254,212 @@ econ %>%
                                   hjust = 0.5,
                                   face="bold"))
 
-#### Local Level Plot
+#### Real Disposable Personal Income 
+
+# Don't think I can use the data because I don't think it was adjusted
+# historically for real personal disposable income
+rdpi_popvote %>%
+  subset(!is.na(rdpi_rate)) %>%
+  ggplot(aes(x=year, y=rdpi_rate,
+             fill = (yr_rdpi > 0))) +
+  geom_col() +
+  xlab("Year") +
+  ylab("RDPI") +
+  ggtitle("Historical Real Disposable Personal Income Growth") +
+  theme_bw() +
+  theme(legend.position="none",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  face="bold"))
+
+rdpi_popvote %>%
+  ggplot(aes(x=rdpi_rate, y=pv2p, label = year)) +
+  geom_text(size = 1.8) +
+  geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Quarterly GDP growth") +
+  ylab("Incumbent party's two-party popular vote share") +
+  labs(title = "Incumbent Party Vote Share vs. Change in Real Disposable Income") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_bw()
+
+#### Unemployment Plot and Prediction
+
+changes %>%
+  subset(quarter == 2 & !is.na(unemploy_rate)) %>%
+  ggplot(aes(x=year, y=unemploy_rate,
+             fill = (unemploy_rate > 0))) +
+  geom_col() +
+  xlab("Year") +
+  ylab("Unemployment Rate Change from  Growth (Second Quarter)") +
+  ggtitle("Historical Quarter 2 Unemployment Rates") +
+  theme_bw() +
+  theme(legend.position="none",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  face="bold"))
+
+# Plot relationship
+changes %>%
+  slice(1:72) %>%
+  filter(quarter == 2) %>%
+  ggplot(aes(x=unemploy_rate, y=pv2p, label = year)) +
+  geom_text(size = 1.8) +
+  geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Change in Unemployment Rate from Previous Presidential Election Year") +
+  ylab("Incumbent party's two-party popular vote share") +
+  labs(title = "Incumbent Party Vote Share vs. Unemployment Rate Change") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_bw()
+
+ggsave("figures/unemployment_lm.png")
+
+# Build linear model
+
+q2_unemploy <- changes %>%
+  filter(quarter == 2) %>%
+  filter(! is.na(unemploy_rate)) %>%
+  filter(! is.na(pv2p))
+
+lm_unemploy <- lm(pv2p ~ unemploy_rate, data = q2_unemploy)
+summary(lm_unemploy)
+# t value of -2.447 for slope
+
+# Cross validation out-of-sample test
+# Around same mean outsample error in comparison to yearly GDP model
+outsamp_errors_unemploy <- sapply(1:1000, function(i){
+  years_outsamp <- sample(q2_unemploy$year, 8)
+  outsamp_mod <- lm(pv2p ~ unemploy_rate,
+                    
+                    q2_unemploy[!(q2_unemploy$year %in% years_outsamp),])
+  
+  outsamp_pred <- predict(outsamp_mod,
+                          
+                          newdata = q2_unemploy[q2_unemploy$year %in% years_outsamp,])
+  outsamp_true <- q2_unemploy$pv2p[q2_unemploy$year %in% years_outsamp]
+  mean(outsamp_pred - outsamp_true)
+})
+mean_outsample_unemploy <- mean(abs(outsamp_errors))
 
 
 
-#### Good News Quarters vs. Q2 for Trump 
-# Explain why can't use Q2 for Trump, so plot 
+# Q2 Unemployment Predict for 2020
+unemploy_new <- changes %>%
+  subset(year == 2020 & quarter == 2) %>%
+  select(unemploy_rate)
+
+unemploy_predict <- predict(lm_unemploy, unemploy_new)
+
+#### Local Plot 
+
+# Using quarter 2 manually again. Positive win_margin is democrat win, negative
+# is republican
+local <- local_econ %>%
+  rename("state" = `State and area`) %>%
+  rename("year" = `Year`) %>%
+  filter(Month == "04" | Month == "05" | Month == "06") %>%
+  group_by(state, year) %>%
+  summarize(local_unemploy = mean(Unemployed_prce)) %>%
+  ungroup() %>%
+  right_join(pvstate) %>%
+  mutate(win_margin = (D_pv2p - R_pv2p)) %>%
+  filter(! is.na(local_unemploy))
+
+# https://www.npr.org/2020/09/16/912004173/2020-electoral-map-ratings-landscape-tightens-some-but-biden-is-still-ahead
+# Use this for swing states to include 
+
+# Not a helpful plot at all, will probably just facet_wrap some swing states
+local %>%
+  filter(state == "Arizona" |
+           state == "Texas" | 
+           state == "New Hampshire" |
+           state == "Wisconsin" | 
+           state == "Florida" | 
+           state == "Minnesota" | 
+           state == "Michigan" | 
+           state == "Pennsylvania" |
+           state == "North Carolina" | 
+           state == "Georgia" |
+           state == "Ohio") %>%
+  ggplot(aes(x=local_unemploy, y=win_margin, label = year)) + 
+  facet_wrap(facets = state ~ .) +
+  geom_text(size = 1.8) +
+  geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
+  geom_hline(yintercept=0, lty=2) +
+  geom_vline(xintercept=0.0, lty=2) +
+  xlab("Unemployment Percentage") +
+  ylab("Two-party Vote Share Win Margin") +
+  labs(title = "State unemployment rate vs. Two party Vote Share Difference") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_bw()
+
+ggsave("figures/swing_lm.png")
+
+# Build prediction and linear model function 
+
+state_lm <- function(s){
+  ok <- local %>%
+    filter(state == s)
+  
+  s <- lm(win_margin ~ local_unemploy, data = ok)
+  print(summary(s)$r.squared)
+}
+
+# Look at R.squared value for each, only will use those with an R.squared value
+# >= 0.1. Those states are WI, PA, OH, MI, GA
+AZ_lm <- state_lm("Arizona")
+TX_lm <- state_lm("Texas")
+NH_lm <- state_lm("New Hampshire") 
+WI_lm <- state_lm("Wisconsin") 
+FL_lm <- state_lm("Florida") 
+MN_lm <- state_lm("Minnesota") 
+MI_lm <- state_lm("Michigan") 
+PA_lm <- state_lm("Pennsylvania") 
+NC_lm <- state_lm("North Carolina") 
+GA_lm <- state_lm("Georgia")
+OH_lm <- state_lm("Ohio")
+
+lm_state <- function(s){
+  ok <- local %>%
+    filter(state == s)
+  
+  s <- lm(win_margin ~ local_unemploy, data = ok)
+}
+
+WI <- lm_state("Wisconsin") 
+MI <- lm_state("Michigan") 
+PA <- lm_state("Pennsylvania") 
+GA <- lm_state("Georgia")
+OH <- lm_state("Ohio")
+
+state_new <- local_econ %>%
+  rename("state"= `State and area`) %>%
+  filter(state == "Wisconsin" | 
+           state == "Michigan" |
+           state == "Pennsylvania" |
+           state == "Georgia" |
+           state == "Ohio") %>%
+  filter(Year == 2020) %>%
+  select(state, Year, Unemployed_prce) %>%
+  group_by(state) %>%
+  summarize(local_unemploy = mean(Unemployed_prce))
+
+# predict win margin with these linear models in these states, make tibble
+state_predictions <- state_new %>%
+mutate(WI_predict =  predict(WI, state_new %>%
+                        filter(state == "Wisconsin"))) %>%
+mutate(MI_predict = predict(MI, state_new %>%
+                              filter(state == "Michigan"))) %>%
+  mutate(PA_predict = predict(PA, state_new %>%
+                                filter(state == "Pennsylvania"))) %>%
+  mutate(GA_predict = predict(GA, state_new %>%
+                                filter(state == "Georgia"))) %>%
+  mutate(OH_predict = predict(OH, state_new %>%
+                                filter(state == "Ohio"))) %>%
+  select(ends_with("predict")) %>%
+  head(1)
+  
+  
