@@ -365,7 +365,7 @@ local <- local_econ %>%
   summarize(local_unemploy = mean(Unemployed_prce)) %>%
   ungroup() %>%
   right_join(pvstate) %>%
-  mutate(win_margin = (D_pv2p - R_pv2p)) %>%
+ #  mutate(win_margin = (D_pv2p - R_pv2p)) %>%
   filter(! is.na(local_unemploy))
 
 # https://www.npr.org/2020/09/16/912004173/2020-electoral-map-ratings-landscape-tightens-some-but-biden-is-still-ahead
@@ -383,16 +383,17 @@ local %>%
            state == "Pennsylvania" |
            state == "North Carolina" | 
            state == "Georgia" |
-           state == "Ohio") %>%
-  ggplot(aes(x=local_unemploy, y=win_margin, label = year)) + 
+           state == "Ohio") 
+  ggplot(aes(x=local_unemploy, y=R_pv2p, label = year)) + 
   facet_wrap(facets = state ~ .) +
   geom_text(size = 1.8) +
   geom_smooth(method="lm", se = FALSE, formula = y ~ x) +
-  geom_hline(yintercept=0, lty=2) +
-  geom_vline(xintercept=0.0, lty=2) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0, lty=2) +
   xlab("Unemployment Percentage") +
-  ylab("Two-party Vote Share Win Margin") +
-  labs(title = "State unemployment rate vs. Two party Vote Share Difference") + 
+  ylab("Republican Two-party Vote Share") +
+  labs(title = "State Unemployment Rate vs. Republican Two-Party Vote Share", 
+       subtitle = "Quarter 2 Historical Unemployment Rates") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()
 
@@ -404,7 +405,7 @@ state_lm <- function(s){
   ok <- local %>%
     filter(state == s)
   
-  s <- lm(win_margin ~ local_unemploy, data = ok)
+  s <- lm(R_pv2p ~ local_unemploy, data = ok)
   print(summary(s)$r.squared)
 }
 
@@ -426,7 +427,7 @@ lm_state <- function(s){
   ok <- local %>%
     filter(state == s)
   
-  s <- lm(win_margin ~ local_unemploy, data = ok)
+  s <- lm(R_pv2p ~ local_unemploy, data = ok)
 }
 
 WI <- lm_state("Wisconsin") 
@@ -437,6 +438,7 @@ OH <- lm_state("Ohio")
 
 state_new <- local_econ %>%
   rename("state"= `State and area`) %>%
+  filter(Month == "04" | Month == "05" | Month == "06") %>%
   filter(state == "Wisconsin" | 
            state == "Michigan" |
            state == "Pennsylvania" |
@@ -462,4 +464,7 @@ mutate(MI_predict = predict(MI, state_new %>%
   select(ends_with("predict")) %>%
   head(1)
   
+# These electoral college votes add up to 64 electoral college votes for Trump,
+# and 16 for Biden in these swing states. Again r.squared value of only >0.1, so
+# not very convincing results.
   
