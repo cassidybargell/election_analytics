@@ -1,3 +1,6 @@
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+
 #### [Home](https://cassidybargell.github.io/election_analytics/)
 
 # Economic Fundamentals 
@@ -17,8 +20,8 @@ Although Q3 provides the strongest correlation for election prediction, data for
 
 Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation ```$$\pv2p_{predicted}$$ = 49.449 + 2.969 * $$\GDP_{Q2}$$```. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
 
-The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both t-values > 2 is is unlikely this is a random correlation*. 
-The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833**.
+The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both t-values > 2 is is unlikely this is a random correlation.* 
+The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833.*
 
 Using this Q2 predictive model and the 2020 Q2 GDP, we would predict a 21.3% vote share for the incumbent, an unparalleled defeat for Donald Trump. This estimate, however does not seem reasonable as it would be the lowest vote share by over 15 percentage points in the post-war (1948) era.
 
@@ -64,7 +67,7 @@ Just as unemployment data was not overly useful in prediction on the national le
 
 Based on 2020 Q2 unemployment rates, the predictions of Republican vote share in these five states are as follows: 
 
-WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.$^3$
+WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.*
 
 Although these predictions do not hold much weight, if this outcome came true this would add up to 64 electoral college votes for Trump and 16 for Biden for this particular subset of swing states. 
 
