@@ -64,7 +64,7 @@ Just as unemployment data was not overly useful in prediction on the national le
 
 Based on 2020 Q2 unemployment rates, the predictions of Republican vote share in these five states are as follows: 
 
-WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*. 
+WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.***
 
 Although these predictions do not hold much weight, if this outcome came true this would add up to 64 electoral college votes for Trump and 16 for Biden for this particular subset of swing states. 
 
@@ -74,7 +74,9 @@ The economic downturn of 2020 cannot be entirely attributed to Trump's administr
 
 <hr>
 
-**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A |t-value| of >2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
+**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A |t-value| of > 2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
 
 
 ***The mean outsampled error is found by taking the average difference between the estimates created by the model and the true outcomes. This is done by leaving out 8 elections from the data, modelling it, and then comparing the subsequent predictions produced with the true values. This is repeated 1,000 times, and then the overall average is found. It is ideal to have a small outsample error as it indicates the model fits the data well.*
+
+****Additional statistical tests for these values can be found on the github for the blog.*
