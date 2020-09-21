@@ -18,7 +18,7 @@ Therefore, I will focus on election year GDP to build an initial predictive mode
 
 Although Q3 provides the strongest correlation for election prediction, data for the election year Q3 GDP is often not available until close to the election itself, so Q2 GDP  is often the choice for predictive modelling, and will be what I focus on. 
 
-Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation \\$pv2p_{predicted}$ = 49.449 + 2.969 * GDP_{Q2}\\. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
+Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation `pv2p_{predicted} = 49.449 + 2.969 * GDP_{Q2}`. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
 
 The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both t-values > 2 is is unlikely this is a random correlation.* 
 The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833.*
@@ -27,7 +27,7 @@ Using this Q2 predictive model and the 2020 Q2 GDP, we would predict a 21.3% vot
 
 The data used for this prediction was the 2020 Q2 GDP, which was historically low and not representative of the economic trends from the pre-COVID-19 Trump term. Using the same Q2 predictive model with the 2019 Q4 GDP before the shock of the pandemic would give an estimate of 51.2% popular vote share for the incumbent, actually predicting a win for Trump. Using an average of all the quarters before 2020, the same model would predict 51.3% of the two-party vote share going to Trump. 
 
-A similar model of linear regression can be constructed using the entire election year GDP, `$pv2p_{prediction} = 47.6993 + 1.2015 * GDP_{year}$`, t-values of 45.347 (intercept) and 4.74 (slope), and a mean out-sample error of 1.8124. If the average of the 2017-2019 GDPs (before coronavirus shock, and more robust than one quarter) is used as an estimate for an evaluation of the economy under the incumbent, there would be a predicted 50.7% slim win margin for Trump. 
+A similar model of linear regression can be constructed using the entire election year GDP, `pv2p_{prediction} = 47.6993 + 1.2015 * GDP_{year}`, t-values of 45.347 (intercept) and 4.74 (slope), and a mean out-sample error of 1.8124. If the average of the 2017-2019 GDPs (before coronavirus shock, and more robust than one quarter) is used as an estimate for an evaluation of the economy under the incumbent, there would be a predicted 50.7% slim win margin for Trump. 
 
 Using the GDP as a predictor for the 2020 election does not seem to carry much weight, despite the historical strength of the models, because of the economic shock of COVID-19. 
 
@@ -35,19 +35,19 @@ Other economic variables, however, should also be evaluated for potential value 
 
 ![](../figures/unemployment_lm.png)
 
-The linear model using historical unemployment rates (unrate) [FRED](https://fred.stlouisfed.org/series/UNRATE), is `$pv2p_{predict} = 51.881 + 0.022 * unrate_{2020}$`. The t-value for the slope in this model is 0.027, and the slope is very close to 0, so I would not consider this particular model to hold any real predictive power. (The estimate is provides is *52.2%* of popular vote share for the incumbent with an mean outsampled error of 2.139). 
+The linear model using historical unemployment rates (unrate) [FRED](https://fred.stlouisfed.org/series/UNRATE), is `pv2p_{predict} = 51.881 + 0.022 * unrate_{2020}`. The t-value for the slope in this model is 0.027, and the slope is very close to 0, so I would not consider this particular model to hold any real predictive power. (The estimate is provides is *52.2%* of popular vote share for the incumbent with an mean outsampled error of 2.139). 
 
 Inflation is another economic indicator that might be useful for prediction. Using historical yearly inflation rates, the linear model relating inflation and two-party popular vote share is visuallized below [FRED](https://fred.stlouisfed.org/series/FPCPITOTLZGUSA). 
 
 ![](../figures/inflate_lm.png)
 
-The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2019}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a t-value < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
+The linear regression in this model is `pv2p_{predict} = 54.8986 + -0.74 * inflation_{2019}`, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a t-value < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
 
 Real personal disposable income (RDPI) is an interesting economic principle to consider during the pandemic as many people's disposable income went up even as other economic factors, like the GDP tanked. As you can see this economic variable also provides a strong predictive model:
 
 ![](../figures/rdpi_lm.png)
 
-The linear model using RDPI  is `$pv2p_{predict} = 51.881 + 0.022 * rdpi_{2020}$` [FRED](https://fred.stlouisfed.org/series/DSPIC96). The t-values for the intercept and slope in this model are 20.172 and 4.036, respectively. The mean outsampled error is 1.7. This model therefore seeems to have strong predictive value. 
+The linear model using RDPI  is `pv2p_{predict} = 51.881 + 0.022 * rdpi_{2020}` [FRED](https://fred.stlouisfed.org/series/DSPIC96). The t-values for the intercept and slope in this model are 20.172 and 4.036, respectively. The mean outsampled error is 1.7. This model therefore seeems to have strong predictive value. 
 
 Using the available data for RDPI in 2020 (January-July), this model predicts *58%* of the two-party popular vote going to the incumbent. 
 
