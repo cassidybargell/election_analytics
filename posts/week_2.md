@@ -4,7 +4,7 @@
 ## 9/21/20
 
 The state of the economy is considered one of the fundamentals of elections. Economic factors are considered fundamental because they are not directly controlled by candidates, unlike for example campaign strategies [Sides and Vavreck]. 
-
+ 
 Economic variables can also act as a proxy for many other factors a voter might care about when they go to the polls. Compared to other issues that might not be as readily quantifiable, economic information is generally accessible. Economic variables are therefore useful for creating predictive models for elections. **How well will these economic predictive models work for the 2020 election in which there has been an unprecedented economic downturn due to the global pandemic?**
 
 
@@ -16,9 +16,9 @@ Therefore, I will focus on election year GDP to build an initial predictive mode
 
 Although Q3 provides the strongest correlation for election prediction, data for the election year Q3 GDP is often not available until close to the election itself, so Q2 GDP  is often the choice for predictive modelling, and will be what I focus on. 
 
-Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation ```$pv2p_{predicted} = 49.449 + 2.969 * GDP_{Q2}$```.
+Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation $pv2p_{predicted} = 49.449 + 2.969 * GDP_{Q2}$.
 
-The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both |t-values| > 2 is is unlikely this is a random correlation. The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833.
+The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both |t-values| > 2 is is unlikely this is a random correlation. The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833*.
 
 Using this Q2 predictive model and the 2020 Q2 GDP, we would predict a 21.3% vote share for the incumbent, an unparalleled defeat for Donald Trump. This estimate, however does not seem reasonable as it would be the lowest vote share by over 15 percentage points in the post-war (1948) era.
 
@@ -54,3 +54,9 @@ WI: 58.03, MI: 63.43, PA: 54. 74, GA: 40.69, OH 60.85
 WI = rsquared 0.250, MI = rsquared 0.258, PA = rsquared 0.147, GA = rsquared 0.2406, OH = rsquared 0.1721
 
 The entire economic downturn of 2020 cannot be attributed to Trump's administration alone. Achen and Bartels discuss how voters consider an element of randomness in their evaluation of an incumbents economy [Achen and Bartels]. Based on economic numbers alone it is not clear how much of the 2020 economy voters will attribute to randomness. The placement of blame for the pandemic economy might have a strong impact on the outcome of the election, however, as it is clear normal predictive economic models do not hold the same weight as in previous elections. 
+
+<hr>
+
+*The mean outsampled error is found by taking the average difference between the prediction model created by leaving out 8 random values, and the true outcomes of those left out elections. This is repeated 1,000 times, and then the overall average is found: the mean outsampled error. It is ideal to have a small outsample error as it indicates the model fits the data well.*
+
+ <--! CB: Mean outsample error is difference between the prediction and the model. --> 
