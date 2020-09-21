@@ -1,6 +1,3 @@
-<script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
-
 #### [Home](https://cassidybargell.github.io/election_analytics/)
 
 # Economic Fundamentals 
@@ -73,7 +70,7 @@ Although these predictions do not hold much weight, if this outcome was accurate
 
 The economic downturn of 2020 cannot be entirely attributed to Trump's administration. Achen and Bartels discuss how voters consider an element of randomness in their evaluation of an incumbents economy [(Achen and Bartels)](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646). Based on economic numbers alone it is not clear how much of the 2020 economy voters will attribute to randomness. Blame for  the pandemic economy still may have a strong impact on the outcome of the election.
 
-**It is clear, however, from the examples explored above that normal predictive economic models may not be as powerful for the 2020 election as they perhaps have in previous elections.**
+**It is clear, however, from the examples explored above that normal predictive economic models may not be as powerful for the 2020 election as they perhaps have been in previous elections.**
 
 <hr>
 
