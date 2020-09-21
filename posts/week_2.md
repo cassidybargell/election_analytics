@@ -17,7 +17,7 @@ Although Q3 provides the strongest correlation for election prediction, data for
 
 Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation ```$$\pv2p_{predicted}$$ = 49.449 + 2.969 * $$\GDP_{Q2}$$```. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
 
-The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both |t-values| > 2 is is unlikely this is a random correlation*. 
+The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both t-values > 2 is is unlikely this is a random correlation*. 
 The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833**.
 
 Using this Q2 predictive model and the 2020 Q2 GDP, we would predict a 21.3% vote share for the incumbent, an unparalleled defeat for Donald Trump. This estimate, however does not seem reasonable as it would be the lowest vote share by over 15 percentage points in the post-war (1948) era.
@@ -38,7 +38,7 @@ Inflation is another economic indicator that might be useful for prediction. Usi
 
 ![](../figures/inflate_lm.png)
 
-The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2019}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a |t-value| < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
+The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2019}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a t-value < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
 
 Real personal disposable income (RDPI) is an interesting economic principle to consider during the pandemic as many people's disposable income went up even as other economic factors, like the GDP tanked. As you can see this economic variable also provides a strong predictive model:
 
@@ -64,7 +64,7 @@ Just as unemployment data was not overly useful in prediction on the national le
 
 Based on 2020 Q2 unemployment rates, the predictions of Republican vote share in these five states are as follows: 
 
-WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.***
+WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.$^3$
 
 Although these predictions do not hold much weight, if this outcome came true this would add up to 64 electoral college votes for Trump and 16 for Biden for this particular subset of swing states. 
 
@@ -74,9 +74,9 @@ The economic downturn of 2020 cannot be entirely attributed to Trump's administr
 
 <hr>
 
-**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A |t-value| of > 2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
+**A t-value close to zero would indicate that the correlation modelled might be due to random chance. An absolute t-value of > 2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
 
 
-***The mean outsampled error is found by taking the average difference between the estimates created by the model and the true outcomes. This is done by leaving out 8 elections from the data, modelling it, and then comparing the subsequent predictions produced with the true values. This is repeated 1,000 times, and then the overall average is found. It is ideal to have a small outsample error as it indicates the model fits the data well.*
+**The mean outsampled error is found by taking the average difference between the estimates created by the model and the true outcomes. This is done by leaving out 8 elections from the data, modelling it, and then comparing the subsequent predictions produced with the true values. This is repeated 1,000 times, and then the overall average is found. It is ideal to have a small outsample error as it indicates the model fits the data well.*
 
-****Additional statistical tests for these values can be found on the github for the blog.*
+**Additional statistical tests for these values can be found on the github for the blog.*
