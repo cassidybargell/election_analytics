@@ -248,6 +248,7 @@ rdpi_popvote %>%
   xlab("Change (%) in Real Disposable Personal Income from Previous Year") +
   ylab("Incumbent party's two-party popular vote share") +
   labs(title = "Incumbent Party Vote Share vs. Change in Real Disposable Income",
+       subtitle = "In Seasonally-Adjusted 2012 Billions of Chained 2012 Dollars",
        caption = "Source: https://fred.stlouisfed.org/series/DSPIC96") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme_bw()

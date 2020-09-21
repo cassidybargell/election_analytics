@@ -32,23 +32,36 @@ Other economic variables, however, should also be evaluated for potential value 
 
 ![](../figures/unemployment_lm.png)
 
-The linear model using historical unemployment rates (unrate) [FRED], is `$pv2p_{predict} = 51.881 + 0.022 * unrate_{2020}$`. The t-value for the slope in this model is 0.027, and the slope is very close to 0, so I would not consider this particular model to hold any real predictive power. (The estimate is provides is 52.2% of popular vote share for the incumbent with an mean outsampled error of 2.139). 
+The linear model using historical unemployment rates (unrate) [FRED], is `$pv2p_{predict} = 51.881 + 0.022 * unrate_{2020}$`. The t-value for the slope in this model is 0.027, and the slope is very close to 0, so I would not consider this particular model to hold any real predictive power. (The estimate is provides is *52.2%* of popular vote share for the incumbent with an mean outsampled error of 2.139). 
 
-Real personal disposable income is an interesting economic principle to consider during the pandemic as many people's disposable income went up even as other economic factors, like the GDP tanked. 
+Inflation is another economic indicator that might be useful for prediction. Using historical yearly inflation rates, the linear model relating inflation and two-party popular vote share is visuallized below. 
+
+![](../figures/inflate_lm.png)
+
+The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2020}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a |t-value| < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
+
+Real personal disposable income (RDPI) is an interesting economic principle to consider during the pandemic as many people's disposable income went up even as other economic factors, like the GDP tanked. As you can see this economic variable also provides a strong predictive model:
 
 ![](../figures/rdpi_lm.png)
 
+The linear model using RDPI  is `$pv2p_{predict} = 51.881 + 0.022 * rdpi_{2020}$` [FRED]. The t-values for the intercept and slope in this model are 20.172 and 4.036, respectively. The mean outsampled error is 1.7. This model therefore seeems to have strong predictive value. 
 
-RDPI predict: 58
-mean outsample error: 1.6620
+Using the available data for RDPI in 2020 (January-July), this model predicts *58%* of the two-party popular vote going to the incumbent. 
 
+Out of these four models representing the relationship between an economic variable and popular vote share, only Q2 GDP and RDPI show promise of being valuable for prediction. Using those two models, however, we find a discrepency between predictions of *36.7* percentage points (58 - 21.3). Given the unique circumstances of 2020 it is unlikely either of those predictions will be extremely accurate.
 
-![](../figures/inflate_lm.png)
-Inflate predict: 53.6
-mean outsample error: 2.258
+<hr>
 
+Another way to use economic data for election predictions is to stratify by state.
+
+The relationship between state economies and Republican two-party percentage can be modelled using yearly state unemployment data.
 
 ![](../figures/swing_lm.png)
+
+I have chosen to show the models for eleven states that are being included in various discussions about 2020 swing states (including my swing state model from [9/14/20]())) [NPR]().
+
+Just as unemployment data was not overly useful in prediction on the national level, only a few states produce models that are significant enough to focus on.
+
 WI: 58.03, MI: 63.43, PA: 54. 74, GA: 40.69, OH 60.85
 
 WI = rsquared 0.250, MI = rsquared 0.258, PA = rsquared 0.147, GA = rsquared 0.2406, OH = rsquared 0.1721
