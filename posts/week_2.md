@@ -7,7 +7,6 @@ The state of the economy is considered one of the fundamentals of elections. Eco
  
 Economic variables can also act as a proxy for many other factors a voter might care about when they go to the polls. Compared to other issues that might not be as readily quantifiable, economic information is generally accessible. Economic variables are therefore useful for creating predictive models for elections. **How well will these economic predictive models work for the 2020 election in which there has been an unprecedented economic downturn due to the global pandemic?**
 
-
 During an election, an incumbent will generally be rewarded or punished by American voters for percieved performance, this concept is based on the retrospective theory of political accountability [Achen and Bartels]. The end-heuristic model of voter behavior also supports the idea that people will substitue end conditions for an assessment of the whole period [Healy and Lenz]. Despite intention to weigh all years of an incumbents performance equally, cumulative performance information is not generally as available and would require serious effort from individual voters to accurately compute [Healy and Lenz]. 
 
 Therefore, I will focus on election year GDP to build an initial predictive model for 2020. Using historical data from past presidential election years, the linear model between quarter GDP growth rate and incumbent share of two-party popular vote can be visuallized with the following model:
@@ -16,9 +15,10 @@ Therefore, I will focus on election year GDP to build an initial predictive mode
 
 Although Q3 provides the strongest correlation for election prediction, data for the election year Q3 GDP is often not available until close to the election itself, so Q2 GDP  is often the choice for predictive modelling, and will be what I focus on. 
 
-Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation $$pv2p_{predicted} = 49.449 + 2.969 * GDP_{Q2}$$. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
+Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation $$\\pv2p_{predicted} = 49.449 + 2.969 * \\GDP_{Q2}$$. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
 
-The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both |t-values| > 2 is is unlikely this is a random correlation. The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833*.
+The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both |t-values| > 2 is is unlikely this is a random correlation*. 
+The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833**.
 
 Using this Q2 predictive model and the 2020 Q2 GDP, we would predict a 21.3% vote share for the incumbent, an unparalleled defeat for Donald Trump. This estimate, however does not seem reasonable as it would be the lowest vote share by over 15 percentage points in the post-war (1948) era.
 
@@ -57,6 +57,7 @@ The entire economic downturn of 2020 cannot be attributed to Trump's administrat
 
 <hr>
 
-*The mean outsampled error is found by taking the average difference between the prediction model created by leaving out 8 random values, and the true outcomes of those left out elections. This is repeated 1,000 times, and then the overall average is found: the mean outsampled error. It is ideal to have a small outsample error as it indicates the model fits the data well.*
+**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A t-value of >2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
+***The mean outsampled error is found by taking the average difference between the prediction model created by leaving out 8 random values, and the true outcomes of those left out elections. This is repeated 1,000 times, and then the overall average is found: the mean outsampled error. It is ideal to have a small outsample error as it indicates the model fits the data well.*
 
  <--! CB: Mean outsample error is difference between the prediction and the model. --> 
