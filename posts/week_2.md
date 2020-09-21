@@ -12,7 +12,7 @@ Economic variables can also act as a proxy for many other factors voters care ab
 
 During an election, an incumbent generally will be rewarded or punished by American voters for perceived performance, a concept based on the retrospective theory of political accountability [(Achen and Bartels)](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646). TThe end-heuristic voter behavior model also supports the idea that people will substitute end conditions for an assessment of the whole period [(Healy and Lenz)](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/24363467?seq=1#metadata_info_tab_contents). Despite intention to weigh all years of an incumbent's performance equally, cumulative performance information is not generally as available and would require serious individual voter effort to accurately compute [(Healy and Lenz)](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/24363467?seq=1#metadata_info_tab_contents). 
 
-Therefore, I will focus on election year GDP to build an initial predictive model for 2020. Using historical data from past presidential election years, the linear model between quarter GDP growth rate and incumbent share of two-party popular vote can be visuallized with the following model:
+Using historical data from past presidential election years, the linear model between quarter GDP growth rate and incumbent share of two-party popular vote can be visuallized with the following model:
 
 ![](../figures/gdp_v_pv2p.png)
 
