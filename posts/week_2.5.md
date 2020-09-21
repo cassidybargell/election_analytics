@@ -1,4 +1,7 @@
+#### [Home](https://cassidybargell.github.io/election_analytics/)
+
 # State Unemployment Data vs. Popular Vote Outcomes
+## 9/21/20
 
 Another use for economic data in election prediction is to stratify by state.
 
