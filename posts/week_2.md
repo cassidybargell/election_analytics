@@ -18,7 +18,7 @@ Therefore, I will focus on election year GDP to build an initial predictive mode
 
 Although Q3 provides the strongest correlation for election prediction, data for the election year Q3 GDP is often not available until close to the election itself, so Q2 GDP  is often the choice for predictive modelling, and will be what I focus on. 
 
-Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation ```$$\pv2p_{predicted}$$ = 49.449 + 2.969 * $$\GDP_{Q2}$$```. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
+Using the Q2 linear model, two-party popular vote share (pv2p) for the incumbent can be estimated with the following equation \\pv2p_{predicted} = 49.449 + 2.969 * GDP_{Q2}\\. This can be interpretted as, if the GDP growth was 0 we would expect a vote share of *49.449%* for the incumbent. For every 1% change in the quarter GDP growth we would expect an increase of *2.969%* popular vote share for the incumbent. 
 
 The t-values for both the intercept (49.449) and the slope (2.969) are 35.425 and 2.783, respectively. With both t-values > 2 is is unlikely this is a random correlation.* 
 The mean out-sampled error for the Q2-GDP predictive model, leaving out 8 years of data and iterating 1,000 times, was 1.7833.*
