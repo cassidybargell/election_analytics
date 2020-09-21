@@ -531,4 +531,3 @@ mutate(MI_predict = predict(MI, state_new %>%
 # These electoral college votes add up to 64 electoral college votes for Trump,
 # and 16 for Biden in these swing states. Again r.squared value of only >0.1, so
 # not very convincing results.
-  

@@ -38,7 +38,7 @@ Inflation is another economic indicator that might be useful for prediction. Usi
 
 ![](../figures/inflate_lm.png)
 
-The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2020}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a |t-value| < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
+The linear regression in this model is $pv2p_{predict} = 54.8986 + -0.74 * inflation_{2019}$, which predicts Trump would recieve *53.6%* of the two-party popular vote share. The model, however, has a a mean outsampled error of 2.3 and a |t-value| < 2 for the slope. Similar to the conclusion drawn from unemployment rates, I have little confidence in the accuracy of this model. 
 
 Real personal disposable income (RDPI) is an interesting economic principle to consider during the pandemic as many people's disposable income went up even as other economic factors, like the GDP tanked. As you can see this economic variable also provides a strong predictive model:
 
@@ -54,23 +54,27 @@ Out of these four models representing the relationship between an economic varia
 
 Another way to use economic data for election predictions is to stratify by state.
 
-The relationship between state economies and Republican two-party percentage can be modelled using yearly state unemployment data.
+The relationship between state economies and two-party vote share for the Republican party can be modelled using Q2 state unemployment data.
 
 ![](../figures/swing_lm.png)
 
 I have chosen to show the models for eleven states that are being included in various discussions about 2020 swing states (including my swing state model from [9/14/20]())) [NPR]().
 
-Just as unemployment data was not overly useful in prediction on the national level, only a few states produce models that are significant enough to focus on.
+Just as unemployment data was not overly useful in prediction on the national level, only a few states produce models that are significant enough to focus on. These are Wisconsin, Michigan, Pennsylvania, Georgia and Ohio. None of these state models produce t-values for slope >= 2, so their predictive power is still limited. 
 
-WI: 58.03, MI: 63.43, PA: 54. 74, GA: 40.69, OH 60.85
+Based on 2020 Q2 unemployment rates, the predictions of Republican vote share in these five states are as follows: 
 
-WI = rsquared 0.250, MI = rsquared 0.258, PA = rsquared 0.147, GA = rsquared 0.2406, OH = rsquared 0.1721
+WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*. 
 
-The entire economic downturn of 2020 cannot be attributed to Trump's administration alone. Achen and Bartels discuss how voters consider an element of randomness in their evaluation of an incumbents economy [Achen and Bartels]. Based on economic numbers alone it is not clear how much of the 2020 economy voters will attribute to randomness. The placement of blame for the pandemic economy might have a strong impact on the outcome of the election, however, as it is clear normal predictive economic models do not hold the same weight as in previous elections. 
+Although these predictions do not hold much weight, if this outcome came true this would add up to 64 electoral college votes for Trump and 16 for Biden for this particular subset of swing states. 
+
+The economic downturn of 2020 cannot be entirely attributed to Trump's administration. Achen and Bartels discuss how voters consider an element of randomness in their evaluation of an incumbents economy [Achen and Bartels]. Based on economic numbers alone it is not clear how much of the 2020 economy voters will attribute to randomness. The placement of blame for the pandemic economy might have a strong impact on the outcome of the election. 
+
+**It is clear, however, from the examples explored above that normal predictive economic models might not hold as much prediction power for the 2020 election as they perhaps have in previous elections.**
 
 <hr>
 
-**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A t-value of >2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
+**A t-value close to zero would indicate that the correlation modelled might be due to random chance. A |t-value| of >2 is often used as a minimum in order to reject the null hypothesis, which is that there is no true correlation between the variables.*
 
 
-***The mean outsampled error is found by taking the average difference between the prediction model created by leaving out 8 random values, and the true outcomes of those left out elections. This is repeated 1,000 times, and then the overall average is found: the mean outsampled error. It is ideal to have a small outsample error as it indicates the model fits the data well.*
+***The mean outsampled error is found by taking the average difference between the estimates created by the model and the true outcomes. This is done by leaving out 8 elections from the data, modelling it, and then comparing the subsequent predictions produced with the true values. This is repeated 1,000 times, and then the overall average is found. It is ideal to have a small outsample error as it indicates the model fits the data well.*
