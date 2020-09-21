@@ -50,24 +50,6 @@ Using the available data for RDPI in 2020 (January-July), this model predicts *5
 
 Out of these four models representing the relationship between an economic variable and popular vote share, only Q2 GDP and RDPI show promise of being valuable for prediction. Using those two models, however, we find a discrepency between predictions of *36.7* percentage points (58 - 21.3). Given the unique circumstances of 2020 it is unlikely either of those predictions will be extremely accurate.
 
-<hr>
-
-Another use for economic data in election prediction is to stratify by state.
-
-The relationship between state economies and two-party vote share for the Republican party can be modelled using Q2 state unemployment data.
-
-![](../figures/swing_lm.png)
-
-For modeling, I have chosen  eleven states that are being included in various discussions as 2020 swing states (including my swing state model from [9/14/20](https://cassidybargell.github.io/election_analytics/posts/week_1.html))) [(NPR)](https://www.npr.org/2020/09/16/912004173/2020-electoral-map-ratings-landscape-tightens-some-but-biden-is-still-ahead).
-
-Only a few states produce models that are significant enough to focus on. These are Wisconsin, Michigan, Pennsylvania, Georgia and Ohio. None of these state models produce t-values for slope >= 2, so their predictive power is limited. 
-
-Based on 2020 Q2 unemployment rates, the predictions of Republican vote share in these five states follow: 
-
-WI: *58.03%*, MI: *63.43%*, PA: *54.74%*, GA: *40.69%*, and OH *60.85%*.*
-
-Although these predictions do not hold much weight, if this outcome was accurate this would add 64 electoral college votes for Trump and 16 for Biden for this particular subset of swing states. 
-
 The economic downturn of 2020 cannot be entirely attributed to Trump's administration. Achen and Bartels discuss how voters consider an element of randomness in their evaluation of an incumbents economy [(Achen and Bartels)](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646). Based on economic numbers alone it is not clear how much of the 2020 economy voters will attribute to randomness. Blame for  the pandemic economy still may have a strong impact on the outcome of the election.
 
 **It is clear, however, from the examples explored above that normal predictive economic models may not be as powerful for the 2020 election as they perhaps have been in previous elections.**
@@ -78,5 +60,3 @@ The economic downturn of 2020 cannot be entirely attributed to Trump's administr
 
 
 **The mean outsampled error is found by taking the average difference between the estimates created by the model and the true outcomes. This is done by leaving out 8 elections from the data, modelling it, and then comparing the subsequent predictions produced with the true values. This is repeated 1,000 times, and then the overall average is found. It is ideal to have a small outsample error as it indicates the model fits the data well.*
-
-**Additional statistical tests for these values can be found on the github for the blog.*

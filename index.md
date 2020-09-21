@@ -5,3 +5,4 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 
 # [Past Presidential Elections - 9/14/20](posts/week_1.md)
 # [Economic Fundamentals - 9/21/20](posts/week_2.md)
+## [State by State Economic Fundamentals](posts/week_2.5.md)
