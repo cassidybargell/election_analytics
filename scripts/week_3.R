@@ -27,7 +27,13 @@ poll_2020_fte <- read_csv("https://projects.fivethirtyeight.com/2020-general-dat
 states <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
-  mutate(predictions = NA)
+  mutate(predictions = NA) %>%
+  mutate(poll_lwr = NA) %>%
+  mutate(poll_uppr = NA) %>%
+  mutate(poll_fit = NA) %>%
+  mutate(econ_lwr = NA) %>%
+  mutate(econ_uppr = NA) %>%
+  mutate(econ_fit = NA)
 
 election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
 
@@ -123,5 +129,52 @@ state_prediction <- predict_function(state)
 states$predictions[states$state == state] <- state_prediction
 }
 
-# Could go through other states 
+# Could go through other states/districts
 NE_1 <- predict_function("NE-1")
+
+#### Confidence Intervals 
+
+CIpoll_function <- function(s){
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_2020 %>%
+    filter(state == s) %>%
+    summarize(avg = mean(pct)) %>%
+    rename(avg_poll = "avg")
+
+ poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
+ #  unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
+}
+
+CIecon_function <- function(s){
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_2020 %>%
+    filter(state == s) %>%
+    summarize(avg = mean(pct)) %>%
+    rename(avg_poll = "avg")
+  
+  # poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
+  unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
+}
+# Loop through again
+for (state in states_list){
+  CIpoll_prediction <- CIpoll_function(state)
+  CIecon_prediction <- CIecon_function(state)
+  states$poll_fit[states$state == state] <- CIpoll_prediction[, 1]
+  states$poll_lwr[states$state == state] <- CIpoll_prediction[, 2]
+  states$poll_uppr[states$state == state] <- CIpoll_prediction[, 3]
+  states$econ_fit[states$state == state] <- CIecon_prediction[, 1]
+  states$econ_lwr[states$state == state] <- CIecon_prediction[, 2]
+  states$econ_uppr[states$state == state] <- CIecon_prediction[, 3]
+}
