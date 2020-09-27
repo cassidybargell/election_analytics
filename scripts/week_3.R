@@ -35,6 +35,7 @@ states <- read_csv("data/csvData.csv") %>%
   mutate(econ_uppr = NA) %>%
   mutate(econ_fit = NA)
 
+# useful for subsetting just election years
 election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
 
 # Create local unemployment dataframe, use Q2 unemployment data
@@ -48,6 +49,7 @@ local <- local_econ %>%
   right_join(election_years) %>%
   left_join(pvstate)
 
+# create list of states to loop through eventually 
 states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")
 
 # Create states map
@@ -125,18 +127,20 @@ predict_function <- function(s){
     ewt*predict(s_lm_econ, Secon)
 }
 
-# Loop through all the states possible with standard state list, save to data frame
+# Loop through all the states possible with standard state list, save to data
+# frame
 for (s in states_list){
 state_prediction <- predict_function(s)
 states$predictions[states$state == s] <- state_prediction
 }
 
-# Could go through other states/districts
+# Could go through other states/districts, but polling information not complete
 # NE_1 <- predict_function("NE-1")
 # WY <- predict_function("Wyoming")
 
 #### Confidence Intervals 
 
+# create function to find just confidence intervals of polling model 
 CIpoll_function <- function(s){
   s_lm_poll <- statepoll_lm_rep(s)
   s_lm_econ <- statelocal_lm_rep(s)
@@ -151,9 +155,9 @@ CIpoll_function <- function(s){
     rename(avg_pollyr = "avg")
 
  poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
- #  unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
 }
 
+# create function to find confidence intervals of just the economic data
 CIecon_function <- function(s){
   s_lm_poll <- statepoll_lm_rep(s)
   s_lm_econ <- statelocal_lm_rep(s)
@@ -166,8 +170,7 @@ CIecon_function <- function(s){
     filter(state == s) %>%
     summarize(avg = mean(pct)) %>%
     rename(avg_pollyr = "avg")
-  
-  # poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
+
   unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
 }
 # Loop through again
@@ -185,6 +188,7 @@ for (state in states_list){
 
 #### Visualizations 
 
+# much easier to interpret win margin in colors
 state_viz <- states %>%
   mutate(D_pv2p = (100 - predictions)) %>%
   mutate(win_margin = (D_pv2p-predictions)) %>%
@@ -193,6 +197,7 @@ state_viz <- states %>%
   mutate(econ_d = (100 - econ_fit)) %>%
   mutate(econ_margin = (econ_d - econ_fit))
 
+# plot map of win margin predictions
 plot_usmap(data = state_viz, regions = "states", values = "win_margin") + 
   theme_void() +
   scale_fill_gradient2(
@@ -217,7 +222,7 @@ ggplot(state_viz, aes(x = poll_fit, y = state, color = poll_fit)) +
   geom_errorbar(aes(xmin = poll_lwr, xmax = poll_uppr)) +
   scale_color_gradient(low = "blue", high = "red") + 
   theme_minimal() + 
-  theme(axis.text.y = element_text(size = 5),
+  theme(axis.text.y = element_text(size = 7),
         legend.position = "none") + 
   ylab("") + 
   xlab("Republican Vote Share %") + 
@@ -230,13 +235,12 @@ ggplot(state_viz, aes(x = poll_fit, y = state, color = poll_fit)) +
 ggsave("figures/hist_polling_lm.png")
 
 # Plot to show errors - local unemployment vs. popular vote share
-
 ggplot(state_viz, aes(x = econ_fit, y = state, color = econ_fit)) + 
   geom_point() + 
   geom_errorbar(aes(xmin = econ_lwr, xmax = econ_uppr)) +
   scale_color_gradient(low = "blue", high = "red") + 
   theme_minimal() + 
-  theme(axis.text.y = element_text(size = 5),
+  theme(axis.text.y = element_text(size = 7),
         legend.position = "none") + 
   ylab("") + 
   xlab("Republican Vote Share %") + 
@@ -247,6 +251,10 @@ ggplot(state_viz, aes(x = econ_fit, y = state, color = econ_fit)) +
        vs. two-party popular vote share.")
 
 ggsave("figures/hist_unemploystate_lm.png")
+
+#### Out of Sample Fit
+# If there is time
+
 
 
 
