@@ -215,7 +215,7 @@ ggsave("figures/pollecon_weightedensemble_map.png")
 ggplot(state_viz, aes(x = poll_fit, y = state, color = poll_fit)) + 
   geom_point() + 
   geom_errorbar(aes(xmin = poll_lwr, xmax = poll_uppr)) +
-  scale_color_gradient(low = "red", high = "blue") + 
+  scale_color_gradient(low = "blue", high = "red") + 
   theme_minimal() + 
   theme(axis.text.y = element_text(size = 5),
         legend.position = "none") + 
