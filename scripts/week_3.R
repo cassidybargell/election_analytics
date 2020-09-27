@@ -20,10 +20,10 @@ local_econ <- read_csv("data/local.csv")
 # rdpi <- read_csv("data/DSPIC96.csv") #FRED
 # unrate <- read_csv("data/UNRATE (1).csv") #FRED
 # inflate <- read_csv("data/FPCPITOTLZGUSA.csv") # FRED
-poll <- read_csv("data/pollavg_1968-2016.csv")
+# poll <- read_csv("data/pollavg_1968-2016.csv")
 poll_2020 <- read_csv("data/polls_2020.csv")
 poll_state <- read_csv("data/pollavg_bystate_1968-2016.csv")
-poll_2020_fte <- read_csv("https://projects.fivethirtyeight.com/2020-general-data/presidential_poll_averages_2020.csv")
+# poll_2020_fte <- read_csv("https://projects.fivethirtyeight.com/2020-general-data/presidential_poll_averages_2020.csv")
 states <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
@@ -54,29 +54,29 @@ states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colo
 states_map <- usmap::us_map()
 unique(states_map$abbr)
 
-# Join poll state and popular vote by state
+# Join poll state and popular vote by state, use weeks left = 6 because that is closest data we have
 state_pv_poll_rep <- poll_state %>%
   filter(party == "republican") %>%
-  filter(weeks_left == 6) %>%
+  filter(weeks_left <= 6) %>%
   group_by(year, candidate_name, state) %>%
   mutate(avg_pollyr = mean(avg_poll)) %>%
   left_join(pvstate) 
 
 # linear model for republican vote share and poll averages
-statepoll_lm_rep <- function(state){
+statepoll_lm_rep <- function(s){
   ok <- state_pv_poll_rep %>%
-    filter(state == state)
+    filter(state == s)
   
-  lm(R_pv2p ~ avg_poll, data = ok)
+  lm(R_pv2p ~ avg_pollyr, data = ok)
 }
 
 # test with Alabama
-AL_lm_poll <- statepoll_lm_rep("Alabama")
+# AL_lm_poll <- statepoll_lm_rep("Alabama")
 
 # linear model for local unemployment rate
-statelocal_lm_rep <- function(state){
+statelocal_lm_rep <- function(s){
   ok <- local %>%
-    filter(state == state)
+    filter(state == s)
   
   # use republican vote share, leanred in section republicans are hurt more by
   # high unemployment than democrats are
@@ -84,30 +84,31 @@ statelocal_lm_rep <- function(state){
 }
 
 # test with Alabama
-AL_lm_econ <- statelocal_lm_rep("Alabama")
-
-# find 2020 values for AL
-ALecon <- local %>%
-  filter(state == "Alabama") %>%
-  filter(year == 2020) %>%
-  select(local_unemploy) 
-
-ALpoll <- poll_2020 %>%
-  filter(state == "Alabama") %>%
-  summarize(avg = mean(pct)) %>%
-  rename(avg_poll = "avg")
-
-# create weights for ensembles
-days_left <- 40
-pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
-
-# predict AL with weighted towards polls closer to election
-AL <- pwt*predict(AL_lm_poll, ALpoll) + ewt*predict(AL_lm_econ, ALecon) # adjusted poll
+# AL_lm_econ <- statelocal_lm_rep("Alabama")
+# 
+# # find 2020 values for AL
+# ALecon <- local %>%
+#   filter(state == "Alabama") %>%
+#   filter(year == 2020) %>%
+#   select(local_unemploy) 
+# 
+# ALpoll <- poll_2020 %>%
+#   filter(state == "Alabama") %>%
+#   summarize(avg = mean(pct)) %>%
+#   rename(avg_poll = "avg")
+# 
+# # create weights for ensembles
+# days_left <- 40
+# pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+# 
+# # predict AL with weighted towards polls closer to election
+# AL <- pwt*predict(AL_lm_poll, ALpoll) + ewt*predict(AL_lm_econ, ALecon) # adjusted poll
 
 # Need to make functions to then run through all states
 predict_function <- function(s){
   s_lm_poll <- statepoll_lm_rep(s)
   s_lm_econ <- statelocal_lm_rep(s)
+  
   Secon <- local %>%
     filter(state == s) %>%
     filter(year == 2020) %>%
@@ -116,21 +117,23 @@ predict_function <- function(s){
   Spoll <- poll_2020 %>%
     filter(state == s) %>%
     summarize(avg = mean(pct)) %>%
-    rename(avg_poll = "avg")
+    rename(avg_pollyr = "avg")
 
   days_left <- 40
   pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
-  state_prediction <- pwt*predict(s_lm_poll, Spoll) + ewt*predict(s_lm_econ, Secon)
+  state_prediction <- pwt*predict(s_lm_poll, Spoll) + 
+    ewt*predict(s_lm_econ, Secon)
 }
 
 # Loop through all the states possible with standard state list, save to data frame
-for (state in states_list){
-state_prediction <- predict_function(state)
-states$predictions[states$state == state] <- state_prediction
+for (s in states_list){
+state_prediction <- predict_function(s)
+states$predictions[states$state == s] <- state_prediction
 }
 
 # Could go through other states/districts
-NE_1 <- predict_function("NE-1")
+# NE_1 <- predict_function("NE-1")
+# WY <- predict_function("Wyoming")
 
 #### Confidence Intervals 
 
@@ -145,7 +148,7 @@ CIpoll_function <- function(s){
   Spoll <- poll_2020 %>%
     filter(state == s) %>%
     summarize(avg = mean(pct)) %>%
-    rename(avg_poll = "avg")
+    rename(avg_pollyr = "avg")
 
  poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
  #  unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
@@ -162,7 +165,7 @@ CIecon_function <- function(s){
   Spoll <- poll_2020 %>%
     filter(state == s) %>%
     summarize(avg = mean(pct)) %>%
-    rename(avg_poll = "avg")
+    rename(avg_pollyr = "avg")
   
   # poll_CI <- predict(s_lm_poll, Spoll, interval = "prediction", level = 0.95)
   unemploy_CI <- predict(s_lm_econ, Secon, interval = "prediction", level = 0.95)
@@ -178,3 +181,74 @@ for (state in states_list){
   states$econ_lwr[states$state == state] <- CIecon_prediction[, 2]
   states$econ_uppr[states$state == state] <- CIecon_prediction[, 3]
 }
+
+
+#### Visualizations 
+
+state_viz <- states %>%
+  mutate(D_pv2p = (100 - predictions)) %>%
+  mutate(win_margin = (D_pv2p-predictions)) %>%
+  mutate(poll_d = (100 - poll_fit)) %>%
+  mutate(poll_margin = (poll_d - poll_fit)) %>%
+  mutate(econ_d = (100 - econ_fit)) %>%
+  mutate(econ_margin = (econ_d - econ_fit))
+
+plot_usmap(data = state_viz, regions = "states", values = "win_margin") + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red", 
+    breaks = c(-60, -40, -20, 0, 20), 
+    limits = c(-61, 20),
+    name = "Win Margin") + 
+  labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
+       subtitle = "Weighted Ensemble of Week 6 Poll Averages and Local Unemployment",
+       caption = "Win margin is difference between Democratic and Republican 
+                  two-party popular vote share in each state.") + 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5))
+
+ggsave("figures/pollecon_weightedensemble_map.png")
+
+# Plot to show errors - polling vs. popular vote share
+ggplot(state_viz, aes(x = poll_fit, y = state, color = poll_fit)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin = poll_lwr, xmax = poll_uppr)) +
+  scale_color_gradient(low = "red", high = "blue") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 5),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "Election Outcome Prediction - State Polling Averages",
+       subtitle = "Poll averages 6 weeks out from election date",
+       caption = "Predicted using a linear model comparing historical polling averages and 
+       two-party popular vote share.")
+
+ggsave("figures/hist_polling_lm.png")
+
+# Plot to show errors - local unemployment vs. popular vote share
+
+ggplot(state_viz, aes(x = econ_fit, y = state, color = econ_fit)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin = econ_lwr, xmax = econ_uppr)) +
+  scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 5),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "Election Outcome Prediction - Q2 State Unemployment Rates",
+       subtitle = "Q2 historical unemployment rates",
+       caption = "Predicted using a linear model comparing historical Q2 state unemployment rates 
+       vs. two-party popular vote share.")
+
+ggsave("figures/hist_unemploystate_lm.png")
+
+
+
+
+  
