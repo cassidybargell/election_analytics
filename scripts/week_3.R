@@ -10,6 +10,8 @@ library(ggplot2)
 library(ggrepel)
 library(skimr)
 library(gt)
+library(googlesheets4)
+library(gt)
 
 # Read in data
 # FRED.org for resources
@@ -23,7 +25,6 @@ local_econ <- read_csv("data/local.csv")
 # poll <- read_csv("data/pollavg_1968-2016.csv")
 poll_2020 <- read_csv("data/polls_2020.csv")
 poll_state <- read_csv("data/pollavg_bystate_1968-2016.csv")
-# poll_2020_fte <- read_csv("https://projects.fivethirtyeight.com/2020-general-data/presidential_poll_averages_2020.csv")
 states <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
@@ -34,6 +35,11 @@ states <- read_csv("data/csvData.csv") %>%
   mutate(econ_lwr = NA) %>%
   mutate(econ_uppr = NA) %>%
   mutate(econ_fit = NA)
+# electoral college votes google sheet
+gs4_deauth()
+electoral_college <- read_sheet("https://docs.google.com/spreadsheets/d/1nOjlGrDkH_EpcqRzWQicLFjX0mo0ymrh8k6FaG0DRdk/edit?usp=sharing") %>%
+  slice(1:51) %>%
+  select(state, votes)
 
 # useful for subsetting just election years
 election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
@@ -100,8 +106,8 @@ statelocal_lm_rep <- function(s){
 #   rename(avg_poll = "avg")
 # 
 # # create weights for ensembles
-# days_left <- 40
-# pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+days_left <- 40
+pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
 # 
 # # predict AL with weighted towards polls closer to election
 # AL <- pwt*predict(AL_lm_poll, ALpoll) + ewt*predict(AL_lm_econ, ALecon) # adjusted poll
@@ -252,11 +258,53 @@ ggplot(state_viz, aes(x = econ_fit, y = state, color = econ_fit)) +
 
 ggsave("figures/hist_unemploystate_lm.png")
 
-#### Out of Sample Fit
-# If there is time
+#### Predict using electoral college votes
 
+# find prediction with electoral college votes
+ec <- states %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
 
+# use poll fits
+ec_poll <- states %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(poll_fit)) %>%
+  mutate(dem_win = ifelse(poll_fit < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(poll_fit >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
 
+# use econ fits 
+ec_econ <- states %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(econ_fit)) %>%
+  mutate(dem_win = ifelse(econ_fit < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(econ_fit >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
 
+#### Aggregate poll prediction 
+# start, maybe finish later
 
-  
+# choose only necessary items from poll_2020 data for weighted average with fte_grade
+agg_poll <- poll_2020 %>%
+  filter(answer == "Biden" | answer == "Trump") %>%
+  select(state, pct, fte_grade) %>%
+  filter(! is.na(state)) %>%
+  filter(! is.na(fte_grade))
+
+# create predict function to loop through states
+predict_fte_state <- function(s){
+ ok <-  agg_poll %>%
+   filter(state == s)
+
+ s <- ok %>%
+   group_by(fte_grade) %>%
+   summarize(avg = mean(pct)) %>%
+   mutate(state = s) %>%
+   gt()
+}
