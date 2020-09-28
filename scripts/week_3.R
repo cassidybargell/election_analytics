@@ -385,9 +385,9 @@ for (s in states_list){
   states$econrsq[states$state == s] <- econrsq
 }
 
+# create table
 rsq <- states %>%
   select(state, econrsq, pollrsq) %>%
-  mutate(greater = ifelse(econrsq > pollrsq, TRUE, FALSE)) %>%
   gt() %>%
   tab_style(style = cell_fill(color = "#ffcccb"), 
             locations = cells_body(rows = econrsq > pollrsq))
