@@ -321,12 +321,12 @@ for (s in states_list){
 }
 
 # add new margin to state_viz
-state_viz <- states %>%
-  mutate(D_pv2p = (100 - predictions_2)) %>%
-  mutate(win_margin2 = (D_pv2p-predictions))
+state_viz2 <- states %>%
+  mutate(D_pv2p2 = (100 - predictions_2)) %>%
+  mutate(win_margin2 = (D_pv2p2-predictions_2))
 
 # plot map of win margin predictions
-plot_usmap(data = state_viz, regions = "states", values = "win_margin2") + 
+plot_usmap(data = state_viz2, regions = "states", values = "win_margin2") + 
   theme_void() +
   scale_fill_gradient2(
     high = "blue",
