@@ -50,7 +50,7 @@ For 2020, it seems that economic fundamental models may not be as useful as they
 
 <hr>
 
-* *High unemployment rates favor the democratic candidate, and that effect is strongest when a Republican is incumbent, as is the case for 2020 [(Wright).](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/23357704?seq=1#metadata_info_tab_contents)*
+**High unemployment rates favor the democratic candidate, and that effect is strongest when a Republican is incumbent, as is the case for 2020 [(Wright).](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/23357704?seq=1#metadata_info_tab_contents)*
 
 ** *A 95% confidence interval in this case means that if this prediction model was repeated an infinite amount of times, the true outcome would fall within the confidence interval in 95% of the trials. It is therefore clear that a model is not very strong when the confidence interval incorporates impossible values to obtain.*
 
