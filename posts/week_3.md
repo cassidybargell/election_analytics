@@ -38,13 +38,18 @@ Both of these weighted ensembles used the same predictive models, just different
 
 Is there any way to go about reconciling these two very different outcomes? 
 
+The first thing to consider would be the strength of either model for each state. The R squared values***, are compared at the bottom of this post. Relatively few states have unemployment linear models that have greater R squared values than the models produced with historical polling averages. 
 
-![](..figures/gt_rsq_wk3.png)
+The first weighted ensemble gives more weight to the economic models, despite their generally lower R-squared values, and general lack of predictive power. Although not all of the state polling models seem to be very strong either, I would still argue that the model giving more weight to the polls is likely a better predictor of this years election outcome.  
+
+![](../figures/gt_rsq_wk3.png)
 
 <hr>
 
-* *High unemployment rates favor the democratic candidate, and that effect is strongest when a Republican is incumbent, as is the case for 2020. [Wright](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/23357704?seq=1#metadata_info_tab_contents)*
+**High unemployment rates favor the democratic candidate, and that effect is strongest when a Republican is incumbent, as is the case for 2020 [(Wright).](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/23357704?seq=1#metadata_info_tab_contents)*
 
-** *95% confidence interval*
+** *A 95% confidence interval in this case means that if this prediction model was repeated an infinite amount of times, the true outcome would fall within the confidence interval in 95% of the trials. It is therefore clear that a model is not very strong when the confidence interval incorporates impossible values to obtain.*
+
+*** *R-squared values. * 
 
 *Thanks to Alison Hu for collaboration this week on code for building the predictive models.*
