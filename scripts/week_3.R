@@ -214,7 +214,7 @@ plot_usmap(data = state_viz, regions = "states", values = "win_margin") +
     limits = c(-61, 20),
     name = "Win Margin") + 
   labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
-       subtitle = "Weighted Ensemble of Week 6 Poll Averages and Local Unemployment",
+       subtitle = "Weighted Ensemble of Week 6 Poll Averages (0.15) and Local Unemployment (0.85)",
        caption = "Win margin is difference between Democratic and Republican 
                   two-party popular vote share in each state.") + 
   theme(plot.title = element_text(size = 14, hjust = 0.5),
@@ -287,6 +287,68 @@ ec_econ <- states %>%
   mutate(rep_ec = sum(rep_win)) %>%
   mutate(dem_ec = sum(dem_win))
 
+#### Switch weighting to more poll heavy 
+
+# simple switch of weights 
+predict_function_poll <- function(s){
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_2020 %>%
+    filter(state == s) %>%
+    summarize(avg = mean(pct)) %>%
+    rename(avg_pollyr = "avg")
+  
+  days_left <- 40
+  pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+  state_prediction <- ewt*predict(s_lm_poll, Spoll) + 
+    pwt*predict(s_lm_econ, Secon)
+}
+
+# Loop through all the states possible with standard state list, save to data
+# frame
+for (s in states_list){
+  state_prediction2 <- predict_function_poll(s)
+  states$predictions_2[states$state == s] <- state_prediction2
+}
+
+# add new margin to state_viz
+state_viz <- states %>%
+  mutate(D_pv2p = (100 - predictions_2)) %>%
+  mutate(win_margin2 = (D_pv2p-predictions))
+
+# plot map of win margin predictions
+plot_usmap(data = state_viz, regions = "states", values = "win_margin2") + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red", 
+    breaks = c(-60, -40, -20, 0, 20), 
+    limits = c(-61, 20),
+    name = "Win Margin") + 
+  labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
+       subtitle = "Weighted Ensemble of Week 6 Poll Averages (0.85) and Local Unemployment (0.15)",
+       caption = "Win margin is difference between Democratic and Republican 
+                  two-party popular vote share in each state.") + 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5))
+
+ggsave("figures/pollecon_weightedensemble2_map.png")
+
+ec2 <- states %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions_2)) %>%
+  mutate(dem_win = ifelse(predictions_2 < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions_2 >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
+
 #### Aggregate poll prediction 
 # start, maybe finish later
 
@@ -299,11 +361,9 @@ agg_poll <- poll_2020 %>%
 
 # create predict function to loop through states
 predict_fte_state <- function(s){
- ok <-  agg_poll %>%
-   filter(state == s)
 
- s <- ok %>%
-   group_by(fte_grade) %>%
+ s <- agg_poll %>%
+   group_by(state, fte_grade) %>%
    summarize(avg = mean(pct)) %>%
    mutate(state = s) %>%
    gt()
