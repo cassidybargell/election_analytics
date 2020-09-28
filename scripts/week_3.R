@@ -12,6 +12,7 @@ library(skimr)
 library(gt)
 library(googlesheets4)
 library(gt)
+options(scipen = 999)
 
 # Read in data
 # FRED.org for resources
@@ -34,7 +35,9 @@ states <- read_csv("data/csvData.csv") %>%
   mutate(poll_fit = NA) %>%
   mutate(econ_lwr = NA) %>%
   mutate(econ_uppr = NA) %>%
-  mutate(econ_fit = NA)
+  mutate(econ_fit = NA) %>%
+  mutate(pollrsq = NA) %>%
+  mutate(econrsq = NA)
 # electoral college votes google sheet
 gs4_deauth()
 electoral_college <- read_sheet("https://docs.google.com/spreadsheets/d/1nOjlGrDkH_EpcqRzWQicLFjX0mo0ymrh8k6FaG0DRdk/edit?usp=sharing") %>%
@@ -349,6 +352,48 @@ ec2 <- states %>%
   mutate(rep_ec = sum(rep_win)) %>%
   mutate(dem_ec = sum(dem_win))
 
+#### R squared values for poll and econ data
+
+# small edit to previous function to save rsquared values - polls
+pollrsq_lm <- function(s){
+  ok <- state_pv_poll_rep %>%
+    filter(state == s)
+  
+  s <- lm(R_pv2p ~ avg_pollyr, data = ok)
+  rs <- (summary(s)$r.squared)
+}
+
+# loop through all states and save to states list - polls
+for (s in states_list){
+  pollrsq <- pollrsq_lm(s)
+  states$pollrsq[states$state == s] <- pollrsq
+}
+
+# small edit to previous function to save rsquared values - econ
+econrsq_lm <- function(s){
+  ok <- local %>%
+    filter(state == s)
+  
+  s <- lm(R_pv2p ~ local_unemploy, data = ok)
+  rs <- (summary(s)$r.squared)
+  format(rs, scientific=F)
+}
+
+# loop through all states and save to states list - econ
+for (s in states_list){
+  econrsq <- econrsq_lm(s)
+  states$econrsq[states$state == s] <- econrsq
+}
+
+rsq <- states %>%
+  select(state, econrsq, pollrsq) %>%
+  mutate(greater = ifelse(econrsq > pollrsq, TRUE, FALSE)) %>%
+  gt() %>%
+  tab_style(style = cell_fill(color = "#ffcccb"), 
+            locations = cells_body(rows = econrsq > pollrsq))
+
+gtsave(rsq, "figures/gt_rsq_wk3.png")
+
 #### Aggregate poll prediction 
 # start, maybe finish later
 
@@ -368,3 +413,4 @@ predict_fte_state <- function(s){
    mutate(state = s) %>%
    gt()
 }
+

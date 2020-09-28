@@ -34,7 +34,12 @@ By simply switching the weighting of the polling and economic models, one could 
 
 This model predicts **220** electoral college votes for Trump and **280** for Biden.
 
-Both of these weighted ensembles used the same predictive models, just different weights and presented two completely different predictions for the outcome of the election. It is 
+Both of these weighted ensembles used the same predictive models, just different weights, yet presented two completely different predictions for the outcome of the election. 
+
+Is there any way to go about reconciling these two very different outcomes? 
+
+
+![](..figures/gt_rsq_wk3.png)
 
 <hr>
 
