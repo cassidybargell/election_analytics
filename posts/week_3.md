@@ -38,7 +38,7 @@ Both of these weighted ensembles used the same predictive models, just different
 
 Is there any way to go about reconciling these two very different outcomes? 
 
-The first thing to consider would be the strength of either model for each state. The R squared values***, are compared at the bottom of this post. Relatively few states have unemployment linear models that have greater R squared values than the models produced with historical polling averages. 
+The first thing to consider would be the strength of either model for each state. The R squared values***, are compared at the bottom of this post. Relatively few states have unemployment linear models that have greater R squared values than the models produced with historical polling averages (highlighted in red). 
 
 The first weighted ensemble gives more weight to the economic models, despite their generally lower R-squared values, and general lack of predictive power. Although not all of the state polling models seem to be very strong either, I would still argue that the model giving more weight to the polls is likely a better predictor of this year’s election outcome.  
 
