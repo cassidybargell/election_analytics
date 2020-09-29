@@ -390,7 +390,9 @@ rsq <- states %>%
   select(state, econrsq, pollrsq) %>%
   gt() %>%
   tab_style(style = cell_fill(color = "#ffcccb"), 
-            locations = cells_body(rows = econrsq > pollrsq))
+            locations = cells_body(rows = econrsq > pollrsq)) %>%
+  cols_label(econrsq = "Unemployment Model R-squared") %>%
+  cols_label(pollrsq = "Poll Model R-squared")
 
 gtsave(rsq, "figures/gt_rsq_wk3.png")
 
