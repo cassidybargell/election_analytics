@@ -3,7 +3,7 @@
 # Incumbency
 ## 10/5/20
 
-When everything else is controlled for, voters do not seem to prefer incumbents over challengers purely because of the status of incumbency [(https://www-cambridge-org.ezp-prod1.hul.harvard.edu/core/services/aop-cambridge-core/content/view/ECFE39E003912F8AF65C2AD14A34BD8C/S2052263014000062a.pdf/div-class-title-voters-don-t-care-much-about-incumbency-div.pdf)](Brown). Incumbents do, however, have structural advatanges over challengers, like being less of an unknown for voters, being able to start their campaigns early (as Trump did), and the ability, although limited, to manipulate the economy [(Fair,](FAIR LINK HERE) [Achen & Bartels).](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) It is therefore unsurprising that in the post-war era, of the 11 elections in which an incumbent has run, only 3 were won by the challenger.
+When everything else is controlled for, voters do not seem to prefer incumbents over challengers purely because of the status of incumbency [(Brown)](https://www-cambridge-org.ezp-prod1.hul.harvard.edu/core/services/aop-cambridge-core/content/view/ECFE39E003912F8AF65C2AD14A34BD8C/S2052263014000062a.pdf/div-class-title-voters-don-t-care-much-about-incumbency-div.pdf). Incumbents do, however, have structural advatanges over challengers, like being less of an unknown for voters, being able to start their campaigns early (as Trump did), and the ability, although limited, to manipulate the economy [(Fair,](FAIR LINK HERE) [Achen & Bartels).](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) It is therefore unsurprising that in the post-war era, of the 11 elections in which an incumbent has run, only 3 were won by the challenger.
 
 Despite Trump being a first term incumbent, it is unclear how much the structural advantages of incumbency will influence this unusual election.
 
@@ -15,6 +15,7 @@ Despite all of the above, approval polls still provide some insight into voter p
 
 ![](../figures/approval_through_time.png)
 
+The sharp drop off in 2016 is what would be expected given increasingly partisan evaluations of candidates and economies. The [retrospective theory of political accountability](https://cassidybargell.github.io/election_analytics/posts/week_2.html) is interesting to consider in this election given that voters do have some basis on which to judge Joe Biden given his involvement in the Obama administration [Achen & Bartels).](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) This *potentially* could reduce the advantage an incumbent might have over a challenger who is completely unknown.
 
 
 
