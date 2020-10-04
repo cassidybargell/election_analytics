@@ -43,7 +43,7 @@ Given the general lack of convincing evidence suggesting there will be a strong 
 
 A weighted ensemble can be created using aggregate COVID-19 approval ratings and a linear model using historical two-party popular vote share and Gallup general election year approval ratings.* 
 
-![](../figures/equation_wk4.png)
+![](../figures/equation_w4.png)
 
 Various weights can be used for sensitivity analysis of this weighted ensemble. If both general approval ratings for 2020 and covid approval aggregates are weighted equally, the predicted two-party popular vote share would be **43.8**.** 
 
