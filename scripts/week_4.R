@@ -169,7 +169,7 @@ ggsave("figures/states_vs_federalspend.png")
 covid <- covid_approval_avg %>%
   summarize(avg = mean(approve_estimate))
 
-gallup <- approval %>%
+gallup <- approval_DT %>%
   summarize(avg = mean(approve))
 
 prediction1 <- 0.5 * (covid$avg) + 0.5 * (gallup$avg)
@@ -177,8 +177,6 @@ prediction2 <- 0.75 * (covid$avg) + 0.25 * (gallup$avg)
 prediction3 <- 0.75 * (gallup$avg) + 0.25 * (covid$avg)
 prediction4 <- 0.85 * (covid$avg) + 0.15 * (gallup$avg)
 prediction5 <- 0.85 * (gallup$avg) + 0.15 * (covid$avg)
-
-
 
 #### Things I wanted to maybe attempt but didnt have time for ####
 
