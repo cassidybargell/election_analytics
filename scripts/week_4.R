@@ -181,11 +181,13 @@ covid <- covid_approval_avg %>%
 gallup_p <- approval_DT %>%
   summarize(avg = mean(approve))
 
-prediction1 <- 0.5 * (covid$avg) + 0.5 * predict(lm_gallup, gallup_p)
-prediction2 <- 0.75 * (covid$avg) + 0.25 * predict(lm_gallup, gallup_p) 
-prediction3 <- 0.75 * predict(lm_gallup, gallup_p) + 0.25 * (covid$avg)
-prediction4 <- 0.85 * (covid$avg) + 0.15 * predict(lm_gallup, gallup_p)
-prediction5 <- 0.85 * predict(lm_gallup, gallup_p) + 0.15 * (covid$avg)
+predict(lm_gallup, gallup_p, interval = "prediction")
+
+prediction1 <- 0.5 * (covid$avg) + 0.5 * predict(lm_gallup, gallup_p, interval = "prediction")
+prediction2 <- 0.75 * (covid$avg) + 0.25 * predict(lm_gallup, gallup_p, interval = "prediction") 
+prediction3 <- 0.75 * predict(lm_gallup, gallup_p, interval = "prediction") + 0.25 * (covid$avg)
+prediction4 <- 0.9 * (covid$avg) + 0.1 * predict(lm_gallup, gallup_p, interval = "prediction")
+prediction5 <- 0.9 * predict(lm_gallup, gallup_p, interval = "prediction") + 0.1 * (covid$avg)
 
 #### Things I wanted to maybe attempt but didnt have time for ####
 
@@ -202,11 +204,4 @@ prediction5 <- 0.85 * predict(lm_gallup, gallup_p) + 0.15 * (covid$avg)
 # fte_grade == "B+" | fte_grade == "B" | fte_grade == "B-") %>%
 # group_by(state) %>%
 # summarize(avg = mean(pct))
-
-
-
-
-  
-  
-
 

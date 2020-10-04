@@ -27,14 +27,21 @@ Trump does not have full control over the economy, especially not in the context
 
 ![](../figures/trump_tweet.png)
 
-- What does the distribution of covid awards look like across states?
-
 ![](../figures/state_covid_relief.png)
 
- - Incumbents can generally expect more return from competitive states for increased election year spending [(Kriner & Reeves)](https://www-cambridge-org.ezp-prod1.hul.harvard.edu/core/services/aop-cambridge-core/content/view/962ABE4FC41A6FF3E1F95CE1B54D1ADD/S0003055414000598a.pdf/presidential_particularism_and_dividethedollar_politics.pdf). 
+Incumbents can generally expect more return from competitive states for increased election year spending [(Kriner & Reeves)](https://www-cambridge-org.ezp-prod1.hul.harvard.edu/core/services/aop-cambridge-core/content/view/962ABE4FC41A6FF3E1F95CE1B54D1ADD/S0003055414000598a.pdf/presidential_particularism_and_dividethedollar_politics.pdf). Although COVID-19 federal awards are not the only measure of election year spending, they are a unique vairable for 2020 that may be more accutely felt by voters.
+
+Given that vote return for increased spending is most seen in competitive states, it might be expected that in states with close polling averages (48-52%) there would be an increased support for the President in polling averages.
 
 ![](../figures/states_vs_federalspend.png)
 
+In this subset of states it does not seem as though this is the case, with approval polls not showing clear upward trends from the start of 2020 through the first peak of the coronavirus pandemic in the U.S. and increased relief spending. (Note that spending was not per capita or per COVID-19 case, so more investigation should be done). 
+
 Alan Abramowitz, the developer of the *Time for Change* model has argued a new stance for the 2020 election in which he emphasizes the importance of presidential evaluations for predicting this election [(Abramowitz)](https://centerforpolitics.org/crystalball/articles/its-the-pandemic-stupid-a-simplified-model-for-forecasting-the-2020-presidential-election/). 
 
-Given the general lack of convincing evidence suggesting there will be a strong incumbent advantage this year, I have used a similar model of combining evalution polls to make a simple popular vote share prediction. 
+Given the general lack of convincing evidence suggesting there will be a strong incumbent advantage this year, I have used a similar model of combining evalution polls to make a simple popular vote share prediction. I have chosen to include general Gallup approval polls aswell as aggregate COVID-19 approval polls, weighted by Nate Silver at [FiveThirtyEight](https://projects.fivethirtyeight.com/coronavirus-polls/). 
+
+A weighted ensemble can be created using aggregate COVID-19 approval ratings and a linear model using historical two-party popular vote share and Gallup general approval ratings. 
+
+![](../figures/equation_wk4.png)
+
