@@ -82,6 +82,7 @@ ggsave("figures/approval_through_time.png")
 
 #### Line graph of Approval Rating for Trump's COVID Response
 
+# set up for ggplot 
 approval_DT <- approval %>%
   filter(president == "Donald Trump") %>%
   rename(date = "poll_enddate")
@@ -103,8 +104,8 @@ ggplot(covid_approval, aes(x = date)) +
   labs(title = "Trump Average General Approval and COVID-19 Response Approval",
        subtitle = "2020",
     color=" ",
-    x = "Approval (%)",
-    y = "Date") 
+    y = "Approval (%)",
+    x = "Date") 
 
 ggsave("figures/trump_2020_approvals.png")
 
@@ -113,6 +114,7 @@ ggsave("figures/trump_2020_approvals.png")
 # look at federal spending there. Possibly look at partisan leanings (paper from
 # class) and determine which states more spending might actually work for.
 
+# plot states by federal covid-19 relief spending
 plot_usmap(data = state_covid_awards, regions = "states", values = "total") + 
   theme_void() +
   scale_fill_gradient2(
@@ -128,13 +130,14 @@ plot_usmap(data = state_covid_awards, regions = "states", values = "total") +
 ggsave("figures/state_covid_relief.png")
 
 #### State Polls and Federal COVID-19 Aid 
+# arbitrarily chose 48-52 poll averages as close, more competitiv
 
 covid_awards$state <- covid_awards$State
 
 # Look at states with close polls and high spending
 combine <- covid_awards %>%
   left_join(poll_2020) %>%
-  filter(date >= "2020-03-15") %>%
+  filter(date >= "2020-01-01") %>%
   filter(candidate_name == "Donald Trump") %>%
   group_by(state) %>%
   filter(pct >= 48) %>%
@@ -159,6 +162,39 @@ ggplot(combine, aes(x = date, color = total)) +
 
 ggsave("figures/states_vs_federalspend.png")
 
+#### Try to make a prediction, super super simple weighted ensemble. 
+
+# Approval ratings not stratified by state, hard to predict electoral college
+# outcome due to this
+covid <- covid_approval_avg %>%
+  summarize(avg = mean(approve_estimate))
+
+gallup <- approval %>%
+  summarize(avg = mean(approve))
+
+prediction1 <- 0.5 * (covid$avg) + 0.5 * (gallup$avg)
+prediction2 <- 0.75 * (covid$avg) + 0.25 * (gallup$avg) 
+prediction3 <- 0.75 * (gallup$avg) + 0.25 * (covid$avg)
+prediction4 <- 0.85 * (covid$avg) + 0.15 * (gallup$avg)
+prediction5 <- 0.85 * (gallup$avg) + 0.15 * (covid$avg)
+
+
+
+#### Things I wanted to maybe attempt but didnt have time for ####
+
+## Improve last weeks weighted ensemble, replace unemployment with federal
+## spending for COVID relief, weight very small, use approval of job instead
+## of polling info
+
+# dummy variable: 1 if historically close polling_avg and high spending for
+# COVID-19 relief (top 15 states), 0 if neither of those. Randomly choosing and
+# then will weight
+
+# DT_2020 <- poll_2020 %>%
+# filter(fte_grade == "A" | fte_grade == "A+" | fte_grade == "A-" | fte_grade == "A/B" | 
+# fte_grade == "B+" | fte_grade == "B" | fte_grade == "B-") %>%
+# group_by(state) %>%
+# summarize(avg = mean(pct))
 
 
 

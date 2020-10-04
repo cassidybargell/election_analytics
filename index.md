@@ -7,3 +7,4 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 # [Economic Fundamentals - 9/21/20](posts/week_2.md)
 ### [State by State Economic Fundamentals](posts/week_2.5.md)
 # [Polls - 9/28/20](posts/week_3.md)
+# [Incumbency - 10/5/20](posts/week_4.md)
