@@ -17,9 +17,12 @@ Despite all of the above, approval polls still provide some insight into voter p
 
 The sharp drop off in 2016 is what would be expected given increasingly partisan evaluations of candidates and economies. The [retrospective theory of political accountability](https://cassidybargell.github.io/election_analytics/posts/week_2.html) is interesting to consider in this election given that voters do have some basis on which to judge Joe Biden given his involvement in the Obama administration [Achen & Bartels).](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) This *potentially* could reduce the advantage an incumbent might have over a challenger who is completely unknown.
 
-
+Given the COVID-19 pandemic, there have also been polls administered about the approval of Trump's COVID-19 response. 
 
 ![](../figures/trump_2020_approvals.png)
+
+These polls do track each other well at the beginning of the year, however starting around late March to early April (when cases were beginning to really spike in the U.S.) there has been a steady decline in COVID-19 response while general approval has seen more fluctuations. This may be simply an artifact of the polls, however it could also reflect the idea of partisaned evaluations of the President. It may suggest that opinions on COVID-19 response may not have a very strong influence on an individual's assessment overall of the President. 
+
 
 ![](../figures/trump_tweet.png)
 ![](../figures/state_covid_relief.png)
