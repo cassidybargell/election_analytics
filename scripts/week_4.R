@@ -166,17 +166,26 @@ ggsave("figures/states_vs_federalspend.png")
 
 # Approval ratings not stratified by state, hard to predict electoral college
 # outcome due to this
+
+gallup <- popvote %>%
+  left_join(approval) %>% 
+  filter(incumbent == T) %>%
+  group_by(year) %>%
+  mutate(avg = mean(approve))
+
+lm_gallup <- lm(pv ~ avg, data = gallup) 
+  
 covid <- covid_approval_avg %>%
   summarize(avg = mean(approve_estimate))
 
-gallup <- approval_DT %>%
+gallup_p <- approval_DT %>%
   summarize(avg = mean(approve))
 
-prediction1 <- 0.5 * (covid$avg) + 0.5 * (gallup$avg)
-prediction2 <- 0.75 * (covid$avg) + 0.25 * (gallup$avg) 
-prediction3 <- 0.75 * (gallup$avg) + 0.25 * (covid$avg)
-prediction4 <- 0.85 * (covid$avg) + 0.15 * (gallup$avg)
-prediction5 <- 0.85 * (gallup$avg) + 0.15 * (covid$avg)
+prediction1 <- 0.5 * (covid$avg) + 0.5 * predict(lm_gallup, gallup_p)
+prediction2 <- 0.75 * (covid$avg) + 0.25 * predict(lm_gallup, gallup_p) 
+prediction3 <- 0.75 * predict(lm_gallup, gallup_p) + 0.25 * (covid$avg)
+prediction4 <- 0.85 * (covid$avg) + 0.15 * predict(lm_gallup, gallup_p)
+prediction5 <- 0.85 * predict(lm_gallup, gallup_p) + 0.15 * (covid$avg)
 
 #### Things I wanted to maybe attempt but didnt have time for ####
 

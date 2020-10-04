@@ -23,8 +23,18 @@ Given the COVID-19 pandemic, there have also been polls administered about the a
 
 These polls do track each other well at the beginning of the year, however starting around late March to early April (when cases were beginning to really spike in the U.S.) there has been a steady decline in COVID-19 response while general approval has seen more fluctuations. This may be simply an artifact of the polls, however it could also reflect the idea of partisaned evaluations of the President. It may suggest that opinions on COVID-19 response may not have a very strong influence on an individual's assessment overall of the President. 
 
+Trump does not have full control over the economy, especially not in the context of a global pandemic, so how then, does the pandemic economy then play into voter perceptions and retrospective analysis of the Trump presidency?  Being the incumbent there can be claim over some aspects like federal COVID-19 awards. 
 
 ![](../figures/trump_tweet.png)
+
+- What does the distribution of covid awards look like across states?
+
 ![](../figures/state_covid_relief.png)
 
+ - Incumbents can generally expect more return from competitive states for increased election year spending [(Kriner & Reeves)](https://www-cambridge-org.ezp-prod1.hul.harvard.edu/core/services/aop-cambridge-core/content/view/962ABE4FC41A6FF3E1F95CE1B54D1ADD/S0003055414000598a.pdf/presidential_particularism_and_dividethedollar_politics.pdf). 
+
 ![](../figures/states_vs_federalspend.png)
+
+Alan Abramowitz, the developer of the *Time for Change* model has argued a new stance for the 2020 election in which he emphasizes the importance of presidential evaluations for predicting this election [(Abramowitz)](https://centerforpolitics.org/crystalball/articles/its-the-pandemic-stupid-a-simplified-model-for-forecasting-the-2020-presidential-election/). 
+
+Given the general lack of convincing evidence suggesting there will be a strong incumbent advantage this year, I have used a similar model of combining evalution polls to make a simple popular vote share prediction. 
