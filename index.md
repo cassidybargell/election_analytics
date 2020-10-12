@@ -8,3 +8,4 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 ### [State by State Economic Fundamentals](posts/week_2.5.md)
 # [Polls - 9/28/20](posts/week_3.md)
 # [Incumbency - 10/5/20](posts/week_4.md)
+# [The Air War - 10/12/20](posts/week_5.md)
