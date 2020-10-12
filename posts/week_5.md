@@ -18,7 +18,11 @@ Trends in tone and purpose of campaigns since 2000 are visualized below.
 
 There is a clear increased count of advertisements over the years. Although policy dominates the purpose of ads through these four elections, both policy and personal advertisements have also continued to trend upwards.
 
-An interesting trend to note is also the fact that Democratic ad spending strongly outweighs Republican ad spending in years the Democratic party is the challenger. (Perhaps this is indicative of awareness of the incumbency advantage?)
+An interesting trend to note is also the fact that Democratic ad spending strongly outweighs Republican ad spending in years the Democratic party is the challenger. (Perhaps this is indicative of awareness of the [incumbency advantage?](https://cassidybargell.github.io/election_analytics/posts/week_4.html)).
+
+It has been abundantly clear normal predictive measures are not proving extremel useful given the incredibly unique circumstances of 2020. One might think that advertisements could be something that could be considered relatively stable this year, however I would argue that this might not be as true as expected. 
+
+Social media usage has continued to skyrocket since 2016. From 2016 to 2019 there was an increase of over 600,000,000 million users on Facebook [(https://ourworldindata.org/rise-of-social-media)](https://ourworldindata.org/rise-of-social-media). Tiktok, a popular video app was created in 2016 and has already proven a controversial topic in American politics [("Trump Administration to Ban TikTok and WeChat From U.S. App Stores")](https://www.nytimes.com/2020/09/18/business/trump-tik-tok-wechat-ban.html). What roll will social media play in the 2020 election? The hard part about prediction using this data is that there is little historical information to compare this election to. Looking at trends can still provide insight about how social media has increasingly become an important facet of advertisement in election campaigns. 
 
 ![](../figures/general_fb_spending.png)
 ![](../figures/vep_fb_spending_10_9.png)
