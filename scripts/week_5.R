@@ -66,6 +66,7 @@ ggplot(ad_creative, aes(x = ad_purpose, fill = party)) + geom_bar(position = "do
        subtitle = "2000-2012", 
        y = "Count",
        x = "Ad Purpose")
+
 ggsave("figures/ad_purpose.png")
 
 
@@ -79,10 +80,9 @@ ggplot(ad_creative, aes(x = ad_tone, fill = party)) + geom_bar(position = "dodge
        subtitle = "2000-2012", 
        y = "Count",
        x = "Ad Tone")
+
 ggsave("figures/ad_tone.png")
   
-
-
 ads <- ad_creative %>%
   group_by(ad_issue, cycle, party) %>%
   summarize(n = n()) 
