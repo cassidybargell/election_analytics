@@ -124,6 +124,7 @@ for (s in unique(poll_pvstate_vep_df$state)) {
   state_forecast[[s]]$sim_elxns_s_2020 <- 
     ((state_forecast[[s]]$sim_Dvotes_s_2020-state_forecast[[s]]$sim_Rvotes_s_2020)/(state_forecast[[s]]$sim_Dvotes_s_2020+state_forecast[[s]]$sim_Rvotes_s_2020))*100
 }
+# Have this big tibble I don't know what to do with
 
 #### Plot yesterday's ad spending 
 # Using data from facebook ad library: ads about social issues, elections or politics
