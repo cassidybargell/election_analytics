@@ -47,6 +47,7 @@ montana_fb <- read_csv("data/FacebookAdLibraryReport_2020-10-09_US_yesterday_Mon
   rename(spent = "Amount Spent (USD)") %>%
   mutate(spent = as.integer(spent)) %>%
   filter(! is.na(spent))
+fb_advertisers_10_9 <- read_csv("data/FacebookAdLibraryReport_2020-10-09_US_yesterday_advertisers.csv")
 
 states_map <- usmap::us_map()
 unique(states_map$abbr)

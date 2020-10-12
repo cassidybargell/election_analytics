@@ -22,8 +22,31 @@ An interesting trend to note is also the fact that Democratic ad spending strong
 
 It has been abundantly clear normal predictive measures are not proving extremel useful given the incredibly unique circumstances of 2020. One might think that advertisements could be something that could be considered relatively stable this year, however I would argue that this might not be as true as expected. 
 
-Social media usage has continued to skyrocket since 2016. From 2016 to 2019 there was an increase of over 600,000,000 million users on Facebook [(https://ourworldindata.org/rise-of-social-media)](https://ourworldindata.org/rise-of-social-media). Tiktok, a popular video app was created in 2016 and has already proven a controversial topic in American politics [("Trump Administration to Ban TikTok and WeChat From U.S. App Stores")](https://www.nytimes.com/2020/09/18/business/trump-tik-tok-wechat-ban.html). What roll will social media play in the 2020 election? The hard part about prediction using this data is that there is little historical information to compare this election to. Looking at trends can still provide insight about how social media has increasingly become an important facet of advertisement in election campaigns. 
+Social media usage has continued to skyrocket since 2016. From 2016 to 2019 there was an increase of over 600,000,000 million users on Facebook [(https://ourworldindata.org/rise-of-social-media)](https://ourworldindata.org/rise-of-social-media). Tiktok, a popular video app was created in 2016 and has already proven a controversial topic in American politics [("Trump Administration to Ban TikTok and WeChat From U.S. App Stores")](https://www.nytimes.com/2020/09/18/business/trump-tik-tok-wechat-ban.html). What roll will social media play in the 2020 election? The hard part about prediction using social media data is that there is relativelty little historical information to compare this election to. Looking at trends can still provide insight about how social media has increasingly become an important facet of advertisement in election campaigns. 
+
+Since September 5th 2020, Trump has spent over \$23,453,782 on both Facebook and Google+ ads, whereas Biden has spent over \$32,566,575. Including data from mid-April, Trump has spent \$135,230,620 on Facebook & Google+ ads, whereas Biden has spent \$101,768,019. This indicates Biden has increased spending closer to the election while Trump started spending heavy much earlier. 
+
+Another interesting point to note is that Trump has continuously outspent Biden on Facebook ads, whereas within the past month or so Biden has spent much more than Trump on Google+ ads. 
+
+The [Facebook Ad Library](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=US) provides data about spending for ads on Facebook about social issues, elections or politics. Spending by any political organization is included in the data, however the top three spenders are Joe Biden, Facebook, and Donald Trump. (The Facebook ads seem to be ads encouraging voting rather than partisan in any way, but it is not clear if this is true for all advertisements Facebook Inc. buys itself.)
+
+Spending in just one day (10/9/20) by state is below.
 
 ![](../figures/general_fb_spending.png)
+
+This graph is not very unexpected given differences in populations of states. If total spending is divided by the voter eligible population of each state in 2016 ad spending on 10/9/20 looks like this:
+
 ![](../figures/vep_fb_spending_10_9.png)
+
+Many of the states discussed as battleground states seem to have increased spending levels. This would align with what happens in television ads where battleground states are the focus of campaigns.* Spending is greatest in Arizona with around ~\$0.143 spent per eligible voter in the state, followed closely by North Carolina at ~\$0.142. There are clear limitations to this data, one being that it is using voting eligible population from 2016, and that it is from only one day. Data from a week earlier, October 3rd, is similar. 
+
 ![](../figures/vep_fb_spending_10_3.png)
+
+Although campaigns are spending big on social media advertisements, social media is also unique in the way it creates echo chambers, and people have the opportunity to express and widely share their personal opinions. 
+
+2016 Presidential campaign election
+Algorithms/friends opinions 
+
+<hr>
+
+**I am not entirely clear on what is happening in Montana, requires further investigation.*
