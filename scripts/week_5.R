@@ -32,6 +32,21 @@ ad_campaigns <- read_csv("data/ad_campaigns_2000-2012.csv")
 ad_creative <- read_csv("data/ad_creative_2000-2012.csv")
 vep <- read_csv("data/vep_1980-2016.csv")
 poll_state <- read_csv("data/pollavg_bystate_1968-2016.csv")
+FB_10_9 <- read_csv("data/FacebookAdLibraryReport_2020-10-09_US_yesterday_locations.csv") %>%
+  rename(spent = "Amount Spent (USD)") %>%
+  rename(state = "Location Name") %>%
+  filter(state != "American Samoa" & state != "Northern Mariana Islands") %>%
+  mutate(spent = as.integer(spent))
+FB_10_3 <- read_csv("data/FacebookAdLibraryReport_2020-10-03_US_yesterday_locations.csv") %>%
+  rename(spent = "Amount Spent (USD)") %>%
+  rename(state = "Location Name") %>%
+  filter(state != "American Samoa" & state != "Northern Mariana Islands" & state != "Unknown") %>%
+  mutate(spent = as.integer(spent))
+montana_fb <- read_csv("data/FacebookAdLibraryReport_2020-10-09_US_yesterday_Montana.csv") %>%
+  rename(page_name = "Page Name") %>%
+  rename(spent = "Amount Spent (USD)") %>%
+  mutate(spent = as.integer(spent)) %>%
+  filter(! is.na(spent))
 
 states_map <- usmap::us_map()
 unique(states_map$abbr)
@@ -46,7 +61,12 @@ ggplot(ad_creative, aes(x = ad_purpose, fill = party)) + geom_bar(position = "do
   scale_fill_manual(values = c("blue", "red"), name = "", 
                      labels = c("Democratic", "Republican")) + 
   facet_grid(~ cycle) + 
-  theme(axis.text.x  = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x  = element_text(angle = 45, hjust = 1)) + 
+  labs(title = "Purpose of Ads in Presidential Campaigns",
+       subtitle = "2000-2012", 
+       y = "Count",
+       x = "Ad Purpose")
+ggsave("figures/ad_purpose.png")
 
 
 ggplot(ad_creative, aes(x = ad_tone, fill = party)) + geom_bar(position = "dodge") +
@@ -54,7 +74,13 @@ ggplot(ad_creative, aes(x = ad_tone, fill = party)) + geom_bar(position = "dodge
   scale_fill_manual(values = c("blue", "red"), name = "", 
                     labels = c("Democratic", "Republican")) + 
   facet_grid(~ cycle) + 
-  theme(axis.text.x  = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x  = element_text(angle = 45, hjust = 1)) + 
+  labs(title = "Tone of Ads in Presidential Campaigns",
+       subtitle = "2000-2012", 
+       y = "Count",
+       x = "Ad Tone")
+ggsave("figures/ad_tone.png")
+  
 
 
 ads <- ad_creative %>%
@@ -98,3 +124,68 @@ for (s in unique(poll_pvstate_vep_df$state)) {
   state_forecast[[s]]$sim_elxns_s_2020 <- 
     ((state_forecast[[s]]$sim_Dvotes_s_2020-state_forecast[[s]]$sim_Rvotes_s_2020)/(state_forecast[[s]]$sim_Dvotes_s_2020+state_forecast[[s]]$sim_Rvotes_s_2020))*100
 }
+
+#### Plot yesterday's ad spending 
+# Using data from facebook ad library: ads about social issues, elections or politics
+
+# plot FB on 10/9/20 by states
+plot_usmap(data = FB_10_9, regions = "state", values = "spent") + 
+  theme_void() + 
+  scale_fill_gradient2(
+    high = "darkgreen",
+    low = "white",
+    name = "Spending") + 
+  labs(title = "Facebook Ad Spending on 10/9/20",
+       caption = "Ads about social issues, elections or politics.")
+ggsave("figures/general_fb_spending.png")
+
+# join datasets, use most recent VEP population (2016)
+vep_fb_10_9 <- FB_10_9 %>%
+  right_join(vep) %>%
+  filter(year == 2016) %>%
+  mutate(normal = spent/VEP)
+
+# find top states based on facebook spending and voter eligible population
+vep_fb_10_9 %>%
+  arrange(desc(normal))
+
+# plot facebook ad spending divided by voter eligible population in 2016
+plot_usmap(data = vep_fb_10_9, regions = "state", values = "normal") + 
+  theme_void() + 
+  scale_fill_gradient2(
+    high = "darkgreen",
+    low = "white",
+    name = "Spending/VEP") + 
+  labs(title = "Facebook Ad Spending on 10/9/20 vs. Voter Eligible Population",
+       subtitle = "2016 VEP Values")
+ggsave("figures/vep_fb_spending_10_9.png")
+
+# repeat with data from a week ago
+plot_usmap(data = FB_10_3, regions = "state", values = "spent") + 
+  theme_void() + 
+  scale_fill_gradient2(
+    high = "darkgreen",
+    low = "white",
+    name = "Facebook Ad Spending on 10/3/20")
+
+# join datasets, use most recent VEP population (2016)
+vep_fb_10_3 <- FB_10_3 %>%
+  right_join(vep) %>%
+  filter(year == 2016) %>%
+  mutate(normal = spent/VEP)
+
+# find top states based on facebook spending and voter eligible population
+vep_fb_10_3 %>%
+  arrange(desc(normal))
+
+# plot facebook ad spending divided by voter eligible population in 2016
+plot_usmap(data = vep_fb_10_3, regions = "state", values = "normal") + 
+  theme_void() + 
+  scale_fill_gradient2(
+    high = "darkgreen",
+    low = "white",
+    name = "Spending/VEP") + 
+  labs(title = "Facebook Ad Spending on 10/3/20 vs. Voter Eligible Population",
+       subtitle = "2016 VEP Values")
+ggsave("figures/vep_fb_spending_10_3.png")
+
