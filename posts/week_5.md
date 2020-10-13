@@ -42,10 +42,8 @@ Many of the states discussed as battleground states seem to have increased spend
 
 ![](../figures/vep_fb_spending_10_3.png)
 
-Although campaigns are spending big on social media advertisements, social media is also unique in the way it creates echo chambers, and people have the opportunity to express and widely share their personal opinions. 
 
-2016 Presidential campaign election
-Algorithms/friends opinions 
+As social media continues to become more omnipresent in the presidential election process, it is likely more controversies, like the 2016 Russian interference, to become of concern. Although it may currently be difficult to predict how much advertisement, especially over social media, will play in the 2020 election, I expect it will be an increasingly common question and concern in future election cycles. 
 
 <hr>
 
