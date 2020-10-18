@@ -56,6 +56,7 @@ poll_state <- read_csv("data/pollavg_bystate_1968-2016.csv")
 demog <- read_csv("data/demographic_1990-2018.csv")
 fo_2012 <- read_csv("data/fieldoffice_2012_bycounty.csv")
 fo_dems <- read_csv("data/fieldoffice_2004-2012_dems.csv")
+turnout <- read_csv("data/turnout_1980-2016.csv")
 
 #### Exploration initially 
 
@@ -95,10 +96,32 @@ demog_pv_plot <- demog %>%
   filter(year == 2016)
   # filter(state != "Hawaii"), when hawaii is not included, slope jumps up to 1
 
-ggplot(demog_pv_plot, aes(y = D_pv2p, x = demographic_pct)) + geom_point() + 
+# create visualizations 
+
+# age demographics
+demog_pv_plot %>%
+  filter(demographic == "age20" | demographic == "age3045" | demographic == "age4565" | 
+           demographic == "age65") %>%
+ggplot(aes(y = D_pv2p, x = demographic_pct, color = demographic)) + geom_point() + 
+  # facet_wrap(~ demographic) + 
+  geom_smooth(method = "lm")
+
+# race/ethnicity demographics
+demog_pv_plot %>%
+  filter(demographic == "Asian" | demographic == "Black" | demographic == "White" | 
+           demographic == "Hispanic" | demographic == "Indigenous") %>%
+  ggplot(aes(y = D_pv2p, x = demographic_pct, color = demographic)) + geom_point() + 
   facet_wrap(~ demographic) + 
   geom_smooth(method = "lm")
 
+# sex demographics
+demog_pv_plot %>%
+  filter(demographic == "Female" | demographic == "Male") %>%
+  ggplot(aes(y = D_pv2p, x = demographic_pct, color = demographic)) + geom_point() + 
+  facet_wrap(~ demographic) + 
+  geom_smooth(method = "lm")
+
+# make new joined data for linear models 
 demog_pv <- demog %>%
   right_join(pvstate2) %>%
   # pivot_longer(cols = c(Hispanic, Black, White, Asian, Indigenous, Female, Male, 
@@ -107,16 +130,28 @@ demog_pv <- demog %>%
   filter(state != "District of Columbia") %>%
   filter(year == 2016)
 
-lm_asian_demog <- lm(D_pv2p ~ Asian, data = demog_pv)
-lm_black_demog <- lm(D_pv2p ~ Black, data = demog_pv)
-lm_hispanic_demog <- lm(D_pv2p ~ Hispanic, data = demog_pv)
-lm_white_demog <- lm(D_pv2p ~ White, data = demog_pv)
-lm_female_demog <- lm(D_pv2p ~ Female, data = demog_pv)
-lm_male_demog <- lm(D_pv2p ~ Male, data = demog_pv) # tvalue intercept: -1.966
-lm_age20_demog <- lm(D_pv2p ~ age20, data = demog_pv)
-lm_age3045_demog <- lm(D_pv2p ~ age3045, data = demog_pv)
+# linear models 
+# if no t values given, t values > 2
+lm_asian_demog <- lm(D_pv2p ~ Asian, data = demog_pv) 
+# intercept: 44.2625, coefficient: 0.5426 p-value: 0.0009966
+lm_black_demog <- lm(D_pv2p ~ Black, data = demog_pv) 
+# intercept: 46.54419, coefficient: 0.04952 (t = 0.29) p-value: 0.7728
+lm_hispanic_demog <- lm(D_pv2p ~ Hispanic, data = demog_pv) 
+# intercept: 42.9130, coefficient: 0.3997 p-value: 0.01228
+lm_white_demog <- lm(D_pv2p ~ White, data = demog_pv) 
+# intercept: 71.12649, coefficient: -0.33253 p-value: 0.0006607
+lm_female_demog <- lm(D_pv2p ~ Female, data = demog_pv) 
+# intercept: -137.475 (tvalue = -1.727), coefficient: 3.623 p-value: 0.02469
+lm_male_demog <- lm(D_pv2p ~ Male, data = demog_pv) 
+# intercept 91.1 (t < 2), coefficient -1.8, p-value 0.055
+lm_age20_demog <- lm(D_pv2p ~ age20, data = demog_pv) 
+# intercept: 91.7202 coefficient: -1.7722 (tvalue = -1.97) p-value: 0.05507
+lm_age3045_demog <- lm(D_pv2p ~ age3045, data = demog_pv) 
+# neither t value close  p-value: 0.1049
 lm_age4565_demog <- lm(D_pv2p ~ age4565, data = demog_pv)
+# neither t value close
 lm_age65_demog <- lm(D_pv2p ~ age65, data = demog_pv)
+# t values not close enough 
 
 
 
