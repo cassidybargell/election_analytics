@@ -207,6 +207,13 @@ lm_white_change <- lm(White ~ turn_16_chg, data = turnout_chg_16)
 
 election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
 
+demog3 <- demog %>%
+  right_join(pvstate2) %>%
+  # pivot_longer(cols = c(Hispanic, Black, White, Asian, Indigenous, Female, Male, 
+  # age20, age3045, age4565, age65), 
+  # names_to = "demographic", values_to = "demographic_pct") %>%
+  filter(state != "District of Columbia") 
+
 # Create local unemployment dataframe, use Q2 unemployment data
 local <- local_econ %>%
   rename("state" = `State and area`) %>%
@@ -249,7 +256,7 @@ statelocal_lm_rep <- function(s){
 
 
 statedemog_lm <- function(s){
-  ok <- demog_pv %>%
+  ok <- demog3 %>%
     filter(state == s)
   
   lm(R_pv2p ~ White, data = ok)
