@@ -2,7 +2,7 @@
 ## 10/19/20
 
 # create model that predicts voteshare based on demographics of a state 
-# predict 2020 demographics based on demographics through 2020? 
+# predict 2020 democratic vote share based on demographics through 2020? 
 # add demographic predictions to the weighted ensemble you did however many weeks ago 
 # talk about ground game in final blog post.
 
@@ -57,6 +57,16 @@ demog <- read_csv("data/demographic_1990-2018.csv")
 fo_2012 <- read_csv("data/fieldoffice_2012_bycounty.csv")
 fo_dems <- read_csv("data/fieldoffice_2004-2012_dems.csv")
 turnout <- read_csv("data/turnout_1980-2016.csv")
+local_econ <- read_csv("data/local.csv")
+gs4_deauth()
+electoral_college <- read_sheet("https://docs.google.com/spreadsheets/d/1nOjlGrDkH_EpcqRzWQicLFjX0mo0ymrh8k6FaG0DRdk/edit?usp=sharing") %>%
+  slice(1:51) %>%
+  select(state, votes)
+
+states_predictions <- read_csv("data/csvData.csv") %>%
+  rename(state = "State") %>%
+  select(state) %>%
+  mutate(predictions = NA)
 
 #### Exploration initially 
 
@@ -153,7 +163,133 @@ lm_age4565_demog <- lm(D_pv2p ~ age4565, data = demog_pv)
 lm_age65_demog <- lm(D_pv2p ~ age65, data = demog_pv)
 # t values not close enough 
 
+## strongest predictors seem to be Asian, Hispanic, White, and 20-30 year old demographics. 
+
+# see changes in pct of white people in states from 2016-2018
+demog2 <- demog %>%
+  filter(year == 2016 | year == 2018) %>%
+  select(year, White, state) %>%
+  pivot_wider(names_from = year, values_from = White) %>%
+  mutate(white_chg = `2018` - `2016`)
+
+ggplot(demog, aes(x = year, y = White, color = state)) + geom_line()
+
+# use predict function to predict new values for each state based on 2018 white data 
+
+# visualize turnout 
+turnout %>%
+  filter(state != "United States") %>%
+  mutate(turn_pct = turnout/VEP) %>%
+  ggplot(aes(x = year, y = turn_pct)) + geom_line() + 
+  facet_wrap(~ state)
+
+# change in turnout from 2012-2016
+turnout_chg_16 <- turnout %>%
+  filter(state != "United States") %>%
+  filter(year == 2016 | year == 2012) %>%
+  mutate(turn_pct = turnout/VEP) %>%
+  select(year, state, turn_pct) %>%
+  pivot_wider(names_from = year, values_from = turn_pct) %>%
+  mutate(turn_16_chg = `2016` - `2012`) %>%
+ #  pivot_longer(cols = c(`2016`, `2012`), names_to = "turnout_pct")
+  left_join(demog) %>%
+  select(year, state, turn_16_chg, White) %>%
+  filter(year == 2016)
+
+# pct of White people vs. change in 2016 turnout
+ggplot(turnout_chg_16, aes(x = White, y = turn_16_chg, color = White)) + geom_point() + 
+  geom_smooth(method = "lm")
+
+# linear model for above 
+lm_white_change <- lm(White ~ turn_16_chg, data = turnout_chg_16)
+
+#### Try to make model like the state polling week 
+
+election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
+
+# Create local unemployment dataframe, use Q2 unemployment data
+local <- local_econ %>%
+  rename("state" = `State and area`) %>%
+  rename("year" = `Year`) %>%
+  filter(Month == "04" | Month == "05" | Month == "06") %>%
+  group_by(state, year) %>%
+  summarize(local_unemploy = mean(Unemployed_prce)) %>%
+  ungroup() %>%
+  right_join(election_years) %>%
+  left_join(pvstate)
+
+# create list of states to loop through eventually 
+states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")
+
+# Join poll state and popular vote by state, use weeks left = 6 because that is closest data we have
+state_pv_poll_rep <- poll_state %>%
+  filter(party == "republican") %>%
+  filter(weeks_left <= 6) %>%
+  group_by(year, candidate_name, state) %>%
+  mutate(avg_pollyr = mean(avg_poll)) %>%
+  left_join(pvstate) 
+
+# linear model for republican vote share and poll averages
+statepoll_lm_rep <- function(s){
+  ok <- state_pv_poll_rep %>%
+    filter(state == s)
+  
+  lm(R_pv2p ~ avg_pollyr, data = ok)
+}
+
+# linear model for local unemployment rate
+statelocal_lm_rep <- function(s){
+  ok <- local %>%
+    filter(state == s)
+  
+  # use republican vote share, leanred in section republicans are hurt more by
+  # high unemployment than democrats are
+  lm(R_pv2p ~ local_unemploy, data = ok)
+}
 
 
+statedemog_lm <- function(s){
+  ok <- demog_pv %>%
+    filter(state == s)
+  
+  lm(R_pv2p ~ White, data = ok)
+}
 
+predict_function <- function(s){
+  s_lm_demog <- statedemog_lm(s)
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_2020 %>%
+    filter(state == s) %>%
+    summarize(avg = mean(pct)) %>%
+    rename(avg_pollyr = "avg")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  # days_left <- 40
+  # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+  state_prediction <- 0.75*predict(s_lm_poll, Spoll) + 
+    0.05*predict(s_lm_econ, Secon) + 0.2*predict(s_lm_demog, Sdemog)
+}
 
+for (s in states_list){
+  state_prediction <- predict_function(s)
+  states_predictions$predictions[states_predictions$state == s] <- state_prediction
+}
+
+pred <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
