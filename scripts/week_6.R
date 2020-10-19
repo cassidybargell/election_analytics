@@ -204,14 +204,24 @@ turnout_chg_16 <- turnout %>%
  #  pivot_longer(cols = c(`2016`, `2012`), names_to = "turnout_pct")
   left_join(demog) %>%
   select(year, state, turn_16_chg, White) %>%
-  filter(year == 2016)
+  filter(year == 2016) %>%
+  left_join(pvstate) 
+  
 
 # pct of White people vs. change in 2016 turnout
-ggplot(turnout_chg_16, aes(x = White, y = turn_16_chg, color = White)) + geom_point() + 
+ggplot(turnout_chg_16, aes(x = White, y = turn_16_chg, color = R_pv2p)) + geom_point() + 
   geom_smooth(method = "lm")
 
+ggplot(turnout_chg_16, aes(x = turn_16_chg, y = R_pv2p, color = White)) + geom_point() + 
+  geom_smooth(method = "lm")
+
+ggplot(turnout_chg_16, aes(x = White, y = R_pv2p, color = turn_16_chg)) + geom_point() + 
+  geom_smooth(method = "lm") + theme_minimal() + 
+  labs(title = "Percentage White Population vs. Republican Two-Party Popular Vote Share",
+       subtitle = "2016 Presidential Election")
+
 # linear model for above 
-lm_white_change <- lm(White ~ turn_16_chg, data = turnout_chg_16)
+lm_white_change <- lm(White ~ R_pv2p, data = turnout_chg_16)
 
 #### Try to make model like the state polling week 
 
@@ -260,7 +270,7 @@ statelocal_lm_rep <- function(s){
   ok <- local %>%
     filter(state == s)
   
-  # use republican vote share, leanred in section republicans are hurt more by
+  # use republican vote share, learned in section republicans are hurt more by
   # high unemployment than democrats are
   lm(R_pv2p ~ local_unemploy, data = ok)
 }
@@ -407,6 +417,7 @@ state_viz2 <- states_predictions2 %>%
   mutate(win_margin = (D_pv2p-predictions)) %>%
   mutate(rep_win = ifelse(win_margin <= 0, TRUE, FALSE))
 
+# only change is florida flips republican
 ggplot(state_viz2, aes(state = state, fill = rep_win)) + 
   geom_statebins() + 
   theme_statebins() +
