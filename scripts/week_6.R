@@ -33,7 +33,7 @@ map_theme = function() {
 }
 
 # Read in data
-# fo_county <- read_sheet("https://docs.google.com/spreadsheets/d/1N8NIGmCaiXC3DC1GMW5vegRTHzc43juJEASJ84A-ebk/edit#gid=707282698")
+fo_county <- read_sheet("https://docs.google.com/spreadsheets/d/1N8NIGmCaiXC3DC1GMW5vegRTHzc43juJEASJ84A-ebk/edit#gid=707282698")
 fo_address <- read_csv("data/fieldoffice_2012-2016_byaddress.csv")
 popvote <- read_csv("data/popvote_1948-2016.csv")
 pvstate <- read_csv("data/popvote_bystate_1948-2016.csv")
@@ -62,13 +62,22 @@ gs4_deauth()
 electoral_college <- read_sheet("https://docs.google.com/spreadsheets/d/1nOjlGrDkH_EpcqRzWQicLFjX0mo0ymrh8k6FaG0DRdk/edit?usp=sharing") %>%
   slice(1:51) %>%
   select(state, votes)
-poll_state_10_18 <- read_csv()
+
+# most updated polls
+poll_state_10_18 <- read_csv("data/presidential_poll_averages_2020 (2).csv") %>%
+  filter(modeldate == "10/18/2020") %>%
+  filter(candidate_name == "Donald Trump") %>%
+  select(state, pct_trend_adjusted)
 
 states_predictions <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
   mutate(predictions = NA)
 
+states_predictions2 <- read_csv("data/csvData.csv") %>%
+  rename(state = "State") %>%
+  select(state) %>%
+  mutate(predictions = NA)
 #### Exploration initially 
 
 # number of field offices vs number of contacts
@@ -230,10 +239,10 @@ local <- local_econ %>%
 # create list of states to loop through eventually 
 states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")
 
-# Join poll state and popular vote by state, use weeks left = 6 because that is closest data we have
+# Join poll state and popular vote by state, use weeks left = 3 because that is closest data we have
 state_pv_poll_rep <- poll_state %>%
   filter(party == "republican") %>%
-  filter(weeks_left <= 6) %>%
+  filter(weeks_left <= 3) %>%
   group_by(year, candidate_name, state) %>%
   mutate(avg_pollyr = mean(avg_poll)) %>%
   left_join(pvstate) 
@@ -276,10 +285,9 @@ predict_function <- function(s){
     filter(year == 2020) %>%
     select(local_unemploy)
   
-  Spoll <- poll_2020 %>%
+  Spoll <- poll_state_10_18 %>%
     filter(state == s) %>%
-    summarize(avg = mean(pct)) %>%
-    rename(avg_pollyr = "avg")
+    rename(avg_pollyr = "pct_trend_adjusted")
   
   Sdemog <- demog %>%
     filter(state == s) %>%
@@ -288,14 +296,16 @@ predict_function <- function(s){
   
   # days_left <- 40
   # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
-  state_prediction <- 0.75*predict(s_lm_poll, Spoll) + 
-    0.2*predict(s_lm_econ, Secon) + 0.05*predict(s_lm_demog, Sdemog)
+  state_prediction <- 0.85*predict(s_lm_poll, Spoll) + 
+    0.1*predict(s_lm_econ, Secon) + 0.05*predict(s_lm_demog, Sdemog)
+  
 }
 
 # loop through all states
 for (s in states_list){
   state_prediction <- predict_function(s)
   states_predictions$predictions[states_predictions$state == s] <- state_prediction
+  
 }
 
 # model electoral college votes based on vote share predictions 
@@ -307,3 +317,107 @@ pred <- states_predictions %>%
   mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
   mutate(rep_ec = sum(rep_win)) %>%
   mutate(dem_ec = sum(dem_win))
+
+#### Prediction Visualization 
+
+# much easier to interpret win margin in colors
+state_viz <- states_predictions %>%
+  mutate(D_pv2p = (100 - predictions)) %>%
+  mutate(win_margin = (D_pv2p-predictions)) %>%
+  mutate(rep_win = ifelse(win_margin <= 0, TRUE, FALSE))
+
+# plot on map
+plot_usmap(data = state_viz, regions = "states", values = "win_margin") + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red", 
+    breaks = c(-60, -40, -20, 0, 20), 
+    limits = c(-61, 50),
+    name = "Win Margin") + 
+  labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
+       subtitle = "Weighted ensemble modeled using 
+       3-weeks out poll averages (0.85), white population (.1),
+       and Q2 local unemployment (0.05)",
+       caption = "Win margin is difference between Democratic and Republican 
+                  two-party popular vote share in each state.") + 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5))
+
+ggsave("figures/10_18_weighted_ensemble.png")
+
+# plot with state bins
+ggplot(state_viz, aes(state = state, fill = rep_win)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted ensemble modeled using 3-weeks out poll averages (0.85), 
+       white population (.1), and Q2 local unemployment (0.05)",
+       fill = "") + 
+  guides(fill=FALSE)
+
+ggsave("figures/10_18_weighted_ensemble_statebins.png")
+
+#### Try doing it with only polls
+predict_function2 <- function(s){
+  s_lm_demog <- statedemog_lm(s)
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_state_10_18 %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  # days_left <- 40
+  # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+  state_prediction2 <- 1*predict(s_lm_poll, Spoll) + 
+    0*predict(s_lm_econ, Secon) + 0*predict(s_lm_demog, Sdemog)
+  
+}
+
+# loop through all states
+for (s in states_list){
+  state_prediction2 <- predict_function2(s)
+  states_predictions2$predictions[states_predictions2$state == s] <- state_prediction2
+}
+
+pred2 <- states_predictions2 %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
+
+# much easier to interpret win margin in colors
+state_viz2 <- states_predictions2 %>%
+  mutate(D_pv2p = (100 - predictions)) %>%
+  mutate(win_margin = (D_pv2p-predictions)) %>%
+  mutate(rep_win = ifelse(win_margin <= 0, TRUE, FALSE))
+
+ggplot(state_viz2, aes(state = state, fill = rep_win)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Modelled using historical polling accuracy 3-weeks out from 
+       election day",
+       fill = "") + 
+  guides(fill=FALSE)
+
+ggsave("figures/10_18_polling_statebins.png")
+
+
+

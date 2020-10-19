@@ -9,3 +9,4 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 # [Polls - 9/28/20](posts/week_3.md)
 # [Incumbency - 10/5/20](posts/week_4.md)
 # [The Air War - 10/12/20](posts/week_5.md)
+# [The Ground Game - 10/18/20](posts/week_6.md)
