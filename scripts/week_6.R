@@ -33,7 +33,7 @@ map_theme = function() {
 }
 
 # Read in data
-fo_county <- read_sheet("https://docs.google.com/spreadsheets/d/1N8NIGmCaiXC3DC1GMW5vegRTHzc43juJEASJ84A-ebk/edit#gid=707282698")
+# fo_county <- read_sheet("https://docs.google.com/spreadsheets/d/1N8NIGmCaiXC3DC1GMW5vegRTHzc43juJEASJ84A-ebk/edit#gid=707282698")
 fo_address <- read_csv("data/fieldoffice_2012-2016_byaddress.csv")
 popvote <- read_csv("data/popvote_1948-2016.csv")
 pvstate <- read_csv("data/popvote_bystate_1948-2016.csv")
@@ -62,6 +62,7 @@ gs4_deauth()
 electoral_college <- read_sheet("https://docs.google.com/spreadsheets/d/1nOjlGrDkH_EpcqRzWQicLFjX0mo0ymrh8k6FaG0DRdk/edit?usp=sharing") %>%
   slice(1:51) %>%
   select(state, votes)
+poll_state_10_18 <- read_csv()
 
 states_predictions <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
@@ -207,6 +208,7 @@ lm_white_change <- lm(White ~ turn_16_chg, data = turnout_chg_16)
 
 election_years <- data.frame(year = seq(from=1948, to=2020, by=4))
 
+# demographics join, remove District of Columbia
 demog3 <- demog %>%
   right_join(pvstate2) %>%
   # pivot_longer(cols = c(Hispanic, Black, White, Asian, Indigenous, Female, Male, 
@@ -254,7 +256,7 @@ statelocal_lm_rep <- function(s){
   lm(R_pv2p ~ local_unemploy, data = ok)
 }
 
-
+# linear model for White demographic and Republican vote share
 statedemog_lm <- function(s){
   ok <- demog3 %>%
     filter(state == s)
@@ -262,6 +264,8 @@ statedemog_lm <- function(s){
   lm(R_pv2p ~ White, data = ok)
 }
 
+# create predict function that uses all three linear models and then a prediction for each state
+# want to weight based off of R squared values but not fully sure how to yet 
 predict_function <- function(s){
   s_lm_demog <- statedemog_lm(s)
   s_lm_poll <- statepoll_lm_rep(s)
@@ -285,14 +289,17 @@ predict_function <- function(s){
   # days_left <- 40
   # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
   state_prediction <- 0.75*predict(s_lm_poll, Spoll) + 
-    0.05*predict(s_lm_econ, Secon) + 0.2*predict(s_lm_demog, Sdemog)
+    0.2*predict(s_lm_econ, Secon) + 0.05*predict(s_lm_demog, Sdemog)
 }
 
+# loop through all states
 for (s in states_list){
   state_prediction <- predict_function(s)
   states_predictions$predictions[states_predictions$state == s] <- state_prediction
 }
 
+# model electoral college votes based on vote share predictions 
+# want to weight based off of R squared values but not fully sure how to yet 
 pred <- states_predictions %>%
   left_join(electoral_college) %>%
   filter(! is.na(predictions)) %>%
