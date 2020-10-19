@@ -217,8 +217,14 @@ ggplot(turnout_chg_16, aes(x = turn_16_chg, y = R_pv2p, color = White)) + geom_p
 
 ggplot(turnout_chg_16, aes(x = White, y = R_pv2p, color = turn_16_chg)) + geom_point() + 
   geom_smooth(method = "lm") + theme_minimal() + 
-  labs(title = "Percentage White Population vs. Republican Two-Party Popular Vote Share",
-       subtitle = "2016 Presidential Election")
+  labs(title = "Percentage White Population vs. Republican Two-Party Vote Share",
+       subtitle = "2016 Presidential Election",
+       x = "Percentage White Population",
+       y = "Republican Two-Party Vote Share",
+       color = "% Change in Voter Turnout 
+       Compared to 2012") 
+
+ggsave("figures/10_18_white_vs_rep.png")
 
 # linear model for above 
 lm_white_change <- lm(White ~ R_pv2p, data = turnout_chg_16)
@@ -429,6 +435,4 @@ ggplot(state_viz2, aes(state = state, fill = rep_win)) +
   guides(fill=FALSE)
 
 ggsave("figures/10_18_polling_statebins.png")
-
-
 
