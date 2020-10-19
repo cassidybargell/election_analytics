@@ -7,3 +7,6 @@
 ![](../figures/10_18_weighted_ensemble.png)
 ![](../figures/10_18_weighted_ensemble_statebins.png)
 ![](../figures/10_18_polling_statebins.png)
+![](../figures/10_18_demographic_statebins.png)
+
+

@@ -20,6 +20,7 @@ library(cowplot)
 library(scales)
 library(geofacet)
 library(maps)
+library(statebins)
 gs4_deauth()
 
 states_map <- ggplot2::map_data("state")
@@ -78,6 +79,12 @@ states_predictions2 <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
   mutate(predictions = NA)
+
+states_predictions3 <- read_csv("data/csvData.csv") %>%
+  rename(state = "State") %>%
+  select(state) %>%
+  mutate(predictions = NA)
+
 #### Exploration initially 
 
 # number of field offices vs number of contacts
@@ -313,7 +320,7 @@ predict_function <- function(s){
   # days_left <- 40
   # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
   state_prediction <- 0.85*predict(s_lm_poll, Spoll) + 
-    0.1*predict(s_lm_econ, Secon) + 0.05*predict(s_lm_demog, Sdemog)
+    0.05*predict(s_lm_econ, Secon) + 0.1*predict(s_lm_demog, Sdemog)
   
 }
 
@@ -349,7 +356,7 @@ plot_usmap(data = state_viz, regions = "states", values = "win_margin") +
     high = "blue",
     mid = "white",
     low = "red", 
-    breaks = c(-60, -40, -20, 0, 20), 
+    breaks = c(-60, -40, -20, 0, 20, 40), 
     limits = c(-61, 50),
     name = "Win Margin") + 
   labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
@@ -376,7 +383,8 @@ ggplot(state_viz, aes(state = state, fill = rep_win)) +
 
 ggsave("figures/10_18_weighted_ensemble_statebins.png")
 
-#### Try doing it with only polls
+#### Sensitivity analysis, mostly polling data
+
 predict_function2 <- function(s){
   s_lm_demog <- statedemog_lm(s)
   s_lm_poll <- statepoll_lm_rep(s)
@@ -396,10 +404,8 @@ predict_function2 <- function(s){
     filter(year == 2018) %>%
     select(state, year, White)
   
-  # days_left <- 40
-  # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
-  state_prediction2 <- 1*predict(s_lm_poll, Spoll) + 
-    0*predict(s_lm_econ, Secon) + 0*predict(s_lm_demog, Sdemog)
+  state_prediction2 <- 0.9*predict(s_lm_poll, Spoll) + 
+    0*predict(s_lm_econ, Secon) + 0.1*predict(s_lm_demog, Sdemog)
   
 }
 
@@ -430,9 +436,107 @@ ggplot(state_viz2, aes(state = state, fill = rep_win)) +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Modelled using historical polling accuracy 3-weeks out from 
-       election day",
+       election day (.85) and white population proportion (0.15)",
        fill = "") + 
   guides(fill=FALSE)
 
+plot_usmap(data = state_viz2, regions = "states", values = "win_margin") + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red", 
+    breaks = c(-60, -40, -20, 0, 20, 40), 
+    limits = c(-61, 50),
+    name = "Win Margin") + 
+  labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
+       subtitle = "Weighted ensemble using historical polling accuracy 3-weeks out from 
+       election day (0.85) and white population proportion (0.15)",
+       caption = "Win margin is difference between Democratic and Republican 
+                  two-party popular vote share in each state.") + 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5))
+
 ggsave("figures/10_18_polling_statebins.png")
+
+#### Sensitivity analysis, mostly demographic data
+
+predict_function3 <- function(s){
+  s_lm_demog <- statedemog_lm(s)
+  s_lm_poll <- statepoll_lm_rep(s)
+  s_lm_econ <- statelocal_lm_rep(s)
+  
+  Secon <- local %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- poll_state_10_18 %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  # days_left <- 40
+  # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
+  state_prediction3 <- 0.15*predict(s_lm_poll, Spoll) + 
+    0*predict(s_lm_econ, Secon) + 0.85*predict(s_lm_demog, Sdemog)
+  
+}
+
+# loop through all states
+for (s in states_list){
+  state_prediction3 <- predict_function3(s)
+  states_predictions3$predictions[states_predictions3$state == s] <- state_prediction3
+}
+
+pred3 <- states_predictions3 %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win))
+
+# much easier to interpret win margin in colors
+state_viz3 <- states_predictions3 %>%
+  mutate(D_pv2p = (100 - predictions)) %>%
+  mutate(win_margin = (D_pv2p-predictions)) %>%
+  mutate(rep_win = ifelse(win_margin <= 0, TRUE, FALSE))
+
+# only change is florida flips republican
+ggplot(state_viz3, aes(state = state, fill = rep_win)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Modelled using historical polling accuracy 3-weeks out from 
+       election day (.15) and white population proportion (0.85)",
+       fill = "") + 
+  guides(fill=FALSE)
+
+plot_usmap(data = state_viz3, regions = "states", values = "win_margin") + 
+  theme_void() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red", 
+    breaks = c(-60, -40, -20, 0, 20, 40), 
+    limits = c(-61, 50),
+    name = "Win Margin") + 
+  labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
+       subtitle = "Weighted ensemble using historical polling accuracy 3-weeks out from 
+       election day (0.15) and white population proportion (0.85)",
+       caption = "Win margin is difference between Democratic and Republican 
+                  two-party popular vote share in each state.") + 
+  theme(plot.title = element_text(size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5))
+
+ggsave("figures/10_18_demographic_statebins.png")
+
+
+
 
