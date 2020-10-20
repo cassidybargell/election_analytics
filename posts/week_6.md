@@ -43,4 +43,4 @@ Because changing the weights in these models did nothing to the final outcome pr
 
 However, the only state that flips using unemployment data is Florida. Without the unemployment data, the prediction outcomes for Florida are still extremely marginal, at a 50.068% popular vote share for Trump in the model relying on demographics, and a 50.14497% popular vote share for Trump in the model relying on polling. 
 
-In 2016 Trump won Florida also by a razor thin margin. It will be interesting to see how the election plays out in states like Florida that are likely to be won very narrowly in a year when mail in ballots and controversy are likely to make election night more chaotic than typical.
+In 2016 Trump won Florida also by a razor thin margin. It will be interesting to see how the election plays out in states like Florida that are likely to be won very narrowly in a year when mail in ballots and controversy might make election night more chaotic than normal.
