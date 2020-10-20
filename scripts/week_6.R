@@ -537,6 +537,13 @@ plot_usmap(data = state_viz3, regions = "states", values = "win_margin") +
 
 ggsave("figures/10_18_demographic_statebins.png")
 
+#### Compare pred2 and pred3 (sensitivity analysis)
 
+# find differences in popular vote outcome. 
+pred4 <- pred3 %>%
+  rename(predictions1 = "predictions") %>%
+  full_join(pred2) %>%
+  select(state, predictions1, predictions) %>%
+  mutate(diff = (predictions1 - predictions))
 
 

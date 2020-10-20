@@ -31,12 +31,16 @@ This weighted ensemble predicts a Biden win with *305* electoral college votes, 
 
 For sensitivity analysis, I have chosen to give no weight to the unemployment rates, and instead compare how weighting the polling and demographic predictive models differently changes the predicted outcome. 
 
-If polling is weighted more heavily, at 0.9 and demographics at 0.1, the predicted outcome is 
+If polling is weighted more heavily, at 0.9 and demographics at 0.1, the predicted outcome is a narrow Biden win with *276* electoral college votes, and *259* for Trump.
 
 ![](../figures/10_18_polling_statebins.png)
 
+If demographics (only white population proportion) are weighted more heavily, the electoral outcome is the same, with Biden winning *276* electoral college votes and Trump winning *259*. 
+
 ![](../figures/10_18_demographic_statebins.png)
 
-I also hoped by including demographic data some of the bias that may be captured in polls might be reduced.
+Because changing the weights in these models did nothing to the final outcome prediction, and given the unparalleled economic data of 2020, I would argue these models are likely better predictors than the initial model which included state unemployment rates.
 
+However, the only state that flips using unemployment data is Florida. Without the unemployment data, the prediction outcomes for Florida are still extremely marginal, at a 50.068% popular vote share for Trump in the model relying on demographics, and a 50.14497% popular vote share for Trump in the model relying on polling. 
 
+In 2016 Trump won Florida also by a razor thin margin. It will be interesting to see how the election plays out in states like Florida that are likely to be won very narrowly in a year when mail in ballots and controversy are likely to make election night more chaotic than typical.
