@@ -13,12 +13,30 @@ Demographics can also be useful for understanding how a certain population is li
 
 The linear model is statistically significant, ```R_pv2p = 0.658(white_pct) + 37.514``` with t-values 4.672 and 4.386 for the intercept and slope respectively (both > 2, so the null hypothesis that there is no correlation is rejected). 
 
+*Although the ground game might be less prominent in this election year, how can demographic data potentially guide predictive models?*
 
-In 2016 polls were generally Democrat-biased, although they were generally as acurate as they had been in the past [(538)](https://fivethirtyeight.com/features/the-polls-are-all-right/). In 2016 Trump dominated votes from white uneducated voters, which may have also been underrepresented in polling data. 
+<hr>
+
+In 2016 polls were generally Democrat-biased, although they were generally as acurate as they had been in the past [(538)](https://fivethirtyeight.com/features/the-polls-are-all-right/). In 2016 Trump dominated votes from white uneducated voters, which therefore may have been a demographic underrepresented in polling data. 
+
+A weighted ensemble using updated state poll aggregates from October 18th and Q2 unemployement rates can also include a model that uses the percentage of white people in a state in 2018 verus the historical Republican two-party vote share.
+
+I have initially chosen the weighting of the ensemble based on various assumptions. As Nate Silver suggests, polls likely get more accurate the closer to an election, so I have weighed them most heavily in my model ([Silver])(https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/). Given the extreme unreliability of this years economic data for forecasts, I have weighted the model based on white percentage of the population more heavily than the unemployment model. Demographics did not change dramatically because of COVID-19, so might provide a more constant factor to include in the final model.  
 
 ![](../figures/10_18_weighted_ensemble.png)
+
 ![](../figures/10_18_weighted_ensemble_statebins.png)
+
+This weighted ensemble predicts a Biden win with *305* electoral college votes, and Trump with *230*.
+
+For sensitivity analysis, I have chosen to give no weight to the unemployment rates, and instead compare how weighting the polling and demographic predictive models differently changes the predicted outcome. 
+
+If polling is weighted more heavily, at 0.9 and demographics at 0.1, the predicted outcome is 
+
 ![](../figures/10_18_polling_statebins.png)
+
 ![](../figures/10_18_demographic_statebins.png)
+
+I also hoped by including demographic data some of the bias that may be captured in polls might be reduced.
 
 

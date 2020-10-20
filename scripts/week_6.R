@@ -451,7 +451,7 @@ plot_usmap(data = state_viz2, regions = "states", values = "win_margin") +
     name = "Win Margin") + 
   labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
        subtitle = "Weighted ensemble using historical polling accuracy 3-weeks out from 
-       election day (0.85) and white population proportion (0.15)",
+       election day (0.9) and white population proportion (0.1)",
        caption = "Win margin is difference between Democratic and Republican 
                   two-party popular vote share in each state.") + 
   theme(plot.title = element_text(size = 14, hjust = 0.5),
@@ -482,8 +482,8 @@ predict_function3 <- function(s){
   
   # days_left <- 40
   # pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left))
-  state_prediction3 <- 0.15*predict(s_lm_poll, Spoll) + 
-    0*predict(s_lm_econ, Secon) + 0.85*predict(s_lm_demog, Sdemog)
+  state_prediction3 <- 0.1*predict(s_lm_poll, Spoll) + 
+    0*predict(s_lm_econ, Secon) + 0.9*predict(s_lm_demog, Sdemog)
   
 }
 
@@ -529,7 +529,7 @@ plot_usmap(data = state_viz3, regions = "states", values = "win_margin") +
     name = "Win Margin") + 
   labs(title = "Predicted Win Margin of Two-Party Popular Vote Share",
        subtitle = "Weighted ensemble using historical polling accuracy 3-weeks out from 
-       election day (0.15) and white population proportion (0.85)",
+       election day (0.1) and white population proportion (0.9)",
        caption = "Win margin is difference between Democratic and Republican 
                   two-party popular vote share in each state.") + 
   theme(plot.title = element_text(size = 14, hjust = 0.5),
