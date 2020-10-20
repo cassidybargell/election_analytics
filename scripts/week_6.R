@@ -1,8 +1,8 @@
 ## Week Six - Ground Game
 ## 10/19/20
 
-# create model that predicts voteshare based on demographics of a state 
-# predict 2020 democratic vote share based on demographics through 2020? 
+# create model that predicts vote share based on demographics of a state 
+# predict 2020 democratic vote share based on demographics through 2018? 
 # add demographic predictions to the weighted ensemble you did however many weeks ago 
 # talk about ground game in final blog post.
 
