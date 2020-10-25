@@ -233,7 +233,10 @@ p2020 <- poll_2020 %>%
 states_predictions <- read_csv("data/csvData.csv") %>%
   rename(state = "State") %>%
   select(state) %>%
-  mutate(predictions = NA)
+  mutate(predictions = NA) %>%
+  mutate(lwr = NA) %>%
+  mutate(uppr = NA) %>%
+  mutate(rsq = NA) 
 
 # use Colorado first
 co <- state_covid %>%
@@ -256,11 +259,11 @@ SCO <- day7_covid_rates %>%
 
 coPred <- predict(lm_co, SCO)
 
-# Something going wrong with D.C. 
+# Look at state that produces an extreme prediction (Louisiana) 
 
-dc <- state_covid %>%
+la <- state_covid %>%
   left_join(states) %>%
-  filter(State == "District of Columbia") %>%
+  filter(State == "Louisiana") %>%
   arrange(desc(date)) %>%
   mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
   filter(! is.na(rate)) %>%
@@ -268,15 +271,15 @@ dc <- state_covid %>%
   left_join(p2020) %>%
   filter(! is.na(avg_poll))
 
-lm_co <- lm(avg_poll ~ rate, data = co)
+lm_la <- lm(avg_poll ~ rate, data = la)
 
-ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
+ggplot(la, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
 
 
-SCO <- day7_covid_rates %>%
-  filter(state == "Colorado")
+SLA <- day7_covid_rates %>%
+  filter(state == "Louisiana")
 
-coPred <- predict(lm_co, SCO)
+laPred <- predict(lm_la, SLA)
 
 # Make function
 statecovid_lm <- function(s){
@@ -311,4 +314,71 @@ for (s in states_list){
   
 }
 
+# join electoral college
+pred <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win)) %>%
+  mutate(d_pred = (100 - predictions)) %>%
+  mutate(win_margin = (d_pred - predictions)) %>%
+  mutate(winner = ifelse(d_pred > 50, "Democrat", "Republican"))
 
+# visualize this
+ggplot(pred, aes(state = state, fill = win_margin)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  # scale_gradient_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "",
+       fill = "") + 
+  guides(fill=FALSE)
+
+#### Add confidence intervals and rsq
+
+CIcovid_function <- function(s){
+  
+  s_lm_covid <- statecovid_lm(s)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+  
+  covid_CI <- predict(s_lm_covid, Scovid, interval = "prediction", level = 0.95)
+}
+
+# Loop through again
+for (s in states_list){
+  CIcovid_prediction <- CIcovid_function(s)
+  states_predictions$lwr[states_predictions$state == s] <- CIcovid_prediction[, 2]
+  states_predictions$uppr[states_predictions$state == s] <- CIcovid_prediction[, 3]
+}
+
+# Add rsquared values to the table 
+covidrsq_lm <- function(s){
+  
+  ok <- state_covid %>%
+    left_join(states) %>%
+    filter(State == s) %>%
+    arrange(desc(date)) %>%
+    mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+    filter(! is.na(rate)) %>%
+    filter(! grepl('Inf', rate)) %>%
+    left_join(p2020) %>%
+    filter(! is.na(avg_poll))
+  
+  s <- lm(avg_poll ~ rate, data = ok)
+  rs <- (summary(s)$r.squared)
+}
+
+# loop through all states and save to states list - polls
+for (s in states_list){
+  covidrsq <- covidrsq_lm(s)
+  states_predictions$rsq[states_predictions$state == s] <- covidrsq
+}
