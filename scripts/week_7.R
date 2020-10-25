@@ -382,3 +382,36 @@ for (s in states_list){
   covidrsq <- covidrsq_lm(s)
   states_predictions$rsq[states_predictions$state == s] <- covidrsq
 }
+
+#### Try to visualize ranges
+ggplot(states_predictions, aes(x = predictions, y = state, color = predictions)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin = lwr, xmax = uppr)) +
+  scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "",
+       subtitle = "",
+       caption = "")
+
+# Filter out states with ridiculous margins
+states_predictions2 <- states_predictions %>%
+  filter(state != "Louisiana" & state != "Kansas" & state != "Oklahoma")
+
+ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)) + 
+  geom_point() + 
+  geom_errorbar(aes(xmin = lwr, xmax = uppr)) +
+  scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "",
+       subtitle = "",
+       caption = "")
