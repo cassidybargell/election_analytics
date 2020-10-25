@@ -26,7 +26,11 @@ map_theme = function() {
     theme(axis.ticks = element_blank()) + 
     theme(legend.title = element_blank()) +
     theme(panel.grid.major = element_blank())
+
 }
+
+states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "South Carolina", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "Wisconsin")
+
 
 # Read in data
 fo_county <- read_sheet("https://docs.google.com/spreadsheets/d/1N8NIGmCaiXC3DC1GMW5vegRTHzc43juJEASJ84A-ebk/edit#gid=707282698")
@@ -75,6 +79,10 @@ census_data <- read_csv("data/nst-est2019-alldata.csv") %>%
   rename(pop_2019 = "POPESTIMATE2019") %>%
   select(State, pop_2019) %>%
   left_join(states)
+day7_covid_rates <- read_csv("data/7day-united_states_covid19_cases_and_deaths_by_state.csv") %>%
+  rename(rate = "Death Rate per 100K in Last 7 Days") %>%
+  rename(state = "State/Territory")
+all_time_covid_rates <- read_csv("data/united_states_covid19_cases_and_deaths_by_state (1).csv")
 
 county_covid$county = as.character(gsub("County", "", county_covid$county))
 
@@ -204,17 +212,103 @@ lm1 <- lm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
 glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
 
 
-
-
 #### Plot most recent approval averages vs. covid deaths maybe 
 # want to make a bubble map of the U.S. 
 
 # US <- map_data("world") %>% filter(region=="US")
 # cities <- world.cities %>% filter(country.etc=="USA")
 
+#### Try to make state level predictions based on COVID rates
+
+# polls to join with 
+p2020 <- poll_2020 %>%
+  filter(candidate_name == "Donald Trump") %>%
+  group_by(state, date) %>%
+  mutate(avg_poll = mean(pct)) %>%
+  filter(! is.na(state)) %>%
+  rename(State = state) %>%
+  select(State, avg_poll, date)
+
+# place to store predictions
+states_predictions <- read_csv("data/csvData.csv") %>%
+  rename(state = "State") %>%
+  select(state) %>%
+  mutate(predictions = NA)
+
+# use Colorado first
+co <- state_covid %>%
+  left_join(states) %>%
+  filter(State == "Colorado") %>%
+  arrange(desc(date)) %>%
+  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  filter(! is.na(rate)) %>%
+  filter(! grepl('Inf', rate)) %>%
+  left_join(p2020) %>%
+  filter(! is.na(avg_poll))
+
+lm_co <- lm(avg_poll ~ rate, data = co)
+
+ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
 
 
+SCO <- day7_covid_rates %>%
+  filter(state == "Colorado")
+
+coPred <- predict(lm_co, SCO)
+
+# Something going wrong with D.C. 
+
+dc <- state_covid %>%
+  left_join(states) %>%
+  filter(State == "District of Columbia") %>%
+  arrange(desc(date)) %>%
+  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  filter(! is.na(rate)) %>%
+  filter(! grepl('Inf', rate)) %>%
+  left_join(p2020) %>%
+  filter(! is.na(avg_poll))
+
+lm_co <- lm(avg_poll ~ rate, data = co)
+
+ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
 
 
+SCO <- day7_covid_rates %>%
+  filter(state == "Colorado")
+
+coPred <- predict(lm_co, SCO)
+
+# Make function
+statecovid_lm <- function(s){
+
+  ok <- state_covid %>%
+    left_join(states) %>%
+    filter(State == s) %>%
+    arrange(desc(date)) %>%
+    mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+    filter(! is.na(rate)) %>%
+    filter(! grepl('Inf', rate)) %>%
+    left_join(p2020) %>%
+    filter(! is.na(avg_poll))
+  
+  lm(avg_poll ~ rate, data = ok)
+}
+
+# Make predict function with most recent 7 day covid death rates 
+predict_function <- function(s){
+  s_lm_covid <- statecovid_lm(s)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+
+  state_prediction <- predict(s_lm_covid, Scovid)
+}
+
+# loop through all the states
+for (s in states_list){
+  state_prediction <- predict_function(s)
+  states_predictions$predictions[states_predictions$state == s] <- state_prediction
+  
+}
 
 
