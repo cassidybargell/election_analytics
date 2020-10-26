@@ -121,22 +121,22 @@ polls_2020_no0 <- polls_2020 %>%
 
 # plot deaths vs. avg polling 
 ggplot(polls_2020, aes(x = tot_death, y = avg_poll, color = date)) + geom_point() + 
-  geom_smooth(method = "lm") + my_line_theme
+  geom_smooth(method = "glm") + my_line_theme
 
 # plot deaths per capita vs. avg polling
 ggplot(polls_2020, aes(x = percap, y = avg_poll, color = date)) + geom_point() + 
-  geom_smooth(method = "lm") + my_line_theme
+  geom_smooth(method = "glm") + my_line_theme
 
-lm_percap <- lm(avg_poll ~ percap, data = polls_2020)
+glm_percap <- glm(avg_poll ~ percap, data = polls_2020)
 
 # repeat plot deaths vs. avg polling after at least one death had occured in the state
 ggplot(polls_2020_no0, aes(x = tot_death, y = avg_poll, color = date)) + geom_point() + 
-  geom_smooth(method = "lm") + my_line_theme
+  geom_smooth(method = "glm") + my_line_theme
 
 # repeat plot deaths per capita vs. avg polling after at least one death had
 # occured in the state
 ggplot(polls_2020_no0, aes(x = percap, y = avg_poll, color = date)) + geom_point() + 
-  geom_smooth(method = "lm") + my_line_theme + 
+  geom_smooth(method = "glm") + my_line_theme + 
   labs(title = "Per Capita Deaths vs. Aggregate Poll Averages",
        subtitle = "Poll Support for Republican Candidate",
        color = "",
@@ -145,7 +145,7 @@ ggplot(polls_2020_no0, aes(x = percap, y = avg_poll, color = date)) + geom_point
 
 ggsave("figures/10-26-20_pollvpercap.png")
 
-lm_percap_no0 <- lm(avg_poll ~ percap, data = polls_2020_no0)
+glm_percap_no0 <- glm(avg_poll ~ percap, data = polls_2020_no0)
 
 # these plots make good sense knowing the more urban places are usually more
 # democratic and have more deaths
@@ -171,7 +171,7 @@ most_recent_covid <- state_covid %>%
 # plot most recent covid deaths data and most recent poll aggregate
 
 ggplot(most_recent_covid, aes(x = per100000, y = pct_estimate, label = state)) + 
-  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "lm") + my_line_theme + 
+  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "glm") + my_line_theme + 
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("Democrat win", "Republican win")) +
   labs(x = "Total COVID Deaths Per 100,000 as of 10-20-2020",
@@ -189,7 +189,7 @@ rep_recent_covid <- most_recent_covid %>%
   filter(winner == "Republican")
 
 ggplot(rep_recent_covid, aes(x = percap, y = pct_estimate, label = state)) + 
-  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "lm") + my_line_theme + 
+  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "glm") + my_line_theme + 
   scale_color_manual(values = c("red", "blue"), name = "", 
                      labels = c("", "")) +
   labs(x = "Total COVID Deaths Per Capita as of 10-20-2020",
@@ -201,7 +201,7 @@ dem_recent_covid <- most_recent_covid %>%
   filter(winner == "Democrat")
 
 ggplot(dem_recent_covid, aes(x = percap, y = pct_estimate, label = state)) + 
-  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "lm") + my_line_theme + 
+  geom_text(size = 1.8, aes(color = winner)) + geom_smooth(method = "glm") + my_line_theme + 
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("", "")) +
   labs(x = "Total COVID Deaths Per Capita as of 10-20-2020",
@@ -211,8 +211,8 @@ ggplot(dem_recent_covid, aes(x = percap, y = pct_estimate, label = state)) +
 
 # run linear model while controlling for 2016 winner, don't really know what to
 # do with this
-lm1 <- lm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
-lm1 <- lm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
+glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
+glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
 
 
 #### Plot most recent approval averages vs. covid deaths maybe 
@@ -252,15 +252,15 @@ co <- state_covid %>%
   left_join(p2020) %>%
   filter(! is.na(avg_poll))
 
-lm_co <- lm(avg_poll ~ rate, data = co)
+glm_co <- glm(avg_poll ~ rate, data = co)
 
-ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
+ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "glm")
 
 
 SCO <- day7_covid_rates %>%
   filter(state == "Colorado")
 
-coPred <- predict(lm_co, SCO)
+coPred <- predict(glm_co, SCO)
 
 # Look at state that produces an extreme prediction (Louisiana) 
 
@@ -274,18 +274,18 @@ or <- state_covid %>%
   left_join(p2020) %>%
   filter(! is.na(avg_poll))
 
-lm_or <- lm(avg_poll ~ rate, data = or)
+glm_or <- glm(avg_poll ~ rate, data = or)
 
-ggplot(or, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
+ggplot(or, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "glm")
 
 
 SOR <- day7_covid_rates %>%
   filter(state == "Oregon")
 
-orPred <- predict(lm_or, SOR)
+orPred <- predict(glm_or, SOR)
 
 # Make function
-statecovid_lm <- function(s){
+statecovid_glm <- function(s){
 
   ok <- state_covid %>%
     left_join(states) %>%
@@ -297,17 +297,17 @@ statecovid_lm <- function(s){
     left_join(p2020) %>%
     filter(! is.na(avg_poll))
   
-  lm(avg_poll ~ rate, data = ok)
+  glm(avg_poll ~ rate, data = ok)
 }
 
 # Make predict function with most recent 7 day covid death rates 
 predict_function <- function(s){
-  s_lm_covid <- statecovid_lm(s)
+  s_glm_covid <- statecovid_glm(s)
   
   Scovid <- day7_covid_rates %>%
     filter(state == s)
 
-  state_prediction <- predict(s_lm_covid, Scovid)
+  state_prediction <- predict(s_glm_covid, Scovid)
 }
 
 # loop through all the states
@@ -350,46 +350,46 @@ ggsave("figures/10-26-20_prediction_map.png")
 
 CIcovid_function <- function(s){
   
-  s_lm_covid <- statecovid_lm(s)
+  s_glm_covid <- statecovid_glm(s)
   
   Scovid <- day7_covid_rates %>%
     filter(state == s)
   
-  covid_CI <- predict(s_lm_covid, Scovid, interval = "prediction", level = 0.95)
+  covid_CI <- predict(s_glm_covid, Scovid, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)
 }
-
-
 
 # Loop through again
 for (s in states_list){
   CIcovid_prediction <- CIcovid_function(s)
   
-  states_predictions$lwr[states_predictions$state == s] <- CIcovid_prediction[, 2]
-  states_predictions$uppr[states_predictions$state == s] <- CIcovid_prediction[, 3]
+  critval <- 1.96 ## approx 95% CI
+  
+  states_predictions$lwr[states_predictions$state == s] <- CIcovid_prediction$fit - (critval * CIcovid_prediction$se.fit)
+  states_predictions$uppr[states_predictions$state == s] <- CIcovid_prediction$fit + (critval * CIcovid_prediction$se.fit)
 }
 
 # Add rsquared values to the table 
-covidrsq_lm <- function(s){
+# covidrsq_glm <- function(s){
   
-  ok <- state_covid %>%
-    left_join(states) %>%
-    filter(State == s) %>%
-    arrange(desc(date)) %>%
-    mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
-    filter(! is.na(rate)) %>%
-    filter(! grepl('Inf', rate)) %>%
-    left_join(p2020) %>%
-    filter(! is.na(avg_poll))
+ #  ok <- state_covid %>%
+   # left_join(states) %>%
+   # filter(State == s) %>%
+   # arrange(desc(date)) %>%
+   # mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+   # filter(! is.na(rate)) %>%
+   # filter(! grepl('Inf', rate)) %>%
+   # left_join(p2020) %>%
+   # filter(! is.na(avg_poll))
   
-  s <- lm(avg_poll ~ rate, data = ok)
-  rs <- (summary(s)$r.squared)
-}
+#  s <- glm(avg_poll ~ rate, data = ok)
+ # rs <- (summary(s)$r.squared)
+# }
 
 # loop through all states and save to states list - polls
-for (s in states_list){
-  covidrsq <- covidrsq_lm(s)
-  states_predictions$rsq[states_predictions$state == s] <- covidrsq
-}
+# for (s in states_list){
+  # covidrsq <- covidrsq_glm(s)
+  # states_predictions$rsq[states_predictions$state == s] <- covidrsq
+# }
 
 #### Try to visualize ranges
 ggplot(states_predictions, aes(x = predictions, y = state, color = predictions)) + 
