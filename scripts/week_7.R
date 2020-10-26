@@ -74,6 +74,8 @@ poll_state_10_18 <- read_csv("data/presidential_poll_averages_2020 (2).csv") %>%
 pv_county <- read_csv("data/popvote_bycounty_2000-2016.csv")
 state_covid <- read_csv("data/United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv") %>%
   mutate(date = as.Date(submission_date, "%m/%d/%y"))
+state_covid2 <- read_csv("data/United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv") %>%
+  mutate(date = as.Date(submission_date, "%m/%d/%y"))
 census_data <- read_csv("data/nst-est2019-alldata.csv") %>%
   rename(State = "NAME") %>%
   rename(pop_2019 = "POPESTIMATE2019") %>%
@@ -427,7 +429,13 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
 
 ggsave("figures/10-26-20_prediction_ranges.png")
 
-#### COVID Rates spiking? 
+#### COVID Rates spiking 
+
+day7_covid_rates <- day7_covid_rates %>%
+  rename(cases = "Case Rate per 100000 in Last 7 Days")
+
+plot_usmap(data = day7_covid_rates, regions = "states", values = "cases") + 
+  theme_void()
 
 #### Figure for Appendix
 
