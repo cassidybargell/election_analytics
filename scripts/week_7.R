@@ -89,25 +89,13 @@ county_covid$county = as.character(gsub("County", "", county_covid$county))
 my_line_theme <- theme_bw() + 
   theme(panel.border = element_blank(),
     plot.title   = element_text(size = 15, hjust = 0.5), 
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
     axis.text.x  = element_text(angle = 45, hjust = 1),
     axis.text    = element_text(size = 12),
     strip.text   = element_text(size = 18),
     axis.line    = element_line(colour = "black"),
-    legend.position = "top",
+    legend.position = "right",
     legend.text = element_text(size = 12))
-
-
-#### Descriptive Statistic 
-## Breakout room
-
-# Just plot county level data
-plot_usmap(data = county_covid, regions = "county", values = "deaths") + 
-  theme_void()
-
-# county_covid_pv <- county_covid %>%
-  # select(state, fips, deaths) %>%
-  # full_join(pv_county) %>%
-           #   select(D_win_margin, fips, state))
 
 #### States Polls vs. COVID Deaths
 
@@ -139,6 +127,8 @@ ggplot(polls_2020, aes(x = tot_death, y = avg_poll, color = date)) + geom_point(
 ggplot(polls_2020, aes(x = percap, y = avg_poll, color = date)) + geom_point() + 
   geom_smooth(method = "lm") + my_line_theme
 
+lm_percap <- lm(avg_poll ~ percap, data = polls_2020)
+
 # repeat plot deaths vs. avg polling after at least one death had occured in the state
 ggplot(polls_2020_no0, aes(x = tot_death, y = avg_poll, color = date)) + geom_point() + 
   geom_smooth(method = "lm") + my_line_theme
@@ -146,7 +136,16 @@ ggplot(polls_2020_no0, aes(x = tot_death, y = avg_poll, color = date)) + geom_po
 # repeat plot deaths per capita vs. avg polling after at least one death had
 # occured in the state
 ggplot(polls_2020_no0, aes(x = percap, y = avg_poll, color = date)) + geom_point() + 
-  geom_smooth(method = "lm") + my_line_theme
+  geom_smooth(method = "lm") + my_line_theme + 
+  labs(title = "Per Capita Deaths vs. Aggregate Poll Averages",
+       subtitle = "Poll Support for Republican Candidate",
+       color = "",
+       x = "Per Capita Deaths by State",
+       y = "State Poll Aggregate") 
+
+ggsave("figures/10-26-20_pollvpercap.png")
+
+lm_percap_no0 <- lm(avg_poll ~ percap, data = polls_2020_no0)
 
 # these plots make good sense knowing the more urban places are usually more
 # democratic and have more deaths
@@ -178,7 +177,11 @@ ggplot(most_recent_covid, aes(x = per100000, y = pct_estimate, label = state)) +
   labs(x = "Total COVID Deaths Per 100,000 as of 10-20-2020",
        y = "Poll Averages on 10-18-2020", 
        legend = "2016 two-party popular vote win", 
-       title = "COVID Deaths Per 100,000 vs. Poll Averages")
+       title = "COVID Deaths Per 100,000 vs. Poll Averages", 
+       subtitle = "Colored by popular vote winner in 2016") + 
+  theme(legend.position = "none")
+
+ggsave("figures/10-26-2020_recent_regression.png")
 
 # stratify based on party (2016 popular vote winner)
 
@@ -209,7 +212,7 @@ ggplot(dem_recent_covid, aes(x = percap, y = pct_estimate, label = state)) +
 # run linear model while controlling for 2016 winner, don't really know what to
 # do with this
 lm1 <- lm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
-glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
+lm1 <- lm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
 
 
 #### Plot most recent approval averages vs. covid deaths maybe 
@@ -337,9 +340,11 @@ ggplot(pred, aes(state = state, fill = win_margin)) +
     name = "Win Margin") + 
   # scale_gradient_manual(values=c("#619CFF", "#F8766D")) +
   labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "",
-       fill = "") + 
-  guides(fill=FALSE)
+       subtitle = "Modelled Using Relationship Between State Polling Averages
+       and 7-day COVID-19 Case Rate",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/10-26-20_prediction_map.png")
 
 #### Add confidence intervals and rsq
 
@@ -353,9 +358,12 @@ CIcovid_function <- function(s){
   covid_CI <- predict(s_lm_covid, Scovid, interval = "prediction", level = 0.95)
 }
 
+
+
 # Loop through again
 for (s in states_list){
   CIcovid_prediction <- CIcovid_function(s)
+  
   states_predictions$lwr[states_predictions$state == s] <- CIcovid_prediction[, 2]
   states_predictions$uppr[states_predictions$state == s] <- CIcovid_prediction[, 3]
 }
@@ -400,7 +408,7 @@ ggplot(states_predictions, aes(x = predictions, y = state, color = predictions))
 
 # Filter out states with ridiculous margins
 states_predictions2 <- states_predictions %>%
-  filter(state != "Louisiana" & state != "Kansas" & state != "Oklahoma")
+  filter(state != "Louisiana")
 
 ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)) + 
   geom_point() + 
@@ -412,6 +420,11 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   ylab("") + 
   xlab("Republican Vote Share %") + 
   geom_vline(xintercept = 50, lty = 2) +
-  labs(title = "",
-       subtitle = "",
-       caption = "")
+  labs(title = "Range of Predicted Republican Popular Vote Share %",
+       subtitle = "Modelled using Relationship Between State Polling Averages
+       and 7-day COVID-19 Case Rate",
+       caption = "LA ommitted - range went above 100%")
+
+ggsave("figures/10-26-20_prediction_ranges.png")
+
+#### COVID Rates spiking? 
