@@ -183,6 +183,8 @@ ggplot(most_recent_covid, aes(x = per100000, y = pct_estimate, label = state)) +
        subtitle = "Colored by popular vote winner in 2016") + 
   theme(legend.position = "none")
 
+glm2 <- glm(pct_estimate ~ per100000, data = most_recent_covid)
+
 ggsave("figures/10-26-2020_recent_regression.png")
 
 # stratify based on party (2016 popular vote winner)
@@ -198,6 +200,9 @@ ggplot(rep_recent_covid, aes(x = percap, y = pct_estimate, label = state)) +
        y = "Poll Averages on 10-18-2020", 
        legend = "2016 two-party popular vote win", 
        title = "COVID Deaths Per Capita vs. Poll Averages")
+
+# look at t values for significance/predictive power
+glm3 <- glm(pct_estimate ~ per100000, data = rep_recent_covid)
   
 dem_recent_covid <- most_recent_covid %>%
   filter(winner == "Democrat")
@@ -211,17 +216,11 @@ ggplot(dem_recent_covid, aes(x = percap, y = pct_estimate, label = state)) +
        legend = "2016 two-party popular vote win", 
        title = "COVID Deaths Per Capita vs. Poll Averages")
 
+glm4 <- glm(pct_estimate ~ per100000, data = dem_recent_covid)
+
 # run linear model while controlling for 2016 winner, don't really know what to
 # do with this
 glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
-glm1 <- glm(pct_estimate ~ per100000 * winner, data = most_recent_covid)
-
-
-#### Plot most recent approval averages vs. covid deaths maybe 
-# want to make a bubble map of the U.S. 
-
-# US <- map_data("world") %>% filter(region=="US")
-# cities <- world.cities %>% filter(country.etc=="USA")
 
 #### Try to make state level predictions based on COVID rates
 
@@ -257,7 +256,6 @@ co <- state_covid %>%
 glm_co <- glm(avg_poll ~ rate, data = co)
 
 ggplot(co, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "glm")
-
 
 SCO <- day7_covid_rates %>%
   filter(state == "Colorado")
@@ -343,7 +341,7 @@ ggplot(pred, aes(state = state, fill = win_margin)) +
   # scale_gradient_manual(values=c("#619CFF", "#F8766D")) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Modelled Using Relationship Between State Polling Averages
-       and 7-day COVID-19 Death Rate",
+       and 7-day Change in COVID-19 Death Rate",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10-26-20_prediction_map.png")
@@ -402,7 +400,7 @@ ggplot(states_predictions, aes(x = predictions, y = state, color = predictions))
   theme(axis.text.y = element_text(size = 7),
         legend.position = "none") + 
   ylab("") + 
-  xlab("Republican Vote Share %") + 
+  xlab("Predicted Republican Vote Share %") + 
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "",
        subtitle = "",
@@ -420,11 +418,11 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   theme(axis.text.y = element_text(size = 7),
         legend.position = "none") + 
   ylab("") + 
-  xlab("Republican Vote Share %") + 
+  xlab("Predicted Republican Vote Share %") + 
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
-       and 7-day COVID-19 Death Rate",
+       and 7-day Change in COVID-19 Death Rate",
        caption = "LA omitted - range went above 100%")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
@@ -449,4 +447,33 @@ ap <- states_predictions %>%
   cols_label(state = "State")
 
 gtsave(ap, "figures/10-26-2020_gt.png")
+
+#### Look at potential swing states
+# Florida, Iowa, Georgia, North Carolina, Arizona, Texas, Ohio
+
+swing <- state_covid %>%
+  left_join(states) %>%
+  filter(State == "Florida" | State == "Iowa" | State == "Georgia" | State == "Colorado" |
+           State == "North Carolina" | State == "Arizona" | State == "Texas" | State == "Ohio") %>%
+  group_by(State) %>%
+  arrange(desc(date)) %>%
+  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  filter(! is.na(rate)) %>%
+  filter(! grepl('Inf', rate)) %>%
+  left_join(p2020) %>%
+  filter(! is.na(avg_poll))
+
+ggplot(swing, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "glm") + 
+  facet_wrap(~ State) + my_line_theme + 
+  labs(x = "7 Day Death Rate Change",
+       y = "Poll Averages", 
+       title = "COVID-19 Deaths Rate vs. Poll Averages by State")
+
+ggsave("figures/10-26-20_swing.png")
+
+
+#### Combine with Previous Weeks 
+# For final prediction next week maybe
+
+
         
