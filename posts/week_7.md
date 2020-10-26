@@ -3,7 +3,7 @@
 # Shocks
 ## 10/26/20
 
-![](../figures/10-26-2020_pollvpercap.png)
+![](../figures/10-26-20_pollvpercap.png)
 
 ![](../figures/10-26-2020_recent_regression.png)
 
