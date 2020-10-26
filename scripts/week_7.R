@@ -408,7 +408,7 @@ ggplot(states_predictions, aes(x = predictions, y = state, color = predictions))
 
 # Filter out states with ridiculous margins
 states_predictions2 <- states_predictions %>%
-  filter(state != "Louisiana" & state != "Kansas" & state != "Oklahoma")
+  filter(state != "Louisiana")
 
 ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)) + 
   geom_point() + 
@@ -423,7 +423,7 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
        and 7-day COVID-19 Case Rate",
-       caption = "LA, OK & KA ommitted - range went above 100%")
+       caption = "LA omitted - range went above 100%")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
 
