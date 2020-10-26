@@ -341,7 +341,7 @@ ggplot(pred, aes(state = state, fill = win_margin)) +
   # scale_gradient_manual(values=c("#619CFF", "#F8766D")) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Modelled Using Relationship Between State Polling Averages
-       and 7-day COVID-19 Case Rate",
+       and 7-day COVID-19 Death Rate",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10-26-20_prediction_map.png")
@@ -422,7 +422,7 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
-       and 7-day COVID-19 Case Rate",
+       and 7-day COVID-19 Death Rate",
        caption = "LA omitted - range went above 100%")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
