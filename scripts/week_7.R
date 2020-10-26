@@ -238,8 +238,8 @@ states_predictions <- read_csv("data/csvData.csv") %>%
   select(state) %>%
   mutate(predictions = NA) %>%
   mutate(lwr = NA) %>%
-  mutate(uppr = NA) %>%
-  mutate(rsq = NA) 
+  mutate(uppr = NA) # %>%
+ #  mutate(rsq = NA) 
 
 # use Colorado first
 co <- state_covid %>%
@@ -433,7 +433,7 @@ ggsave("figures/10-26-20_prediction_ranges.png")
 
 ap <- states_predictions %>%
   gt() %>%
-  cols_label(rsq = "R-squared Value") %>%
+  # cols_label(rsq = "R-squared Value") %>%
   cols_label(predictions = "Point Estimate") %>%
   cols_label(lwr = "Lower Bound") %>%
   cols_label(uppr = "Upper Bound") %>%
