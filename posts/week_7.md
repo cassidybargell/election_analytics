@@ -3,8 +3,6 @@
 # Shocks
 ## 10/26/20
 
-Theory - timing of shocks in 2020, covid rates spike close to election, use 7 day rates in a model between state polling averages and 7 day covid death rates, big spikes in COVID death rates might be the most recent shock that could impact the election. Reality - use reference for Iraq paper that the incumbent will likely be differentially impacted by COVId-19 death rates depending on a states partisanship. Also possible governors recieve more retrospective voting punishment than the incumbent does. Retain prediction model from previous week as stronger in my opinion. 
-
 The 2020 election has been full of unexpected events, its hard to even recall all of the developments that could be considered major shocks. The impeachment, civil unrest and riots, the death of Ruth Bader Ginsberg could all be considered large enough shocks that might impact the election in some way. The global COVID-19 pandemic is yet another a shock to this election that has had deep and lasting impacts on nearly every aspect of society. 
 
 As I have discussed in previous weeks, the pandemic has already made predicting this election difficult. Economic factors which are typically included in predictions, like Q2 GDP and unemployment rates, are so unprecedented they have lost predictive power in models that use historical data. Even if the pandemic is not directly included in a certain model, its impact on other fundamental and campaign factors has been profound. 
