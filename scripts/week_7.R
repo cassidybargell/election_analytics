@@ -264,9 +264,9 @@ coPred <- predict(lm_co, SCO)
 
 # Look at state that produces an extreme prediction (Louisiana) 
 
-la <- state_covid %>%
+or <- state_covid %>%
   left_join(states) %>%
-  filter(State == "Louisiana") %>%
+  filter(State == "Oregon") %>%
   arrange(desc(date)) %>%
   mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
   filter(! is.na(rate)) %>%
@@ -274,15 +274,15 @@ la <- state_covid %>%
   left_join(p2020) %>%
   filter(! is.na(avg_poll))
 
-lm_la <- lm(avg_poll ~ rate, data = la)
+lm_or <- lm(avg_poll ~ rate, data = or)
 
-ggplot(la, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
+ggplot(or, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "lm")
 
 
-SLA <- day7_covid_rates %>%
-  filter(state == "Louisiana")
+SOR <- day7_covid_rates %>%
+  filter(state == "Oregon")
 
-laPred <- predict(lm_la, SLA)
+orPred <- predict(lm_or, SOR)
 
 # Make function
 statecovid_lm <- function(s){
@@ -408,7 +408,7 @@ ggplot(states_predictions, aes(x = predictions, y = state, color = predictions))
 
 # Filter out states with ridiculous margins
 states_predictions2 <- states_predictions %>%
-  filter(state != "Louisiana")
+  filter(state != "Louisiana" & state != "Kansas" & state != "Oklahoma")
 
 ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)) + 
   geom_point() + 
@@ -423,8 +423,22 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
        and 7-day COVID-19 Case Rate",
-       caption = "LA ommitted - range went above 100%")
+       caption = "LA, OK & KA ommitted - range went above 100%")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
 
 #### COVID Rates spiking? 
+
+#### Figure for Appendix
+
+ap <- states_predictions %>%
+  gt() %>%
+  cols_label(rsq = "R-squared Value") %>%
+  cols_label(predictions = "Point Estimate") %>%
+  cols_label(lwr = "Lower Bound") %>%
+  cols_label(uppr = "Upper Bound") %>%
+  tab_spanner(label = "95% C.I.", columns = vars(lwr, uppr)) %>%
+  cols_label(state = "State")
+
+gtsave(ap, "figures/10-26-2020_gt.png")
+        
