@@ -40,11 +40,11 @@ Using state poll aggregates from throughout 2020 and matching by date with the 7
 
 Some states only have one poll average throughout 2020, and are represented by a single point without a confidence interval. Other states without sufficient polling data were omitted completely. 
 
-This particular model using only COVID-19 rates and polling averages predicts a landslide win for Biden with **426** electoral college votes and Trump receiving **66** (the remaining 46 votes from states that were not modelled, but the outcome is decisive). 
+This particular model using only COVID-19 rates and polling averages predicts a landslide win for Biden with **405** electoral college votes and Trump receiving **87** (the remaining 46 votes from states that were not modelled, but the outcome is decisive). 
 
 This large of a win margin seems unlikely, especially given how much COVID-19 has become a partisan issue. I would not expect some safe red states to swing left purely because of an increase in COVID-19 death rates for a variety of reasons. For example, blame might be placed further down the ballot, or economic recovery might be valued more heavily than changes in death rates. 
 
-Some states create models that seem more predictive than others, like Colorado. In the seven states that are predicted to be the closest by Elliot Morris from the [Economist](https://projects.economist.com/us-2020-forecast/president), the models created using this data seem to have little to no real predictive power. (Using this model, all of these 7 states are predicted to vote blue, with not one having a confidence interval that includes a potential Republican win).
+Some states create models that seem more predictive than others, like Colorado. In the seven states that are predicted to be the closest by Elliot Morris from the [Economist](https://projects.economist.com/us-2020-forecast/president), the models created using this data seem to have less predictive power.
 
 ![](../figures/10-26-20_swing.png)
 

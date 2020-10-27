@@ -247,7 +247,8 @@ co <- state_covid %>%
   left_join(states) %>%
   filter(State == "Colorado") %>%
   arrange(desc(date)) %>%
-  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  left_join(census_data) %>%
+  mutate(rate = (100000*((tot_death - lead(tot_death, n = 7))/ pop_2019))) %>%
   filter(! is.na(rate)) %>%
   filter(! grepl('Inf', rate)) %>%
   left_join(p2020) %>%
@@ -268,7 +269,8 @@ or <- state_covid %>%
   left_join(states) %>%
   filter(State == "Oregon") %>%
   arrange(desc(date)) %>%
-  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  left_join(census_data) %>%
+  mutate(rate = (100000*((tot_death - lead(tot_death, n = 7))/ pop_2019))) %>%
   filter(! is.na(rate)) %>%
   filter(! grepl('Inf', rate)) %>%
   left_join(p2020) %>%
@@ -291,7 +293,8 @@ statecovid_glm <- function(s){
     left_join(states) %>%
     filter(State == s) %>%
     arrange(desc(date)) %>%
-    mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+    left_join(census_data) %>%
+    mutate(rate = (100000*((tot_death - lead(tot_death, n = 7))/ pop_2019))) %>%
     filter(! is.na(rate)) %>%
     filter(! grepl('Inf', rate)) %>%
     left_join(p2020) %>%
@@ -341,7 +344,7 @@ ggplot(pred, aes(state = state, fill = win_margin)) +
   # scale_gradient_manual(values=c("#619CFF", "#F8766D")) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Modelled Using Relationship Between State Polling Averages
-       and 7-day Change in COVID-19 Death Rate",
+       and 7-day Death Rate per 100,000",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10-26-20_prediction_map.png")
@@ -422,7 +425,7 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
-       and 7-day Change in COVID-19 Death Rate",
+       and 7-day COVID-19 Death Rate per 100,000",
        caption = "LA omitted - range went above 100%")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
@@ -457,7 +460,8 @@ swing <- state_covid %>%
            State == "North Carolina" | State == "Arizona" | State == "Texas" | State == "Ohio") %>%
   group_by(State) %>%
   arrange(desc(date)) %>%
-  mutate(rate = ((tot_death - lead(tot_death, n = 7))/ lead(tot_death, n = 7))) %>%
+  left_join(census_data) %>%
+  mutate(rate = (100000*((tot_death - lead(tot_death, n = 7))/ pop_2019))) %>%
   filter(! is.na(rate)) %>%
   filter(! grepl('Inf', rate)) %>%
   left_join(p2020) %>%
@@ -465,7 +469,7 @@ swing <- state_covid %>%
 
 ggplot(swing, aes(x = rate, y = avg_poll)) + geom_point() + geom_smooth(method = "glm") + 
   facet_wrap(~ State) + my_line_theme + 
-  labs(x = "7 Day Death Rate Change",
+  labs(x = "7-Day Death Rate per 100,000",
        y = "Poll Averages", 
        title = "COVID-19 Deaths Rate vs. Poll Averages by State")
 
