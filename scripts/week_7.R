@@ -409,11 +409,9 @@ ggplot(states_predictions, aes(x = predictions, y = state, color = predictions))
        subtitle = "",
        caption = "")
 
-# Filter out states with ridiculous margins
-states_predictions2 <- states_predictions %>%
-  filter(state != "Louisiana")
+# Plot predicted republican vote share with confidence intervals
 
-ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)) + 
+ggplot(states_predictions, aes(x = predictions, y = state, color = predictions)) + 
   geom_point() + 
   geom_errorbar(aes(xmin = lwr, xmax = uppr)) +
   scale_color_gradient(low = "blue", high = "red") + 
@@ -425,8 +423,7 @@ ggplot(states_predictions2, aes(x = predictions, y = state, color = predictions)
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "Range of Predicted Republican Popular Vote Share %",
        subtitle = "Modelled using Relationship Between State Polling Averages
-       and 7-day COVID-19 Death Rate per 100,000",
-       caption = "LA omitted - range went above 100%")
+       and 7-day COVID-19 Death Rate per 100,000")
 
 ggsave("figures/10-26-20_prediction_ranges.png")
 
