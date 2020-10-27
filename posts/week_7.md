@@ -44,7 +44,7 @@ This particular model using only COVID-19 rates and polling averages predicts a 
 
 This large of a win margin seems unlikely, especially given how much COVID-19 has become a partisan issue. I would not expect some safe red states to swing left purely because of an increase in COVID-19 death rates for a variety of reasons. For example, blame might be placed further down the ballot, or economic recovery might be valued more heavily than changes in death rates. 
 
-Some states create models that seem more predictive than others, like Colorado. In the seven states that are predicted to be the closest by [Elliot Morris of the Economist](https://projects.economist.com/us-2020-forecast/president), the models created using this data seem to have little to no real predictive power. (Using this model, all of these 7 states are predicted to vote blue, with not one having a confidence interval that includes a potential Republican win).
+Some states create models that seem more predictive than others, like Colorado. In the seven states that are predicted to be the closest by Elliot Morris from the [Economist](https://projects.economist.com/us-2020-forecast/president), the models created using this data seem to have little to no real predictive power. (Using this model, all of these 7 states are predicted to vote blue, with not one having a confidence interval that includes a potential Republican win).
 
 ![](../figures/10-26-20_swing.png)
 
