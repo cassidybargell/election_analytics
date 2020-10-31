@@ -198,8 +198,8 @@ COSdemog <- demog %>%
 COScovid <- day7_covid_rates %>%
   filter(state == "Colorado")
 
-CO_prediction <- 0.85*predict(co_poll, COSpoll) + 
-  0.04*predict(co_econ, COSecon) + 0.1*predict(co_demog, COSdemog) + 
+CO_prediction <- 0.97*predict(co_poll, COSpoll) + 
+  0.01*predict(co_econ, COSecon) + 0.01*predict(co_demog, COSdemog) + 
   0.01*predict(co_covid, COScovid)
 
 # Create predict function with all the variables
@@ -228,9 +228,9 @@ predict_function <- function(s){
   Scovid <- day7_covid_rates %>%
     filter(state == s)
   
-state_prediction <- 0.9*predict(s_glm_poll, Spoll) + 
-    0.01*predict(s_glm_econ, Secon) + 0.07*predict(s_glm_demog, Sdemog) + 
-    0.01*predict(s_glm_covid, Scovid)
+state_prediction <- 0.85*predict(s_glm_poll, Spoll) + 
+    0.05*predict(s_glm_econ, Secon) + 0.05*predict(s_glm_demog, Sdemog) + 
+    0.05*predict(s_glm_covid, Scovid)
 }
 
 # loop through all states
@@ -240,13 +240,92 @@ for (s in states_list){
 }
 
 # join electoral college
-pred <- states_predictions %>%
+pred_final <- states_predictions %>%
   left_join(electoral_college) %>%
   filter(! is.na(predictions)) %>%
   mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
   mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
   mutate(rep_ec = sum(rep_win)) %>%
   mutate(dem_ec = sum(dem_win))
+
+#### Create Confidence Intervals for final prediction
+# function to pull a state standard error. Weight the same as original model 
+CI_function_se <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_glm_poll <- poll_glm(s)
+  s_glm_econ <- econ_glm(s)
+  s_glm_covid <- covid_glm(s)
+
+  Secon <- hist_econ %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- polls_10_29 %>%
+    filter(modeldate == "10/29/2020") %>%
+    filter(candidate_name == "Donald Trump") %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+  
+  prediction_CI_se <- 0.85*predict(s_glm_poll, Spoll, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit + 
+    0.05*predict(s_glm_econ, Secon, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit + 
+    0.05*predict(s_glm_demog, Sdemog, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit + 
+    0.05*predict(s_glm_covid, Scovid, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit
+
+}
+
+# function to pull fit of each state (same as prediction I just found this
+# method easier). Weight the same as the model
+CI_function_fit <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_glm_poll <- poll_glm(s)
+  s_glm_econ <- econ_glm(s)
+  s_glm_covid <- covid_glm(s)
+  
+  Secon <- hist_econ %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- polls_10_29 %>%
+    filter(modeldate == "10/29/2020") %>%
+    filter(candidate_name == "Donald Trump") %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+  
+  prediction_CI_fit <- 0.85*predict(s_glm_poll, Spoll, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit + 
+    0.05*predict(s_glm_econ, Secon, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit + 
+    0.05*predict(s_glm_demog, Sdemog, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit + 
+    0.05*predict(s_glm_covid, Scovid, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit
+  
+}
+
+# Loop through again, find upper and lower bounds.
+for (s in states_list){
+  CI_prediction_se <- CI_function_se(s)
+  CI_prediction_fit <- CI_function_fit(s)
+  
+  critval <- 1.96 ## approx 95% CI
+  
+  states_predictions$lwr[states_predictions$state == s] <- CI_prediction_fit - (critval * CI_prediction_se)
+  states_predictions$uppr[states_predictions$state == s] <- CI_prediction_fit + (critval * CI_prediction_se)
+}
 
 # not use change in demographics because just want to represent white voter
 # population, polling bias from 2016/idea of shy Trump supporter?
