@@ -239,15 +239,6 @@ for (s in states_list){
   states_predictions$predictions[states_predictions$state == s] <- state_prediction
 }
 
-# join electoral college
-pred_final <- states_predictions %>%
-  left_join(electoral_college) %>%
-  filter(! is.na(predictions)) %>%
-  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
-  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
-  mutate(rep_ec = sum(rep_win)) %>%
-  mutate(dem_ec = sum(dem_win))
-
 #### Create Confidence Intervals for final prediction
 # function to pull a state standard error. Weight the same as original model 
 CI_function_se <- function(s){
@@ -326,6 +317,53 @@ for (s in states_list){
   states_predictions$lwr[states_predictions$state == s] <- CI_prediction_fit - (critval * CI_prediction_se)
   states_predictions$uppr[states_predictions$state == s] <- CI_prediction_fit + (critval * CI_prediction_se)
 }
+
+# join electoral college
+pred_final <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win = ifelse(predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win)) %>%
+  mutate(winner = ifelse(dem_win > 0, "Democrat", "Republican")) %>%
+  mutate(d_pred = (100 - predictions)) %>%
+  mutate(win_margin = (d_pred - predictions))
+
+#### Visualizations
+
+# Visualize state map wins 
+ggplot(pred_final, aes(state = state, fill = win_margin)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/10_31_predictionmap.png")
+
+# Visualize confidence intervals of final prediction
+ggplot(pred_final, aes(x = predictions, y = state, color = winner)) + 
+  geom_point() + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("Democratic", "Republican")) + 
+  geom_errorbar(aes(xmin = lwr, xmax = uppr)) +
+  # scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Predicted Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "Range of Predicted Republican Popular Vote Share %",
+       subtitle = "Weighted Ensemble Model")
+
+ggsave("figures/10_31_ci_predictions.png")
 
 # not use change in demographics because just want to represent white voter
 # population, polling bias from 2016/idea of shy Trump supporter?
