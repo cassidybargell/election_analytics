@@ -330,6 +330,10 @@ pred_final <- states_predictions %>%
   mutate(d_pred = (100 - predictions)) %>%
   mutate(win_margin = (d_pred - predictions))
 
+#### RMSE
+
+
+
 #### Visualizations
 
 # Visualize state map wins 
@@ -364,6 +368,30 @@ ggplot(pred_final, aes(x = predictions, y = state, color = winner)) +
        subtitle = "Weighted Ensemble Model")
 
 ggsave("figures/10_31_ci_predictions.png")
+
+# visualize states with confidence intervals that include 50%, could swing in my
+# model
+
+potential_swing <- pred_final %>%
+  mutate(swing = ifelse(lwr <  50 & uppr > 50, TRUE, FALSE)) %>%
+  filter(swing == TRUE)
+
+ggplot(potential_swing, aes(x = predictions, y = state, color = winner)) + 
+  geom_point() + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("Democratic", "Republican")) + 
+  geom_errorbar(aes(xmin = lwr, xmax = uppr)) +
+  # scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Predicted Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "Range of Predicted Republican Popular Vote Share %",
+       subtitle = "Weighted Ensemble Model")
+
+ggsave("figures/10_31_swing.png")
 
 # not use change in demographics because just want to represent white voter
 # population, polling bias from 2016/idea of shy Trump supporter?
