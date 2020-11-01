@@ -426,7 +426,8 @@ ggplot(pred_final, aes(state = state, fill = win_margin)) +
     low = "red",
     name = "Win Margin") + 
   labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10_31_predictionmap.png")
@@ -437,8 +438,9 @@ ggplot(pred_final, aes(state = state, fill = winner)) +
   theme_statebins() +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
   labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model",
-       fill = "Predicted Two-Party Popular Vote Winner")
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Predicted Popular Vote Winner")
 
 ggsave("figures/10_31_predictionmap_winners.png")
 
@@ -455,8 +457,9 @@ ggplot(pred_final, aes(x = predictions, y = state, color = winner)) +
   ylab("") + 
   xlab("Predicted Republican Vote Share %") + 
   geom_vline(xintercept = 50, lty = 2) +
-  labs(title = "Range of Predicted Republican Popular Vote Share %",
-       subtitle = "Weighted Ensemble Model")
+  labs(title = "2020 Election 95% Confidence Intervals",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths")
 
 ggsave("figures/10_31_ci_predictions.png")
 
@@ -480,8 +483,10 @@ ggplot(potential_swing, aes(x = predictions, y = state, color = winner)) +
   ylab("") + 
   xlab("Predicted Republican Vote Share %") + 
   geom_vline(xintercept = 50, lty = 2) +
-  labs(title = "Range of Predicted Republican Popular Vote Share %",
-       subtitle = "Weighted Ensemble Model")
+  labs(title = "2020 Election 95% Confidence Intervals
+                 Potential Swing States",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths")
 
 ggsave("figures/10_31_swing.png")
 
@@ -506,8 +511,10 @@ ggplot(pred_upper, aes(state = state, fill = win_margin_upper)) +
     mid = "white",
     low = "red",
     name = "Win Margin") + 
-  labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model, Upper Bounds",
+  labs(title = "2020 Presidential Election Prediction Map
+       Upper Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10_31_predictionmap_uppr.png")
@@ -517,9 +524,11 @@ ggplot(pred_upper, aes(state = state, fill = winner_upper)) +
   geom_statebins() + 
   theme_statebins() +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) +
-  labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model, Upper Bounds",
-       fill = "Projected Democrat Win Margin")
+  labs(title = "2020 Presidential Election Prediction Map
+       Upper Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Predicted Popular Vote Winner")
 
 ggsave("figures/10_31_predictionmap_uppr_winner.png")
 
@@ -544,8 +553,10 @@ ggplot(pred_lwr, aes(state = state, fill = win_margin_lwr)) +
     mid = "white",
     low = "red",
     name = "Win Margin") + 
-  labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model, Lower Bounds",
+  labs(title = "2020 Presidential Election Prediction Map
+       Lower Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
        fill = "Projected Democrat Win Margin")
 
 ggsave("figures/10_31_predictionmap_lwr.png")
@@ -555,9 +566,12 @@ ggplot(pred_lwr, aes(state = state, fill = winner_lwr)) +
   geom_statebins() + 
   theme_statebins() +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
-  labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model, Lower Bounds", 
-       fill = "Projected Winner")
+  labs(title = "2020 Presidential Election Prediction Map
+       Lower Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths
+       Lower Bounds", 
+       fill = "Predicted Popular Vote Winner")
 
 ggsave("figures/10_31_predictionmap_lwr_winner.png")
 
@@ -565,7 +579,6 @@ ggsave("figures/10_31_predictionmap_lwr_winner.png")
 # population, polling bias from 2016/idea of shy Trump supporter?
 
 #### Try to change weights for each state based on RSME of each variable
-
 
 states_predictions2 <- states_predictions %>%
   mutate(econ_rmse = as.numeric(econ_rmse)) %>% 
@@ -603,14 +616,15 @@ new_predict_function <- function(s){
       filter(state == s)
   
   # give weights based on rmse values, but don't know how. 
-  pwt <- (1 - (bruh$polls_rmse / bruh$total_rmse))
-  ewt <- (1 - (bruh$econ_rmse / bruh$total_rmse))
-  cwt <- (1 - (bruh$covid_rmse / bruh$total_rmse))
-  dwt <- (1 - (bruh$demog_rmse / bruh$total_rmse))
+  a <- bruh$polls_rmse
+  b <- bruh$econ_rmse
+  c <- bruh$covid_rmse
+  d <- bruh$demog_rmse
+  x <- (a*b*c*d)/((a*b*c) + (a*b*d) + (a*c*d) + (b*c*d))
   
-  new_state_prediction <- pwt*predict(s_glm_poll, Spoll) + 
-    ewt*predict(s_glm_econ, Secon) + cwt*predict(s_glm_demog, Sdemog) + 
-    dwt*predict(s_glm_covid, Scovid)
+  new_state_prediction <- (x/a)*predict(s_glm_poll, Spoll) + 
+    (x/b)*predict(s_glm_econ, Secon) + (x/d)*predict(s_glm_demog, Sdemog) + 
+    (x/c)*predict(s_glm_covid, Scovid)
 }
 
 # loop through all states
@@ -637,20 +651,10 @@ ggplot(pred_rmse, aes(state = state, fill = winner)) +
   theme_statebins() +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
   labs(title = "2020 Presidential Election Prediction Map",
-       subtitle = "Weighted Ensemble Model",
-       fill = "Predicted Two-Party Popular Vote Winner")
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       caption = "Weights inversely proportionate with RMSE of each model, 
+       for each state.",
+       fill = "Predicted Popular Vote Winner")
 
 ggsave("figures/10_31_rmse_predmap.png")
-
-bruh <- states_predictions2 %>%
-  filter(state == "Colorado")
-
-# give weights based on rmse values, but don't know how. 
-pwt <- ((bruh$total_rmse - bruh$polls_rmse) / bruh$total_rmse)
-ewt <- ((bruh$total_rmse - bruh$econ_rmse) / bruh$total_rmse) 
-cwt <- ((bruh$total_rmse - bruh$covid_rmse) / bruh$total_rmse) 
-dwt <- ((bruh$total_rmse - bruh$demog_rmse) / bruh$total_rmse) 
-
-new_state_prediction <- pwt*predict(s_glm_poll, Spoll) + 
-  ewt*predict(s_glm_econ, Secon) + cwt*predict(s_glm_demog, Sdemog) + 
-  dwt*predict(s_glm_covid, Scovid)
