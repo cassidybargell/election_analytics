@@ -21,7 +21,7 @@ The individual models that make up the weighted ensemble are as follows:
 
 The final weighted ensemble is: 
 
-##### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
+#### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
 
 Where *pwt*, *ewt*, *dwt*, and *cwt* are weights assigned to each model. The heavier a model is weighted, the more influence it has over the final prediction produced by the model. 
 
@@ -68,7 +68,7 @@ If all models are weighted equally at 0.25, the ensemble predicts a Biden win wi
 
 The variations of the weighted ensemble using simple choice in weights are below: 
 
-##### **Predicted Trump Electoral College Votes** = (*0.85* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **259**
+**Predicted Trump Electoral College Votes** = (*0.85* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **259**
 
 **Predicted Trump Electoral College Votes** = (*0.25* * Poll-Model) + (*0.25* * Unemploy-Model) + (*0.25* * Demographic-Model) + (*0.25* * COVID-Model) = **215**
 
