@@ -16,6 +16,10 @@ library(scales)
 library(geofacet)
 library(maps)
 library(statebins)
+library(Metrics)
+library(modelr)
+library(dvmisc)
+
 gs4_deauth()
 
 states_map <- ggplot2::map_data("state")
@@ -81,7 +85,16 @@ states_predictions <- read_csv("data/csvData.csv") %>%
   select(state) %>%
   mutate(predictions = NA) %>%
   mutate(lwr = NA) %>%
-  mutate(uppr = NA)
+  mutate(uppr = NA) %>%
+  mutate(econ_coef = NA) %>%
+  mutate(demog_coef = NA) %>%
+  mutate(polls_coef = NA) %>%
+  mutate(covid_coef = NA) %>%
+  mutate(econ_rmse = NA) %>%
+  mutate(demog_rmse = NA) %>%
+  mutate(covid_rmse = NA) %>%
+  mutate(polls_rmse = NA) %>%
+  mutate(weighted_rmse = NA)
 
 ### Combine data for later use
 # Make each data frame for each part of weighted ensemble what I need it to be
@@ -332,6 +345,64 @@ pred_final <- states_predictions %>%
 
 #### RMSE
 
+# Make rmse functions
+
+# test with CO first
+co_poll_mse <- get_mse(co_poll)
+
+# polls
+mse_function_poll <- function(s){
+  s_glm_poll <- poll_glm(s)
+s_poll_mse <- get_mse(s_glm_poll)
+}
+
+for (s in states_list){
+  s_poll_mse <- mse_function_poll(s)
+  states_predictions$polls_rmse[states_predictions$state == s] <- sqrt(s_poll_mse)
+}
+
+ 
+# econ
+mse_function_econ <- function(s){
+  s_glm_econ <- econ_glm(s)
+  s_econ_mse <- get_mse(s_glm_econ)
+}
+
+for (s in states_list){
+  s_econ_mse <- mse_function_econ(s)
+  states_predictions$econ_rmse[states_predictions$state == s] <- sqrt(s_econ_mse)
+}
+
+# demog 
+mse_function_demog <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_demog_mse <- get_mse(s_glm_demog)
+}
+
+for (s in states_list){
+  s_demog_mse <- mse_function_demog(s)
+  states_predictions$demog_rmse[states_predictions$state == s] <- sqrt(s_demog_mse)
+}
+
+# covid 
+mse_function_covid <- function(s){
+  s_glm_covid <- covid_glm(s)
+  s_covid_mse <- get_mse(s_glm_covid)
+}
+
+for (s in states_list){
+  s_covid_mse <- mse_function_covid(s)
+  states_predictions$covid_rmse[states_predictions$state == s] <- sqrt(s_covid_mse)
+}
+
+# weight the rmse same to model 
+
+for (s in states_list){
+  s_weighted_mse <- states_predictions %>% filter(state == s) %>%
+    mutate(weighted = (0.85*polls_rmse + 0.5*econ_rmse + 0.5*covid_rmse + 0.5*demog_rmse)) %>%
+    select(weighted)
+  states_predictions$weighted_rmse[states_predictions$state == s] <- s_weighted_mse
+}
 
 
 #### Visualizations
@@ -351,6 +422,17 @@ ggplot(pred_final, aes(state = state, fill = win_margin)) +
 
 ggsave("figures/10_31_predictionmap.png")
 
+# Same visualization without graded win margin
+ggplot(pred_final, aes(state = state, fill = winner)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model",
+       fill = "Predicted Two-Party Popular Vote Winner")
+
+ggsave("figures/10_31_predictionmap_winners.png")
+
 # Visualize confidence intervals of final prediction
 ggplot(pred_final, aes(x = predictions, y = state, color = winner)) + 
   geom_point() + 
@@ -368,6 +450,7 @@ ggplot(pred_final, aes(x = predictions, y = state, color = winner)) +
        subtitle = "Weighted Ensemble Model")
 
 ggsave("figures/10_31_ci_predictions.png")
+
 
 # visualize states with confidence intervals that include 50%, could swing in my
 # model
@@ -392,6 +475,82 @@ ggplot(potential_swing, aes(x = predictions, y = state, color = winner)) +
        subtitle = "Weighted Ensemble Model")
 
 ggsave("figures/10_31_swing.png")
+
+# Upper bound of prediction interval 
+pred_upper <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win_upper = ifelse(uppr < 50, votes, 0)) %>%
+  mutate(rep_win_upper = ifelse(uppr >50, votes, 0)) %>%
+  mutate(rep_ec_upper = sum(rep_win_upper)) %>%
+  mutate(dem_ec_upper = sum(dem_win_upper)) %>%
+  mutate(winner_upper = ifelse(dem_win_upper > 0, "Democrat", "Republican")) %>%
+  mutate(d_pred_upper = (100 - uppr)) %>%
+  mutate(win_margin_upper = (d_pred_upper - uppr))
+
+# Plot upper win predictions
+ggplot(pred_upper, aes(state = state, fill = win_margin_upper)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model, Upper Bounds",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/10_31_predictionmap_uppr.png")
+
+# Same without graded fill 
+ggplot(pred_upper, aes(state = state, fill = winner_upper)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model, Upper Bounds",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/10_31_predictionmap_uppr_winner.png")
+
+# Do the same for lower bound predictions
+pred_lwr <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(predictions)) %>%
+  mutate(dem_win_lwr = ifelse(lwr < 50, votes, 0)) %>%
+  mutate(rep_win_lwr = ifelse(lwr >50, votes, 0)) %>%
+  mutate(rep_ec_lwr = sum(rep_win_lwr)) %>%
+  mutate(dem_ec_lwr = sum(dem_win_lwr)) %>%
+  mutate(winner_lwr = ifelse(dem_win_lwr > 0, "Democrat", "Republican")) %>%
+  mutate(d_pred_lwr = (100 - lwr)) %>%
+  mutate(win_margin_lwr = (d_pred_lwr - lwr))
+
+# Plot lwr win predictions
+ggplot(pred_lwr, aes(state = state, fill = win_margin_lwr)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model, Lower Bounds",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/10_31_predictionmap_lwr.png")
+
+# Same without graded win margin
+ggplot(pred_lwr, aes(state = state, fill = winner_lwr)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model, Lower Bounds", 
+       fill = "Projected Winner")
+
+ggsave("figures/10_31_predictionmap_lwr_winner.png")
 
 # not use change in demographics because just want to represent white voter
 # population, polling bias from 2016/idea of shy Trump supporter?
