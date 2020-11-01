@@ -96,7 +96,9 @@ states_predictions <- read_csv("data/csvData.csv") %>%
   mutate(polls_rmse = NA) %>%
   mutate(weighted_rmse = NA) %>%
   mutate(total_rmse = NA) %>%
-  mutate(rmse_predictions = NA)
+  mutate(rmse_predictions = NA) %>%
+  mutate(rmse_lwr = NA) %>%
+  mutate(rmse_uppr = NA)
 
 ### Combine data for later use
 # Make each data frame for each part of weighted ensemble what I need it to be
@@ -684,5 +686,315 @@ for (s in states_list){
   covid_coef <- covid_glm(s)
   states_predictions$covid_coef[states_predictions$state == s] <- covid_coef$coef[2]
 }
+
+#### More Visualizations about validity of model 
+
+states_predictions <- states_predictions %>%
+  mutate(weighted_rmse = as.double(weighted_rmse))
+
+rmse_viz <- states_predictions %>%
+  select(state, covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse) %>%
+  pivot_longer(cols = c(covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse),
+               names_to = "type", values_to = "rmse")
+
+ggplot(rmse_viz, aes(x = rmse)) + geom_histogram(bins = 20, fill = "#52307c") + 
+  facet_wrap(~ type) + theme_minimal() + 
+  labs(title = "Distribution of RMSE by Model", 
+       x = "RMSE", 
+       y = "Count",
+       covid_rmse = "COVID-19 Death Rate")
+
+ggsave("figures/10_31_hist_rmse.png")
+
+# Coefficients visual 
+
+coef_viz <- states_predictions %>%
+  select(state, covid_coef, demog_coef, econ_coef, polls_coef) %>%
+  pivot_longer(cols = c(covid_coef, demog_coef, econ_coef, polls_coef), 
+               names_to = "type", values_to = "coef")
+
+ggplot(coef_viz, aes(x = coef)) + geom_histogram(bins = 20, fill = "#52307c") + 
+  facet_wrap(~ type) + theme_minimal() + 
+  labs(title = "Distribution of Coefficients by State", 
+       x = "Coefficient Value", 
+       y = "Count")
+  
+ggsave("figures/10_31_hist_coef.png")
+
+#### RMSE Upper and Lower Bounds ------------------------------------
+
+states_predictions2 <- states_predictions %>%
+  mutate(econ_rmse = as.numeric(econ_rmse)) %>% 
+  mutate(polls_rmse = as.numeric(polls_rmse)) %>%
+  mutate(covid_rmse = as.numeric(covid_rmse)) %>%
+  mutate(demog_rmse = as.numeric(demog_rmse)) %>%
+  mutate(total_rmse = as.numeric(total_rmse))
+
+rmse_CI_function_se <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_glm_poll <- poll_glm(s)
+  s_glm_econ <- econ_glm(s)
+  s_glm_covid <- covid_glm(s)
+  
+  Secon <- hist_econ %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- polls_10_29 %>%
+    filter(modeldate == "10/29/2020") %>%
+    filter(candidate_name == "Donald Trump") %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+  
+  bruh <- states_predictions2 %>%
+    filter(state == s)
+  
+  # give weights based on rmse values, but don't know how. 
+  a <- bruh$polls_rmse
+  b <- bruh$econ_rmse
+  c <- bruh$covid_rmse
+  d <- bruh$demog_rmse
+  x <- (a*b*c*d)/((a*b*c) + (a*b*d) + (a*c*d) + (b*c*d))
+  
+  new_state_prediction <- (x/a)*predict(s_glm_poll, Spoll, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit + 
+    (x/b)*predict(s_glm_econ, Secon, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit +
+    (x/d)*predict(s_glm_demog, Sdemog,interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit + 
+    (x/c)*predict(s_glm_covid, Scovid, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$se.fit
+}
+
+# function to pull fit of each state (same as prediction I just found this
+# method easier). Weight the same as the model
+rmse_CI_function_fit <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_glm_poll <- poll_glm(s)
+  s_glm_econ <- econ_glm(s)
+  s_glm_covid <- covid_glm(s)
+  
+  Secon <- hist_econ %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- polls_10_29 %>%
+    filter(modeldate == "10/29/2020") %>%
+    filter(candidate_name == "Donald Trump") %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+  
+  bruh <- states_predictions2 %>%
+    filter(state == s)
+  
+  # give weights based on rmse values, but don't know how. 
+  a <- bruh$polls_rmse
+  b <- bruh$econ_rmse
+  c <- bruh$covid_rmse
+  d <- bruh$demog_rmse
+  x <- (a*b*c*d)/((a*b*c) + (a*b*d) + (a*c*d) + (b*c*d))
+  
+  new_state_prediction <- (x/a)*predict(s_glm_poll, Spoll, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit + 
+    (x/b)*predict(s_glm_econ, Secon, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit +
+    (x/d)*predict(s_glm_demog, Sdemog,interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit + 
+    (x/c)*predict(s_glm_covid, Scovid, interval = "prediction", level = 0.95, type = "link", se.fit = TRUE)$fit
+}
+
+# Loop through again, find upper and lower bounds.
+for (s in states_list){
+  rmse_CI_prediction_se <- rmse_CI_function_se(s)
+  rmse_CI_prediction_fit <- rmse_CI_function_fit(s)
+  
+  critval <- 1.96 ## approx 95% CI
+  
+  states_predictions$rmse_lwr[states_predictions$state == s] <- rmse_CI_prediction_fit - (critval * rmse_CI_prediction_se)
+  states_predictions$rmse_uppr[states_predictions$state == s] <- rmse_CI_prediction_fit + (critval * rmse_CI_prediction_se)
+}
+
+# join electoral college
+rmse_pred_final <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(rmse_predictions)) %>%
+  mutate(rmse_dem_win = ifelse(rmse_predictions < 50, votes, 0)) %>%
+  mutate(rmse_rep_win = ifelse(rmse_predictions >50, votes, 0)) %>%
+  mutate(rmse_rep_ec = sum(rmse_rep_win)) %>%
+  mutate(rmse_dem_ec = sum(rmse_dem_win)) %>%
+  mutate(rmse_winner = ifelse(rmse_dem_win > 0, "Democrat", "Republican")) %>%
+  mutate(rmse_d_pred = (100 - rmse_predictions)) %>%
+  mutate(rmse_win_margin = (rmse_d_pred - rmse_predictions))
+
+#### Vizualize again with RMSE Weights ------------
+
+ggplot(rmse_pred_final, aes(state = state, fill = rmse_win_margin)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/rmse_10_31_predictionmap.png")
+
+# Same visualization without graded win margin
+ggplot(rmse_pred_final, aes(state = state, fill = rmse_winner)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Predicted Popular Vote Winner")
+
+ggsave("figures/rmse_10_31_predictionmap_winners.png")
+
+# Visualize confidence intervals of final prediction
+ggplot(rmse_pred_final, aes(x = rmse_predictions, y = state, color = rmse_winner)) + 
+  geom_point() + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("Democratic", "Republican")) + 
+  geom_errorbar(aes(xmin = rmse_lwr, xmax = rmse_uppr)) +
+  # scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Predicted Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "2020 Election 95% Confidence Intervals",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths")
+
+ggsave("figures/rmse_10_31_ci_predictions.png")
+
+
+# visualize states with confidence intervals that include 50%, could swing in my
+# model
+
+rmse_potential_swing <- rmse_pred_final %>%
+  mutate(rmse_swing = ifelse(rmse_lwr <  50 & rmse_uppr > 50, TRUE, FALSE)) %>%
+  filter(rmse_swing == TRUE)
+
+ggplot(rmse_potential_swing, aes(x = rmse_predictions, y = state, color = rmse_winner)) + 
+  geom_point() + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("Democratic", "Republican")) + 
+  geom_errorbar(aes(xmin = rmse_lwr, xmax = rmse_uppr)) +
+  # scale_color_gradient(low = "blue", high = "red") + 
+  theme_minimal() + 
+  theme(axis.text.y = element_text(size = 7),
+        legend.position = "none") + 
+  ylab("") + 
+  xlab("Predicted Republican Vote Share %") + 
+  geom_vline(xintercept = 50, lty = 2) +
+  labs(title = "2020 Election 95% Confidence Intervals
+                 Potential Swing States",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths")
+
+ggsave("figures/rmse_10_31_swing.png")
+
+# Upper bound of prediction interval 
+rmse_pred_upper <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(rmse_predictions)) %>%
+  mutate(rmse_dem_win_upper = ifelse(rmse_uppr < 50, votes, 0)) %>%
+  mutate(rmse_rep_win_upper = ifelse(rmse_uppr >50, votes, 0)) %>%
+  mutate(rmse_rep_ec_upper = sum(rmse_rep_win_upper)) %>%
+  mutate(rmse_dem_ec_upper = sum(rmse_dem_win_upper)) %>%
+  mutate(rmse_winner_upper = ifelse(rmse_dem_win_upper > 0, "Democrat", "Republican")) %>%
+  mutate(rmse_d_pred_upper = (100 - rmse_uppr)) %>%
+  mutate(rmse_win_margin_upper = (rmse_d_pred_upper - rmse_uppr))
+
+# Plot upper win predictions
+ggplot(rmse_pred_upper, aes(state = state, fill = rmse_win_margin_upper)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map
+       Upper Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/rmse_10_31_predictionmap_uppr.png")
+
+# Same without graded fill 
+ggplot(rmse_pred_upper, aes(state = state, fill = rmse_winner_upper)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  labs(title = "2020 Presidential Election Prediction Map
+       Upper Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Predicted Popular Vote Winner")
+
+ggsave("figures/rmse_10_31_predictionmap_uppr_winner.png")
+
+# Do the same for lower bound predictions
+rmse_pred_lwr <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(rmse_predictions)) %>%
+  mutate(rmse_dem_win_lwr = ifelse(rmse_lwr < 50, votes, 0)) %>%
+  mutate(rmse_rep_win_lwr = ifelse(rmse_lwr >50, votes, 0)) %>%
+  mutate(rmse_rep_ec_lwr = sum(rmse_rep_win_lwr)) %>%
+  mutate(rmse_dem_ec_lwr = sum(rmse_dem_win_lwr)) %>%
+  mutate(rmse_winner_lwr = ifelse(rmse_dem_win_lwr > 0, "Democrat", "Republican")) %>%
+  mutate(rmse_d_pred_lwr = (100 - rmse_lwr)) %>%
+  mutate(rmse_win_margin_lwr = (rmse_d_pred_lwr - rmse_lwr))
+
+# Plot lwr win predictions
+ggplot(rmse_pred_lwr, aes(state = state, fill = rmse_win_margin_lwr)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_gradient2(
+    high = "blue",
+    mid = "white",
+    low = "red",
+    name = "Win Margin") + 
+  labs(title = "2020 Presidential Election Prediction Map
+       Lower Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       fill = "Projected Democrat Win Margin")
+
+ggsave("figures/rmse_10_31_predictionmap_lwr.png")
+
+# Same without graded win margin
+ggplot(rmse_pred_lwr, aes(state = state, fill = rmse_winner_lwr)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
+  labs(title = "2020 Presidential Election Prediction Map
+       Lower Bounds",
+       subtitle = "Weighted Ensemble Model: 
+       Polls, Demographics, Unemployment and COVID-19 Deaths
+       Lower Bounds", 
+       fill = "Predicted Popular Vote Winner")
+
+ggsave("figures/rmse_10_31_predictionmap_lwr_winner.png")
 
 
