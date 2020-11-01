@@ -94,7 +94,9 @@ states_predictions <- read_csv("data/csvData.csv") %>%
   mutate(demog_rmse = NA) %>%
   mutate(covid_rmse = NA) %>%
   mutate(polls_rmse = NA) %>%
-  mutate(weighted_rmse = NA)
+  mutate(weighted_rmse = NA) %>%
+  mutate(total_rmse = NA) %>%
+  mutate(rmse_predictions = NA)
 
 ### Combine data for later use
 # Make each data frame for each part of weighted ensemble what I need it to be
@@ -404,6 +406,13 @@ for (s in states_list){
   states_predictions$weighted_rmse[states_predictions$state == s] <- s_weighted_mse
 }
 
+# create total of rmse to use later 
+for (s in states_list){
+  s_total_mse <- states_predictions %>% filter(state == s) %>%
+    mutate(total = (polls_rmse + econ_rmse + covid_rmse + demog_rmse)) %>%
+    select(total)
+  states_predictions$total_rmse[states_predictions$state == s] <- s_total_mse
+}
 
 #### Visualizations
 
@@ -555,5 +564,93 @@ ggsave("figures/10_31_predictionmap_lwr_winner.png")
 # not use change in demographics because just want to represent white voter
 # population, polling bias from 2016/idea of shy Trump supporter?
 
+#### Try to change weights for each state based on RSME of each variable
 
 
+states_predictions2 <- states_predictions %>%
+  mutate(econ_rmse = as.numeric(econ_rmse)) %>% 
+  mutate(polls_rmse = as.numeric(polls_rmse)) %>%
+  mutate(covid_rmse = as.numeric(covid_rmse)) %>%
+  mutate(demog_rmse = as.numeric(demog_rmse)) %>%
+  mutate(total_rmse = as.numeric(total_rmse))
+
+new_predict_function <- function(s){
+  s_glm_demog <- demog_glm(s)
+  s_glm_poll <- poll_glm(s)
+  s_glm_econ <- econ_glm(s)
+  s_glm_covid <- covid_glm(s)
+  
+  Secon <- hist_econ %>%
+    filter(state == s) %>%
+    filter(year == 2020) %>%
+    select(local_unemploy)
+  
+  Spoll <- polls_10_29 %>%
+    filter(modeldate == "10/29/2020") %>%
+    filter(candidate_name == "Donald Trump") %>%
+    filter(state == s) %>%
+    rename(avg_pollyr = "pct_trend_adjusted")
+  
+  Sdemog <- demog %>%
+    filter(state == s) %>%
+    filter(year == 2018) %>%
+    select(state, year, White)
+  
+  Scovid <- day7_covid_rates %>%
+    filter(state == s)
+    
+  bruh <- states_predictions2 %>%
+      filter(state == s)
+  
+  # give weights based on rmse values, but don't know how. 
+  pwt <- (1 - (bruh$polls_rmse / bruh$total_rmse))
+  ewt <- (1 - (bruh$econ_rmse / bruh$total_rmse))
+  cwt <- (1 - (bruh$covid_rmse / bruh$total_rmse))
+  dwt <- (1 - (bruh$demog_rmse / bruh$total_rmse))
+  
+  new_state_prediction <- pwt*predict(s_glm_poll, Spoll) + 
+    ewt*predict(s_glm_econ, Secon) + cwt*predict(s_glm_demog, Sdemog) + 
+    dwt*predict(s_glm_covid, Scovid)
+}
+
+# loop through all states
+for (s in states_list){
+  new_state_prediction <- new_predict_function(s)
+  states_predictions$rmse_predictions[states_predictions$state == s] <- new_state_prediction
+}
+
+# make prediction model with rmse values 
+pred_rmse <- states_predictions %>%
+  left_join(electoral_college) %>%
+  filter(! is.na(rmse_predictions)) %>%
+  mutate(dem_win = ifelse(rmse_predictions < 50, votes, 0)) %>%
+  mutate(rep_win = ifelse(rmse_predictions >50, votes, 0)) %>%
+  mutate(rep_ec = sum(rep_win)) %>%
+  mutate(dem_ec = sum(dem_win)) %>%
+  mutate(winner = ifelse(dem_win > 0, "Democrat", "Republican")) %>%
+  mutate(d_pred = (100 - rmse_predictions)) %>%
+  mutate(win_margin = (d_pred - rmse_predictions))
+
+# visualize this prediction 
+ggplot(pred_rmse, aes(state = state, fill = winner)) + 
+  geom_statebins() + 
+  theme_statebins() +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
+  labs(title = "2020 Presidential Election Prediction Map",
+       subtitle = "Weighted Ensemble Model",
+       fill = "Predicted Two-Party Popular Vote Winner")
+
+ggsave("figures/10_31_rmse_predmap.png")
+
+bruh <- states_predictions2 %>%
+  filter(state == "Colorado")
+
+# give weights based on rmse values, but don't know how. 
+pwt <- ((bruh$total_rmse - bruh$polls_rmse) / bruh$total_rmse)
+ewt <- ((bruh$total_rmse - bruh$econ_rmse) / bruh$total_rmse) 
+cwt <- ((bruh$total_rmse - bruh$covid_rmse) / bruh$total_rmse) 
+dwt <- ((bruh$total_rmse - bruh$demog_rmse) / bruh$total_rmse) 
+
+new_state_prediction <- pwt*predict(s_glm_poll, Spoll) + 
+  ewt*predict(s_glm_econ, Secon) + cwt*predict(s_glm_demog, Sdemog) + 
+  dwt*predict(s_glm_covid, Scovid)

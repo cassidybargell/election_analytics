@@ -12,3 +12,4 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 # [The Ground Game - 10/18/20](posts/week_6.md)
 # [Shocks - 10/26/20](posts/week_7.md)
 ### [Regression Details](posts/week_7.5.md)
+# [Final Prediction](posts/final_prediction.md)
