@@ -19,6 +19,10 @@ The individual models that make up the weighted ensemble are as follows:
 
 * **COVID-19 Deaths**: Incumbent support represented directly by poll support versus 7-day COVID-19 death rates. Seven day death rate by state from 10/18/20 was used for the 2020 prediction.
 
+The final weighted ensemble is: 
+
+### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
+
 ![](../figures/10_31_hist_coef.png)
 
 [justify why these models in my ensemble, coefficients]
