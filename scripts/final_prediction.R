@@ -430,7 +430,9 @@ ggplot(pred_final, aes(state = state, fill = win_margin)) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap.png")
 
@@ -442,7 +444,9 @@ ggplot(pred_final, aes(state = state, fill = winner)) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner",
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap_winners.png")
 
@@ -461,7 +465,9 @@ ggplot(pred_final, aes(x = predictions, y = state, color = winner)) +
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "2020 Election 95% Confidence Intervals",
        subtitle = "Weighted Ensemble Model: 
-       Polls, Demographics, Unemployment and COVID-19 Deaths")
+       Polls, Demographics, Unemployment and COVID-19 Deaths", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_ci_predictions.png")
 
@@ -488,7 +494,9 @@ ggplot(potential_swing, aes(x = predictions, y = state, color = winner)) +
   labs(title = "2020 Election 95% Confidence Intervals
                  Potential Swing States",
        subtitle = "Weighted Ensemble Model: 
-       Polls, Demographics, Unemployment and COVID-19 Deaths")
+       Polls, Demographics, Unemployment and COVID-19 Deaths", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_swing.png")
 
@@ -517,7 +525,9 @@ ggplot(pred_upper, aes(state = state, fill = win_margin_upper)) +
        Upper Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap_uppr.png")
 
@@ -530,7 +540,9 @@ ggplot(pred_upper, aes(state = state, fill = winner_upper)) +
        Upper Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap_uppr_winner.png")
 
@@ -559,7 +571,9 @@ ggplot(pred_lwr, aes(state = state, fill = win_margin_lwr)) +
        Lower Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap_lwr.png")
 
@@ -573,7 +587,9 @@ ggplot(pred_lwr, aes(state = state, fill = winner_lwr)) +
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths
        Lower Bounds", 
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner", 
+       caption = "Weighting: 0.85 * Polls + 0.05 * Demographics + 
+       0.05 * Unemployment + 0.05 * COVID-19")
 
 ggsave("figures/10_31_predictionmap_lwr_winner.png")
 
@@ -655,7 +671,7 @@ ggplot(pred_rmse, aes(state = state, fill = winner)) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       caption = "Weights inversely proportionate with RMSE of each model, 
+       caption = "Weights inversely proportionate to RMSE of each model 
        for each state.",
        fill = "Predicted Popular Vote Winner")
 
@@ -850,7 +866,9 @@ ggplot(rmse_pred_final, aes(state = state, fill = rmse_win_margin)) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weights inversely proportionate with RMSE of each model, 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap.png")
 
@@ -862,7 +880,9 @@ ggplot(rmse_pred_final, aes(state = state, fill = rmse_winner)) +
   labs(title = "2020 Presidential Election Prediction Map",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap_winners.png")
 
@@ -881,7 +901,9 @@ ggplot(rmse_pred_final, aes(x = rmse_predictions, y = state, color = rmse_winner
   geom_vline(xintercept = 50, lty = 2) +
   labs(title = "2020 Election 95% Confidence Intervals",
        subtitle = "Weighted Ensemble Model: 
-       Polls, Demographics, Unemployment and COVID-19 Deaths")
+       Polls, Demographics, Unemployment and COVID-19 Deaths", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_ci_predictions.png")
 
@@ -908,7 +930,9 @@ ggplot(rmse_potential_swing, aes(x = rmse_predictions, y = state, color = rmse_w
   labs(title = "2020 Election 95% Confidence Intervals
                  Potential Swing States",
        subtitle = "Weighted Ensemble Model: 
-       Polls, Demographics, Unemployment and COVID-19 Deaths")
+       Polls, Demographics, Unemployment and COVID-19 Deaths",
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_swing.png")
 
@@ -937,7 +961,9 @@ ggplot(rmse_pred_upper, aes(state = state, fill = rmse_win_margin_upper)) +
        Upper Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap_uppr.png")
 
@@ -950,7 +976,9 @@ ggplot(rmse_pred_upper, aes(state = state, fill = rmse_winner_upper)) +
        Upper Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap_uppr_winner.png")
 
@@ -979,7 +1007,9 @@ ggplot(rmse_pred_lwr, aes(state = state, fill = rmse_win_margin_lwr)) +
        Lower Bounds",
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths",
-       fill = "Projected Democrat Win Margin")
+       fill = "Projected Democrat Win Margin", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap_lwr.png")
 
@@ -993,7 +1023,9 @@ ggplot(rmse_pred_lwr, aes(state = state, fill = rmse_winner_lwr)) +
        subtitle = "Weighted Ensemble Model: 
        Polls, Demographics, Unemployment and COVID-19 Deaths
        Lower Bounds", 
-       fill = "Predicted Popular Vote Winner")
+       fill = "Predicted Popular Vote Winner", 
+       caption = "Weights inversely proportionate to RMSE of each model 
+       for each state.")
 
 ggsave("figures/rmse_10_31_predictionmap_lwr_winner.png")
 

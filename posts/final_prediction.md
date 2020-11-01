@@ -24,6 +24,8 @@ The individual models that make up the weighted ensemble are as follows:
 [justify why these models in my ensemble, coefficients]
 
 ## Weighting the Models
+
+sensitivity analysis 
  - RMSE vs arbitrary 
 
 ### Weight by Root Mean Squared Error
