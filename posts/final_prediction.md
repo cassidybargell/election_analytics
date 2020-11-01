@@ -40,10 +40,19 @@ The outlier in demographic coefficients is West Virginia, a solidly red state. T
 
 **Why include these variables in the weighted ensemble?**
 
+I have explored each of these variables in previous weeks, and believe the combination has the potential to accurately capture the complexities of the 2020 election. 
+
+* **Polling**: Polls provide direct insight into voter preferences. Given how 
+
+* **Demographics**: 
+
+* **Unemployment Rates**: 
+
+* **COVID-19 Deaths**: 
+
 ## Weighting the Models
 
-sensitivity analysis 
- - RMSE vs arbitrary 
+I explored two ways to weight the models in the ensemble. One method was weighting was based on the root mean squared errors of each generalized linear model. The other was a somewhat arbitrary choice in weights. The weighting options are explained further below. 
 
 ### Weight by Root Mean Squared Error
 
@@ -51,7 +60,7 @@ sensitivity analysis
 
 ![](../figures/rmse_10_31_predictionmap.png)
 
-### Choice in Weights
+### Choice Weights
 
 ![](../figures/10_31_predictionmap.png)
 
