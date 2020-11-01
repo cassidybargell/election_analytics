@@ -658,3 +658,31 @@ ggplot(pred_rmse, aes(state = state, fill = winner)) +
        fill = "Predicted Popular Vote Winner")
 
 ggsave("figures/10_31_rmse_predmap.png")
+
+#### Pull coefficients 
+
+# polls
+for (s in states_list){
+  poll_coef <- poll_glm(s)
+  states_predictions$polls_coef[states_predictions$state == s] <- poll_coef$coef[2]
+}
+
+# demog
+for (s in states_list){
+  demog_coef <- demog_glm(s)
+  states_predictions$demog_coef[states_predictions$state == s] <- demog_coef$coef[2]
+}
+
+# econ
+for (s in states_list){
+  econ_coef <- econ_glm(s)
+  states_predictions$econ_coef[states_predictions$state == s] <- econ_coef$coef[2]
+}
+
+# covid
+for (s in states_list){
+  covid_coef <- covid_glm(s)
+  states_predictions$covid_coef[states_predictions$state == s] <- covid_coef$coef[2]
+}
+
+
