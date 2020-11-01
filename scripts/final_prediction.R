@@ -98,7 +98,8 @@ states_predictions <- read_csv("data/csvData.csv") %>%
   mutate(total_rmse = NA) %>%
   mutate(rmse_predictions = NA) %>%
   mutate(rmse_lwr = NA) %>%
-  mutate(rmse_uppr = NA)
+  mutate(rmse_uppr = NA) %>%
+  mutate(rmse_weighted_rmse = NA)
 
 ### Combine data for later use
 # Make each data frame for each part of weighted ensemble what I need it to be
@@ -403,7 +404,7 @@ for (s in states_list){
 
 for (s in states_list){
   s_weighted_mse <- states_predictions %>% filter(state == s) %>%
-    mutate(weighted = (0.85*polls_rmse + 0.5*econ_rmse + 0.5*covid_rmse + 0.5*demog_rmse)) %>%
+    mutate(weighted = (0.85*polls_rmse + 0.05*econ_rmse + 0.05*covid_rmse + 0.05*demog_rmse)) %>%
     select(weighted)
   states_predictions$weighted_rmse[states_predictions$state == s] <- s_weighted_mse
 }
@@ -651,6 +652,23 @@ for (s in states_list){
   states_predictions$rmse_predictions[states_predictions$state == s] <- new_state_prediction
 }
 
+for (s in states_list){
+  
+  bruh <- states_predictions2 %>%
+    filter(state == s)
+  
+  a <- bruh$polls_rmse
+  b <- bruh$econ_rmse
+  c <- bruh$covid_rmse
+  d <- bruh$demog_rmse
+  x <- (a*b*c*d)/((a*b*c) + (a*b*d) + (a*c*d) + (b*c*d))
+  
+  rmse_s_weighted_mse <- states_predictions %>% filter(state == s) %>%
+    mutate(rmse_weighted = ((x/a)*polls_rmse + (x/b)*econ_rmse + (x/c)*covid_rmse + (x/d)*demog_rmse)) %>%
+    select(rmse_weighted)
+  states_predictions$rmse_weighted_rmse[states_predictions$state == s] <- rmse_s_weighted_mse
+}
+
 # make prediction model with rmse values 
 pred_rmse <- states_predictions %>%
   left_join(electoral_college) %>%
@@ -706,15 +724,20 @@ for (s in states_list){
 #### More Visualizations about validity of model 
 
 states_predictions <- states_predictions %>%
-  mutate(weighted_rmse = as.double(weighted_rmse))
+  mutate(weighted_rmse = as.double(weighted_rmse)) %>%
+  mutate(rmse_weighted_rmse = as.double(rmse_weighted_rmse))
 
 rmse_viz <- states_predictions %>%
-  select(state, covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse) %>%
-  pivot_longer(cols = c(covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse),
+  select(state, covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse, rmse_weighted_rmse) %>%
+  pivot_longer(cols = c(covid_rmse, polls_rmse, econ_rmse, demog_rmse, weighted_rmse, rmse_weighted_rmse),
                names_to = "type", values_to = "rmse")
 
+rmse.labs <- c("COVID-19", "Demographics", "Unemployment", "Polling", "Choice Weights", "RMSE-Weights")
+names(rmse.labs) <- c("covid_rmse", "demog_rmse", "econ_rmse", "polls_rmse", "weighted_rmse", "rmse_weighted_rmse")
+
 ggplot(rmse_viz, aes(x = rmse)) + geom_histogram(bins = 20, fill = "#52307c") + 
-  facet_wrap(~ type) + theme_minimal() + 
+  facet_wrap(~ type, 
+             labeller = labeller(type = rmse.labs)) + theme_minimal() + 
   labs(title = "Distribution of RMSE by Model", 
        x = "RMSE", 
        y = "Count",
