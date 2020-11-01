@@ -54,15 +54,35 @@ I have explored each of these variables in previous weeks, and believe the combi
 
 I explored two ways to weight the models in the ensemble. One method was weighting was based on the root mean squared errors of each generalized linear model. The other was a somewhat arbitrary choice in weights. The weighting options are explained further below. 
 
+### Choice Weights
+
+The first way I chose to weight the models was somewhat arbitrary, however represents what I think logically should recieve the most weighting in the model. Given that the polling data being used is from 1 week or less out from the election, the polls should be less variable and in turn more predictive of the actual election outcome. Nate Silver, for example, weights his model almost entirely on polls the closer to election day it gets [(538)](https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/).
+
+For this reason, I weighed polls most heavily at **0.85**, and weighed the rest of the models equally at **0.05**. 
+
+![](../figures/10_31_predictionmap.png)
+
+This choice of weights predicts a Biden win with **279** electoral college votes over Trump's **259**. This is the same model predicted using only polling data (1 weight for polls, 0 weight for the other variables).
+
+If all models are weighted equally at 0.25, the ensemble predicts a Biden win with 323 electoral college votes over Trump's 215. When any of the other variables are weighed the most heavily at 0.85, only the unemployment model predicts a Trump electoral college victory with 304 votes over Biden at 234. COVID-19 death data on the other hand provides the most extreme prediction at a Biden win with 418 electoral college votes. 
+
+The variations of the weighted ensemble using simple choice in weights are below: 
+
+##### **Predicted Trump Electoral College Votes** = (*0.85* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **259**
+
+**Predicted Trump Electoral College Votes** = (*0.25* * Poll-Model) + (*0.25* * Unemploy-Model) + (*0.25* * Demographic-Model) + (*0.25* * COVID-Model) = **215**
+
+**Predicted Treump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.85* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **304**
+
+**Predicted Trump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.85* * Demographic-Model) + (*0.05* * COVID-Model) = **230**
+
+**Predicted Trump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.85* * COVID-Model) = **120**
+
 ### Weight by Root Mean Squared Error
 
 ![](../figures/10_31_hist_rmse.png)
 
 ![](../figures/rmse_10_31_predictionmap.png)
-
-### Choice Weights
-
-![](../figures/10_31_predictionmap.png)
 
 ## Prediction Interval
 
@@ -78,5 +98,6 @@ Confidence intervals
 ## Final Point Estimate of Electoral College
 
 ![](../figures/10_31_predictionmap_winners.png)
+![](../figures/rmse_10_31_predictionmap_winners.png)
 
 
