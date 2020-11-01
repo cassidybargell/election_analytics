@@ -21,7 +21,7 @@ The individual models that make up the weighted ensemble are as follows:
 
 The final weighted ensemble is: 
 
-### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
+##### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
 
 ![](../figures/10_31_hist_coef.png)
 
