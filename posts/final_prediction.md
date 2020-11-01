@@ -34,7 +34,7 @@ Positive coefficients suggest a positive relationship between independent variab
 * *COVID-19 Deaths*: the change in predicted vote share for the incumbent party (modelled directly with polling data) for a 1% increase in 7-day COVID-19 death rate per 100,000
 * *Demographics*: the change in predicted vote share for the Republican party for a 1% increase in white population in a state
 * *Unemployment*: the change in predicted vote share for the Republican party for a 1% increase in Q2 unemployment rate 
-* *Polls*: the change in predicted vote share for the Republican party for a 1 point increase in the polls
+* *Polls*: the change in predicted vote share for the Republican party for a 1 point increase in the polls (adjusted poll aggregates - [538](https://projects.fivethirtyeight.com/polls/))
 
 The outlier in demographic coefficients is West Virginia, a solidly red state. This is because the white population in West Virginia has steadily declined since 1992, from ~96% to ~94%, while the state has become increasingly Republican. This is not overly informative about the demographic inindependent variable, but rather reflects the rapid increase in vote share the the Republican party experienced in West Virginia; from recieving ~42% in 1992, to ~72% in 2016. 
 
@@ -42,13 +42,13 @@ The outlier in demographic coefficients is West Virginia, a solidly red state. T
 
 I have explored each of these variables in previous weeks, and believe the combination has the potential to accurately capture the complexities of the 2020 election. 
 
-* **Polling**: Polls provide direct insight into voter preferences. Given how 
+* **Polling**: Polls provide direct insight into voter preferences. Given how unpredictable other variables have been in 2020, I believe polling is essential to create a prediction model this year. As the election date approaches, there is also an uptick in the amount of polls coming from states so polling becomes less variable the closer to the election. 
 
-* **Demographics**: 
+* **Demographics**: Demographics can also be useful in predicting election outcomes. I have chosen to include white percentage as a predictor for Republican vote share because of the criticisms of 2016 polls having a generally left-leaning bias [(Economist)](https://projects.economist.com/us-2020-forecast/president/how-this-works). In theory including demographic data would increase the stability of the model for 2020 (the pandemic has not drastically altered demographic makeup of states), while also perhaps balancing any potential skewed polling bias that might not yet be detectable. 
 
-* **Unemployment Rates**: 
+* **Unemployment Rates**: Unemployment is the only economic fundamental I have chosen to include in the weighted ensemble. Although nearly every economic indicator crashed in 2020, unemployment may have the most direct impact on individuals, and therefore might have the largest effect on retrospective voting evaluating the incumbent administration. As will be explored in the weighting of the ensemble, unemployment is given a small weight to reflect the potential lack of predictive power economic models have in such an unprecedented year. 
 
-* **COVID-19 Deaths**: 
+* **COVID-19 Deaths**: The pandemic has been a central theme of this years election as it has massively disrupted life for nearly every American. I think failing to include it in the model would ignore a massive variable in 2020. In theory [casualty sensitivity](https://www-journals-uchicago-edu.ezp-prod1.hul.harvard.edu/doi/pdfplus/10.1111%2Fj.1468-2508.2007.00564.x) would impact support for the incumbent. There is no historical data that can be used to model the effect of the pandemic however, so poll support throughout 2020 is being used as a direct proxy to understand how a second wave near the election could change vote share. 
 
 ## Weighting the Models
 
