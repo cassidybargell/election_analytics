@@ -13,7 +13,7 @@ The individual models that make up the weighted ensemble are as follows:
 
 * **Polling**: Historical Republican two-party popular vote share versus state polling averages one week out or less from the election. (1972-2016) Poll averages from 10/29/20 were used to make a prediction for 2020. 
 
-* **Demographics**: Historical Republican two-party popular vote share versus percentage of white people in the state.(1990-2016) White percentage by state in 2018 was used in the prediction for 2020.
+* **Demographics**: Historical Republican two-party popular vote share versus percentage of white people in the state.(1992-2016) White percentage by state in 2018 was used in the prediction for 2020.
 
 * **Unemployment Rates**: Historical Republican two-party popular vote share versus state unemployment rates from Q2 of the election year. (1976-2016) 2020 Q2 state unemployment rates were used for the 2020 prediction.
 
@@ -22,6 +22,14 @@ The individual models that make up the weighted ensemble are as follows:
 The final weighted ensemble is: 
 
 ##### **Predicted Incumbent Vote Share** = (*pwt* * Poll-Model) + (*ewt* * Unemploy-Model) + (*dwt* * Demographic-Model) + (*cwt* * COVID-Model)
+
+Where *pwt*, *ewt*, *dwt*, and *cwt* are weights assigned to each model. The heavier a model is weighted, the more influence it has over the final prediction produced by the model. 
+
+Below is the distribution of coefficients for each state included in the final ensemble. A coefficient of zero suggests there is not a strong relationship between the independent variable (polls, unemployment, demographics and COVID-19) and incumbent vote share. 
+
+Positive coefficients suggest a positive relationship between independent variable and predicted voteshare, and the opposite is true for negative coefficients. The slight skew of distributions is noteworthy. For example, the small lean of the polling coefficients to the left but not past a coefficient of 1. This depicts that in some states a historical 1 percent increase in polls translates to slightly less than a 1 percent increase in actual voteshare.
+
+The outlier in demographic coefficients is West Virginia, a solidly red state. This is because the white population in West Virginia has steadily declined since 1992, from ~96% to ~94%, while the state has become increasingly Republican. This is not overly informative about the demographic inindependent variable, but rather reflects the rapid increase in vote share the the Republican party experienced in West Virginia; from recieving ~42% in 1992, to ~72% in 2016. 
 
 ![](../figures/10_31_hist_coef.png)
 
