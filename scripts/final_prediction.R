@@ -729,7 +729,7 @@ coef_viz <- states_predictions %>%
   pivot_longer(cols = c(covid_coef, demog_coef, econ_coef, polls_coef), 
                names_to = "type", values_to = "coef")
 
-ggplot(coef_viz, aes(x = coef)) + geom_histogram(bins = 20, fill = "#52307c") + 
+ggplot(coef_viz, aes(x = coef)) + geom_histogram(bins = 30, fill = "#52307c") + 
   facet_wrap(~ type) + theme_minimal() + 
   labs(title = "Distribution of Coefficients by State", 
        x = "Coefficient Value", 
