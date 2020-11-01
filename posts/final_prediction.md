@@ -129,10 +129,20 @@ The prediction interval for Trump from this model is constructed in the same way
 
 Exploring both of these weighted ensembles has been helpful in understanding what factors might pull the election one way or another. For my final point prediction I have chosen to use the RMSE-weighted model. Although this model predicts much more extreme Biden wins, I think that the weighting of states dynamically is valuable. I believe it better reflects how different states are influenced and predicted by differing variables more strongly. 
 
+Polls may be overstated in this model as both the polling and COVID-19 models rely heavily on 2020 polls. While this might be the case, given the uniqueness of this election in terms of economic fundamentals and other shocks, I believe polling data is the strongest method for understanding public opinion in 2020.*
+
 ![](../figures/rmse_10_31_predictionmap_winners.png)
 
 In that case, I would predict a **Biden victory**. With a point-estimate of **368** electoral college votes, and a prediction interval of **284 to 412**. 
 
 In turn, I predict **Trump** to recieve **170** electoral college votes, with a prediction interval of **126 to 254**.
+
+There is of course uncertainty in this model, and a Biden victory is not necessarily guaranteed, although I am predicting it to be highly likely.
+
+<hr>
+
+* Any bias in polling will be interesting to examine post-election in order to understand how this model might have missed in its prediction.
+
+*Thanks to Alison Hu for collaboration and help in building my final prediction model.*
 
 
