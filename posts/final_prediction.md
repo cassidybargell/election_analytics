@@ -97,20 +97,42 @@ The weighted total RMSE for each state is also lower using the RMSE weights rath
 
 Using the RMSE weighted ensemble, it predicts a more secure Biden win with **368** electoral college votes, and Trump with **170**.
 
+I believe the initial choice weighted ensemble (polls at 0.85), and the RMSE-weighted model provide the most promising prediction outcomes, so those two will be explored further below. 
+
 ## Prediction Interval
 
-Confidence intervals
-
-![](../figures/rmse_10_31_ci_predictions.png)
-![](../figures/rmse_10_31_swing.png)
+For these two models I have constructed a 95% confidence interval for predicted vote share in each state. 
 
 ![](../figures/10_31_ci_predictions.png)
+
+For the choice weighted ensemble, there are 8 states whose confidence intervals include the 50% vote share mark. They are **Wisconsin, Virginia, New Hampshire, Nevada, Iowa, Georgia, Florida and Colorado**. In this prediction model electoral college votes are determined by winning above 50% of the popular vote share. So, within the 95% confidence interval these states are most likely to "flip" from their predicted party winner to the other. 
+
 ![](../figures/10_31_swing.png)
 
+To illustrate this point, a prediction interval can be created using the upper and lower bounds of the confidence intervals. In the choice weighted ensemble, this means that for the lower bound of the prediction interval, Iowa, Georgia and Florida flip blue. The opposite would happen for the upper bound of the prediction interval.   
+
+For my choice weighted ensemble, the prediction interval for Trump electoral college votes would range from **208 to 301**. (For Biden this would translate to **330 to 237**). 
+
+This means that within my 95% confidence intervals there is a path for Trump to win, however it would require flipping states currently projected to vote blue. 
+
+A prediction interval can also be constructed for the RMSE-weighted ensemble using 95% confidence intervals for each state. 
+
+![](../figures/rmse_10_31_ci_predictions.png)
+
+Seven states from this model have confidence intervals that include the 50% vote share tipping point. They are **Wisconsin, Texas, Ohio, Iowa, Georgia, Florida and Arizona**. 
+
+![](../figures/rmse_10_31_swing.png)
+
+The prediction interval for Trump from this model is constructed in the same way, using the lower and upper bounds of state confidence intervals which in turn flips these potential swing states one way or another. The prediction interval for Trump electoral college votes would therefore range from **126 to 254**. For Biden this would be from **284 to 412**. Although this suggests that a Trump win would be highly unlikely, because 95% confidence intervals are used, a Trump win is definitely not impossible. 
 
 ## Final Point Estimate of Electoral College
 
-![](../figures/10_31_predictionmap_winners.png)
+Exploring both of these weighted ensembles has been helpful in understanding what factors might pull the election one way or another. For my final point prediction I have chosen to use the RMSE-weighted model. Although this model predicts much more extreme Biden wins, I think that the weighting of states dynamically is valuable. I believe it better reflects how different states are influenced and predicted by differing variables more strongly. 
+
 ![](../figures/rmse_10_31_predictionmap_winners.png)
+
+In that case, I would predict a **Biden victory**. With a point-estimate of **368** electoral college votes, and a prediction interval of **284 to 412**. 
+
+In turn, I predict **Trump** to recieve **170** electoral college votes, with a prediction interval of **126 to 254**.
 
 
