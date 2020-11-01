@@ -5,7 +5,7 @@
 
 <hr>
 
-### The Model
+## The Model
 
 For my final election prediction I have chosen to use a **weighted ensemble** that combines generalized linear models based off of data from polls, demographics, unemployment rates, and COVID-19 deaths.
 
@@ -23,20 +23,20 @@ The individual models that make up the weighted ensemble are as follows:
 
 [justify why these models in my ensemble, coefficients]
 
-### Weighting the Models
+## Weighting the Models
  - RMSE vs arbitrary 
 
-#### Weight by Root Mean Squared Error
+### Weight by Root Mean Squared Error
 
 ![](../figures/10_31_hist_rmse.png)
 
 ![](../figures/rmse_10_31_predictionmap.png)
 
-#### Choice in Weights
+### Choice in Weights
 
 ![](../figures/10_31_predictionmap.png)
 
-### Prediction Interval
+## Prediction Interval
 
 Confidence intervals
 
@@ -47,7 +47,7 @@ Confidence intervals
 ![](../figures/10_31_swing.png)
 
 
-### Final Point Estimate of Electoral College
+## Final Point Estimate of Electoral College
 
 ![](../figures/10_31_predictionmap_winners.png)
 
