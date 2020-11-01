@@ -29,14 +29,14 @@ Below is the distribution of coefficients for each state included in the final e
 
 ![](../figures/10_31_hist_coef.png)
 
-Positive coefficients suggest a positive relationship between independent variable and predicted voteshare, and the opposite is true for negative coefficients. Therefore the coefficients can be interpretted as follows: 
+Positive coefficients suggest a positive relationship between independent variable and predicted vote share, and the opposite is true for negative coefficients. Therefore the coefficients can be interpreted as follows: 
 
 * *COVID-19 Deaths*: the change in predicted vote share for the incumbent party (modelled directly with polling data) for a 1% increase in 7-day COVID-19 death rate per 100,000
 * *Demographics*: the change in predicted vote share for the Republican party for a 1% increase in white population in a state
 * *Unemployment*: the change in predicted vote share for the Republican party for a 1% increase in Q2 unemployment rate 
 * *Polls*: the change in predicted vote share for the Republican party for a 1 point increase in the polls (adjusted poll aggregates - [538](https://projects.fivethirtyeight.com/polls/))
 
-The outlier in demographic coefficients is West Virginia, a solidly red state. This is because the white population in West Virginia has steadily declined since 1992, from ~96% to ~94%, while the state has become increasingly Republican. This is not overly informative about the demographic inindependent variable, but rather reflects the rapid increase in vote share the the Republican party experienced in West Virginia; from recieving ~42% in 1992, to ~72% in 2016. 
+The outlier in demographic coefficients is West Virginia, a solidly red state. This is because the white population in West Virginia has steadily declined since 1992, from ~96% to ~94%, while the state has become increasingly Republican. This is not overly informative about the demographic independent variable, but rather reflects the rapid increase in vote share the the Republican party experienced in West Virginia; from receiving ~42% in 1992, to ~72% in 2016. 
 
 **Why include these variables in the weighted ensemble?**
 
@@ -56,7 +56,7 @@ I explored two ways to weight the models in the ensemble. One method was weighti
 
 ### Choice Weights
 
-The first way I chose to weight the models was somewhat arbitrary, however represents what I think logically should recieve the most weighting in the model. Given that the polling data being used is from 1 week or less out from the election, the polls should be less variable and in turn more predictive of the actual election outcome. Nate Silver, for example, weights his model almost entirely on polls the closer to election day it gets [(538)](https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/).
+The first way I chose to weight the models was somewhat arbitrary, however represents what I think logically should receive the most weighting in the model. Given that the polling data being used is from 1 week or less out from the election, the polls should be less variable and in turn more predictive of the actual election outcome. Nate Silver, for example, weights his model almost entirely on polls the closer to election day it gets [(538)](https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/).
 
 For this reason, I weighted polls most heavily at **0.85**, and weighted the rest of the models equally at **0.05**. 
 
@@ -72,7 +72,7 @@ The variations of the weighted ensemble using simple choice in weights are below
 
 **Predicted Trump Electoral College Votes** = (*0.25* * Poll-Model) + (*0.25* * Unemploy-Model) + (*0.25* * Demographic-Model) + (*0.25* * COVID-Model) = **215**
 
-**Predicted Treump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.85* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **304**
+**Predicted Trump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.85* * Unemploy-Model) + (*0.05* * Demographic-Model) + (*0.05* * COVID-Model) = **304**
 
 **Predicted Trump Electoral College Votes** = (*0.05* * Poll-Model) + (*0.05* * Unemploy-Model) + (*0.85* * Demographic-Model) + (*0.05* * COVID-Model) = **230**
 
@@ -82,9 +82,9 @@ The variations of the weighted ensemble using simple choice in weights are below
 
 The second way I have weighted the models uses root mean square errors (RMSE). RMSE is a measure of the differences between the values predicted by a model and the true values, or a measure of the in-sample performance of each model. The smaller the RMSE, the more predictive that model has historically performed.
 
-I have therefore weighted the models individually for each state. The weights are inversely proportional to the models' RMSE. If a models' RMSE was higher in comparison to the other models for that state, it was weighted less, and if a model had a relatively lower RMSE, it was weighted more heavily in that states weighted ensemble. This method allows for dynamic weighting based on state.
+I have therefore weighted the models individually for each state. The weights are inversely proportional to the models' RMSE. If a models' RMSE was higher in comparison to the other models for that state, it was weighted less, and if a model had a relatively lower RMSE, it was weighted more heavily in that state's weighted ensemble. This method allows for dynamic weighting based on state.
 
-The distribution of RMSEs is visualized below. Choice weights represents the weighted total RMSE produced by the ensembles with polls weighted at 0.85. RMSE-Weights is the weighted total RMSE produced by using each models RMSE value for varying weights by state. 
+The distribution of RMSEs is visualized below. ‘Choice weights’ represents the weighted total RMSE produced by the ensembles with polls weighted at 0.85. ‘RMSE-Weights’ is the weighted total RMSE produced by using each model's RMSE value for varying weights by state. 
 
 ![](../figures/10_31_hist_rmse.png)
 
@@ -135,7 +135,7 @@ Polls may be overstated in this model as both the polling and COVID-19 models re
 
 In that case, I would predict a **Biden victory**. With a point-estimate of **368** electoral college votes, and a prediction interval of **284 to 412**. 
 
-In turn, I predict **Trump** to recieve **170** electoral college votes, with a prediction interval of **126 to 254**.
+In turn, I predict **Trump** to receive **170** electoral college votes, with a prediction interval of **126 to 254**.
 
 There is of course uncertainty in this model, and a Biden victory is not necessarily guaranteed, although I am predicting it to be highly likely.
 
@@ -144,5 +144,3 @@ There is of course uncertainty in this model, and a Biden victory is not necessa
 * Any bias in polling will be interesting to examine post-election in order to understand how this model might have missed in its prediction.
 
 *Thanks to Alison Hu for collaboration and help in building my final prediction model.*
-
-
