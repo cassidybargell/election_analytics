@@ -141,6 +141,6 @@ There is of course uncertainty in this model, and a Biden victory is not necessa
 
 <hr>
 
-* Any bias in polling will be interesting to examine post-election in order to understand how this model might have missed in its prediction.
+*Any bias in polling will be interesting to examine post-election in order to understand how this model might have missed in its prediction.
 
 *Thanks to Alison Hu for collaboration and help in building my final prediction model.*
