@@ -1054,4 +1054,8 @@ ggplot(rmse_pred_lwr, aes(state = state, fill = rmse_winner_lwr)) +
 
 ggsave("figures/rmse_10_31_predictionmap_lwr_winner.png")
 
+file.create("my_predictions.RDS")
+saveRDS(states_predictions, file = "my_predictions.RDS")
+
+
 
