@@ -48,16 +48,26 @@ The RMSE model seemed to perform better predicting blue states, while the choice
 
 ![](../figures/post-election/choice_diff_separate.png)
 
-The RMSE for the choice weight model overall was lower than the RMSE weighted model, at **2.98**. When separated by red and blue states, the RMSE for blue states using the choice model was **2.84** and for red states was **3.12**.  
+The RMSE for the choice weight model overall was lower than the RMSE weighted model, at **2.98**. When separated by red and blue states, the RMSE for blue states using the choice model was **2.84** and for red states was **3.12**. For both models it therefore seems I was **less accurate in predicting the outcome for states that went to Trump, and consistently overpredicted Biden vote share.** 
 
 # Sources of Innaccuracy
 
-I think a large source of my underprediction of Trump's performance came from an overreliance on polling data, especially given my inclusion of the COVID-19 model weighted very heavily. 
+### COVID Model
+I think a large source of my underprediction of Trump's performance came from an overreliance on polling data, especially given my inclusion of the COVID-19 model. I included the COVID-19 death rate model in an attempt to represent casualty sensitivity that might decrease support for the incumbent given the pandemic. This model matched polling averages with 7 day death rates, which allowed me to create a generalized linear model that I used to predict vote share dependening on the 7-day COVID death rate directly prior to the election. 
+
+The thought behind the inclusion of this parameter was that the general public is sensitive to casualties, and a spike that was predicted right around the election should hurt the incumbent. 
+
+For the RMSE weighted model, each parameter was weighted inversely proportional to its RMSE by state. The COVID-19 model generally had the lowest RMSE, which makes sense given it was modelled off of polls from one year, so was weighted the most heavily. This model of COVID-19 deaths seemed important to include given the magnitude of the pandemic, but in retrospect I don't think that the matching of polling data with 7-day death rate was the most appropriate way to measure any potential effect of COVID deaths on the election. 
+
+- For one, this made my prediction very poll-heavy. In 2020 the polls had a left-leaning bias, which might be a contributing factor in my consistent over-prediction of Biden vote share. 
+- Changes in polls reflect a response to any number of factors, not coronavirus deaths alone. COVID-19 approval ratings might have been a better source to match on, however lack of data might be a limiting factor. 
+- As discussed in my post on [shocks](https://cassidybargell.github.io/election_analytics/posts/week_7.html), there might be partisan differences in perception of how the virus was handled. COVID-19 death rates might therefore impact voters in some states but not others. 
 
 ![](../figures/post-election/poll_v_actual.png)
 
-- changes in polls averages wasn't necessarily reflective of COVID-19 death rate
-- a more realistic thing to include should have been approval rating of COVID response, or maybe just approval rating of the president overall. 
+In order to test this hypothesis that COVID-19 death rates were not reflected in polling data, it would be useful to compare trends in other measures of public opinion. For example, Presidential approval ratings, or surveys that ask about approval of the handling of the virus could be modelled against COVID-19 death rates and then compared to the model using polls to see if a different type of public opinion survey better reflects casualty sensitivity. 
+
+
 
 # If I Were to Do It Again...
 
