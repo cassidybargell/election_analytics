@@ -79,9 +79,6 @@ Instead, voters might have considered the pre-pandemic economy as more reflectiv
 I would assume the answers would [vary greatly by party](https://www.pewresearch.org/politics/2020/02/07/views-of-nations-economy-remain-positive-sharply-divided-by-partisanship/). This might require use of differential weighting of parameters to predict outcomes in various states. 
 
 
-
-
-
 # If I Were to Do It Again...
 
 - maybe use more economic factors from the prior year
