@@ -19,6 +19,8 @@ The final election outcome was **306** electoral college votes for Biden and **2
 
 ![](../figures/post-election/predicted_v_actual.png)
 
+(The three states I missed are the three red points to the left of the verticle line)
+
 ![](../figures/post-election/missedstates_gt.png)
 
 ![](../figures/post-election/rmse_diff_combined.png)
