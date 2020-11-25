@@ -27,7 +27,7 @@ States above the diagonal line are states in which I overpredicted the Biden vot
 
 *The [Choice Model](https://cassidybargell.github.io/election_analytics/posts/final_prediction.html) weighted polls most heavily at 0.85, with unemployment, demographics, and COVID-19 death rates all given a weight of 0.05.*
 
-The difference between predicted vote share and actual vote share for Trump can be visualized below. The verticle dashed lines represent the average difference between predicted and actual values for states that went to Trump (-2.95) and states that went to Biden (-1.15).
+The difference between predicted vote share and actual vote share for Trump can be visualized below. The vertical dashed lines represent the average difference between predicted and actual values for states that went to Trump (-2.95) and states that went to Biden (-1.15).
 
 ![](../figures/post-election/rmse_diff_combined.png)
 *NY had not finished counting at the time of the creation of this dataset, so it is expected its final outcome is more blue than depicted* 
