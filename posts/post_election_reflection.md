@@ -21,7 +21,7 @@ The final election outcome was **306** electoral college votes for Biden and **2
 
 (The three states I missed are the three red points to the left of the vertical line)
 
-States above the diagonal line are states in which I overpredicted the Biden vote share, and states under the diagonal line are where I underpredicted Biden vote share. Overall I overpredicted Biden in 41 out of 50 states, the nine states in which I overpredicted Trump vote share were Maryland, Colorado, New Mexico, Oregon, Vermont, Washington, Nebraksa, Utah, and Delaware.
+States above the diagonal line are states in which I overpredicted the Biden vote share, and states under the diagonal line are where I underpredicted Biden vote share. Overall I overpredicted Biden in 41 out of 50 states, the nine states in which I overpredicted Trump vote share were Maryland, Colorado, New Mexico, Oregon, Vermont, Washington, Nebraska, Utah, and Delaware.
 
 ![](../figures/post-election/missedstates_gt.png)
 
@@ -87,7 +87,7 @@ Although many news sources are discussing the pivotal role many demographic grou
 If I were to predict this election again, I would change my model in a few ways:
 - I would remove the COVID-19 death rate model from the ensemble.
 - I would test more economic variables to decide which one was actually most predictive, and include that more heavily weighted in my final model.
-- Use weighting based on my intuition rather than RMSE, as that led to me giving too much weight to a parameter that might not have had any real predictive value. 
+-  would use weighting based on my intuition rather than RMSE, as that led to me giving too much weight to a parameter that might not have had any real predictive value. 
 
 
 
