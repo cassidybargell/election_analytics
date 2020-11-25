@@ -78,13 +78,16 @@ Instead, voters might have considered the pre-pandemic economy as more reflectiv
 
 I would assume the answers would [vary greatly by party](https://www.pewresearch.org/politics/2020/02/07/views-of-nations-economy-remain-positive-sharply-divided-by-partisanship/). This might require use of differential weighting of parameters to predict outcomes in various states. 
 
+I think that including economic variables is important in the final model, even if they are slightly less predictive than a model based on polling alone. A certain amount of error is expected in polling, so including fundamental parameters may help to buffer an effect that might be felt if all the polls are off by a large magnitude.
+
+Although many news sources are discussing the pivotal role many demographic groups played in this election, I would not necessarily be inclined to include more demographic variables in my final model. I think that including more demographics in the model would fail to capture the [variance within demographic groups](https://www.economist.com/united-states/2020/11/04/why-donald-trump-exceeded-expectations-with-americas-latinos), for example seen in the Latino community this year, where Trump made gains with Cuban-American voters in Florida, but lost Latino support in Arizona.
 
 # If I Were to Do It Again...
 
 If I were to predict this election again, I would change my model in a few ways:
-I would remove the COVID-19 death rate model from the ensemble.
-I would test more economic variables to decide which one was actually most predictive, and include that in my final model.
-Use weighting based on my intuition rather than RMSE, as that led to me giving too much weight to a parameter that might not have had any real predictive value. 
+- I would remove the COVID-19 death rate model from the ensemble.
+- I would test more economic variables to decide which one was actually most predictive, and include that more heavily weighted in my final model.
+- Use weighting based on my intuition rather than RMSE, as that led to me giving too much weight to a parameter that might not have had any real predictive value. 
 
 
 
