@@ -68,6 +68,18 @@ For the RMSE weighted model, each parameter was weighted inversely proportional 
 
 In order to test this hypothesis that COVID-19 death rates were not reflected in polling data, it would be useful to compare trends in other measures of public opinion. For example, Presidential approval ratings, or surveys that ask about approval of the handling of the virus could be modelled against COVID-19 death rates and then compared to the model using polls to see if a different type of public opinion survey better reflects casualty sensitivity. 
 
+### Economic Model
+
+In my attempt to model how the coronavirus might change the election, I neglected to strongly consider how fundamentals might come into play this election. I used unemployment data as an economic model in my final weighted ensemble, but it was not given much weight as it often had a high RMSE score and I gave it little weight in my choice model. 
+
+Although in 2020 the pandemic caused a major economic downturn, it is possible that voters did not attribute blame to Trump for the economy. [Heely and Lenz](https://www-jstor-org.ezp-prod1.hul.harvard.edu/stable/24363467?seq=1#metadata_info_tab_contents) discuss why voters substitute the end for the whole in their retrospective analysis of an incumbent, as overall performance is not as readily available to be assessed. In the case of the 2020 election, however, voters might not have used this same assumption of the end being reflective of the whole. 
+
+Instead, voters might have considered the pre-pandemic economy as more reflective of what the incumbent could control. In order to test this hypothesis, it would be useful to have a survey that could quantify how people were attributing blame for the economy. This could include questions to understand if people differentially attributed blame for various economic factors like GDP, unemployment status, and RDI. It would be useful to know if people were attributing blame to the President for the election year economy, which would be typical given historical data, or if people were restropectively assessing the President based on the pre-pandemic economy. 
+
+I would assume the answers would [vary greatly by party](https://www.pewresearch.org/politics/2020/02/07/views-of-nations-economy-remain-positive-sharply-divided-by-partisanship/). This might require use of differential weighting of parameters to predict outcomes in various states. 
+
+
+
 
 
 # If I Were to Do It Again...
