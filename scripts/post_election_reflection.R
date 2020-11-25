@@ -214,7 +214,20 @@ ggsave("figures/post-election/predicted_v_actual.png")
 #### Closer look at the three states I missed
 three <- accuracy %>%
   filter(state == "Ohio" | state == "North Carolina" | state == "Florida") %>%
-  select(rmse_predictions, rmse_diff, predictions, choice_diff)
+  select(state, real_Rpv2p, rmse_predictions, rmse_diff, predictions, choice_diff)
+
+three_gt <- three %>% gt() %>%
+  tab_header(title = "Trump Predicted vs. Actual Vote Share",
+             subtitle = "Two-Party Popular Vote") %>%
+  cols_label(state = "State",
+             real_Rpv2p = "Popular Vote %",
+             rmse_predictions = "RMSE Model Prediction",
+             rmse_diff = "RMSE Prediction - Actual",
+             predictions = "Choice Model Prediction",
+             choice_diff = "Choice Prediction - Actual"
+             )
+
+gtsave(three_gt, "figures/post-election/missedstates_gt.png")
 
 # which model; rmse or choice weighted was better
 compare <- accuracy %>%
@@ -238,4 +251,27 @@ ggplot(compare, aes(state = state, fill = trump_win)) +
        fill = "Trump Win")
 
 ggsave("figures/post-election/compare_models_statebin.png")
+
+#### gt table with all of predictions to be on the blog
+big_gt <- accuracy %>%
+  select(state, real_Rpv2p, rmse_predictions, rmse_diff, predictions, choice_diff) %>%
+  gt() %>%
+  tab_header(title = "Trump Predicted Vote Share and Actual Outcome",
+             subtitle = "Two-Party Popular Vote") %>%
+  cols_label(state = "State",
+             real_Rpv2p = "Popular Vote %",
+             rmse_predictions = "RMSE Model Prediction",
+             rmse_diff = "RMSE Prediction - Actual",
+             predictions = "Choice Model Prediction",
+             choice_diff = "Choice Prediction - Actual"
+  ) %>%
+  tab_style(style = cell_fill(color = "#ffcccb"), 
+            locations = cells_body(rows = real_Rpv2p > 50)) %>%
+  tab_style(style = cell_fill(color = "#89cff0"), 
+            locations = cells_body(rows = real_Rpv2p < 50))
+
+gtsave(big_gt, "figures/post-election/big_gt.png")
+  
+  
+  
 

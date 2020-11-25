@@ -5,6 +5,7 @@ This will be where I post my descriptive analysis and prediction blogs for the 2
 
 # [Final Prediction](posts/final_prediction.md)
 # [Post Election Reflection](posts/post_election_reflection.md)
+### [All State Outcomes](posts/state_outcomes.md)
 
 <hr>
 

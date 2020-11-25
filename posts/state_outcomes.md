@@ -1,0 +1,1 @@
+![](../figures/post-election/big_gt.png)
