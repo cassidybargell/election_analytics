@@ -65,11 +65,15 @@ ggplot(accuracy, aes(x = rmse_diff, fill = trump_win)) +
   labs(title = "Difference Between Actual and Predicted Vote Share",
        subtitle = "RMSE Weighted Model",
        x = "Trump Predicted - Trump Actual",
-       y = "Frequency")
+       y = "Frequency") + 
+  geom_vline(xintercept = -1.147841, color = "blue", linetype = 2) +
+  geom_vline(xintercept = -2.953784, color = "red", linetype = 2)
+
+ggsave("figures/post-election/rmse_diff_combined.png")
 
 # visualize split by red/blue states
 ggplot(accuracy, aes(x = rmse_diff, fill = trump_win)) + 
-  facet_wrap(~ trump_win) + 
+  facet_grid(~ trump_win) + 
   geom_histogram(bins = 20) + 
   theme_minimal() + 
   scale_fill_manual(values = c("blue", "red"), name = "State Winner", 
@@ -77,8 +81,11 @@ ggplot(accuracy, aes(x = rmse_diff, fill = trump_win)) +
   labs(title = "Difference Between Actual and Predicted Vote Share",
        subtitle = "RMSE Weighted Model",
        x = "Trump Predicted - Trump Actual",
-       y = "Frequency")
+       y = "Frequency") + 
+  geom_vline(xintercept = -1.147841, color = "blue", linetype = 2) +
+  geom_vline(xintercept = -2.953784, color = "red", linetype = 2)
 
+ggsave("figures/post-election/rmse_diff_separate.png")
 
 ## Choice Weights Model
 ggplot(accuracy, aes(x = choice_diff, fill = trump_win)) + 
@@ -90,11 +97,15 @@ ggplot(accuracy, aes(x = choice_diff, fill = trump_win)) +
   labs(title = "Difference Between Actual and Predicted Vote Share",
        subtitle = "Choice Weighted Model",
        x = "Trump Predicted - Trump Actual",
-       y = "Frequency")
+       y = "Frequency") + 
+  geom_vline(xintercept = 1.327542, color = "blue", linetype = 2) +
+  geom_vline(xintercept = 1.218747, color = "red", linetype = 2)
+
+ggsave("figures/post-election/choice_diff_combined.png")
 
 # split by red/blue states
 ggplot(accuracy, aes(x = choice_diff, fill = trump_win)) + 
-  facet_wrap(~ trump_win) + 
+  facet_grid(~ trump_win) + 
   geom_histogram(bins = 20) + 
   theme_minimal() + 
   scale_fill_manual(values = c("blue", "red"), name = "State Winner", 
@@ -102,7 +113,11 @@ ggplot(accuracy, aes(x = choice_diff, fill = trump_win)) +
   labs(title = "Difference Between Actual and Predicted Vote Share",
        subtitle = "Choice Weighted Model",
        x = "Trump Predicted - Trump Actual",
-       y = "Frequency")
+       y = "Frequency") + 
+  geom_vline(xintercept = 1.327542, color = "blue", linetype = 2) +
+  geom_vline(xintercept = 1.218747, color = "red", linetype = 2)
+
+ggsave("figures/post-election/choice_diff_separate.png")
 
 #### Get RMSE for predicted vs. actual
 
@@ -141,8 +156,15 @@ rmse2_blue <- Metrics::rmse(accuracy_blue$real_Rpv2p, accuracy_blue$predictions)
 # rmse higher for red states than it is blue states in both cases, missing blue
 # states by more?
 
-#### Find average error in differences?
-
+#### Find average error in differences, add to plots above 
+rmse_error <- accuracy %>%
+  filter(state != "District of Columbia") %>%
+  group_by(trump_win) %>%
+  summarise(rmse_avg_diff = mean(rmse_diff)) 
+choice_error <- accuracy %>%
+  filter(state != "District of Columbia") %>%
+  group_by(trump_win) %>%
+  summarise(choice_avg_diff = mean(choice_diff))
 
 #### Polling 
 # Look at just 2020 first, then can go back and consider other years maybe. 
@@ -171,6 +193,8 @@ ggplot(poll_pop, aes(x = pct_trend_adjusted, y = real_Rpv2p, color = trump_win))
   scale_color_manual(values = c("blue", "red"), name = "State Winner", 
                     labels = c("Biden", "Trump")) 
 
+ggsave("figures/post-election/poll_v_actual.png")
+
 #### Visualize predictions vs. actual 
 ggplot(accuracy, aes(x = rmse_predictions, y = real_Rpv2p, color = trump_win)) + geom_point() + 
   geom_abline(intercept = 0, slope = 1) + 
@@ -185,6 +209,7 @@ ggplot(accuracy, aes(x = rmse_predictions, y = real_Rpv2p, color = trump_win)) +
        y = "Actual Popular Vote % for Trump") + 
   geom_vline(xintercept = 50, linetype = 2)
 
+ggsave("figures/post-election/predicted_v_actual.png")
 
 #### Closer look at the three states I missed
 three <- accuracy %>%
@@ -211,4 +236,6 @@ ggplot(compare, aes(state = state, fill = trump_win)) +
   scale_fill_manual(values=c("#619CFF", "#F8766D")) + 
   labs(title = "Compare Accuracy Between RMSE and Choice Models",
        fill = "Trump Win")
+
+ggsave("figures/post-election/compare_models_statebin.png")
 
