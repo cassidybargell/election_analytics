@@ -21,6 +21,7 @@ library(modelr)
 library(dvmisc)
 library(haven)
 library(tidycensus)
+library(readxl)
 
 gs4_deauth()
 
@@ -56,9 +57,22 @@ county_covid <- read_csv("data/Provisional_COVID-19_Death_Counts_in_the_United_S
   rename(state = "State") %>%
   rename(deaths = "Deaths involving COVID-19") %>%
   rename(county = "County name")
-pop_vote_county_2020 <- read_csv("data/post-election/popvote_bycounty_2020.csv")
+pop_vote_county_2020 <- read_csv("data/post-election/popvote_bycounty_2020.csv") %>%
+  rename(fips = "FIPS") %>%
+  filter(! is.na(fips)) %>%
+  filter(fips != "fips") %>%
+  mutate(fips = as.double(fips))
 pop_vote_county_historical <- read_csv("data/post-election/popvote_bycounty_2000-2016.csv")
-x <- data("fips_codes")
+fips <- read_csv("data/post-election/ZIP-COUNTY-FIPS_2018-03.csv")
+census_data <- read_csv("data/nst-est2019-alldata.csv") %>%
+  rename(State = "NAME") %>%
+  rename(pop_2019 = "POPESTIMATE2019") %>%
+  select(State, pop_2019) %>%
+  left_join(states)
+county_pop <- read_xls("data/post-election/PopulationEstimates.xls") %>%
+  rename(county = "...3") %>%
+  rename(pop = "...20") %>%
+  select(county, pop)
 
 # Explore Latino Voting Block with Nationscape data
 
@@ -150,8 +164,21 @@ corona %>%
 
 # coronavirus death rates vs. county popular vote outcomes 
 
+# join corona county deaths with popular vote
 all_corona_vote <- county_covid %>%
-  left_join(pop_vote_county_2020)
+  left_join(pop_vote_county_2020) %>%
+  rename(trump = "Donald J. Trump") %>%
+  rename(total = "Total Vote") %>%
+  mutate(trump = as.double(trump)) %>%
+  mutate(total = as.double(total)) %>%
+  mutate(trump_pct = ((trump / total) * 100)) %>%
+  left_join(county_pop) %>%
+  filter(! is.na(pop)) %>%
+  mutate(pop = as.double(pop)) %>%
+  mutate(per_cap = (deaths / pop)) 
+  
+
+ggplot(all_corona_vote, aes(x = deaths, y = trump_pct)) + geom_point() + geom_smooth(method = "glm")
   
   
   
