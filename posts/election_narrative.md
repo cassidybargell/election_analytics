@@ -14,6 +14,8 @@ Now that the election has concluded and Biden has been declared President-Elect,
 
 Several media narratives have begun to speculate on the causal effect of COVID-19 on the outcome of the election. A [USA Today](https://www.usatoday.com/story/news/politics/elections/2020/11/09/covid-19-shaped-2020-election-amid-split-biden-trump-response/3729201001/) headline claimed COVID-19 "[swung] some voters to Biden but [bolstered] Trump with his base". [The Washington Post](https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/elections/interactive/2020/trump-pandemic-coronavirus-election/ions/interactive/2020/trump-pandemic-coronavirus-election/) has published an article on why "Trump's erratic behavior and failure on coronavirus doomed his reelection". [The Guardian](https://www.theguardian.com/world/2020/nov/04/exit-polls-economy-covid-lockdown-trump) noted that "Fears about the economy under lockdown helped Trump outperform [the] polls", and [Time Magazine](https://time.com/5910256/covid-19-presidential-election-outcome/) pointed out a potential paradox, that "Where the virus was the worst, voters supported Trump the most".
 
+It is critical we understand how COVID-19 has impacted the election because it has large implications for how future elections will run, dependent on our understanding of how the American public responded to this crisis. It would be important to know if COVID-19 deaths and severity impacted how Americans voted, or if the pandemic has largely just become another partisan issue. Understanding how a shock this large impacted American voters will impact what future campaigns focus on, and where and on who they spend their money. 
+
 Understanding the true causal impact the virus had voter decision making is beyond the scope of this blog post, there are some testable implications of the claims being made by the media about the effect COVID-19 had on the election outcome. **If the virus was worst where Trump had the most support, then we would expect to see a positive correlation between deaths (either in total or per capita) and popular vote share for Trump**. This claim can begin to be examined using county level data about voting outcomes and COVID-19 death totals (as of 10/21/20) for 1,172 U.S. counties. 
 
 When the log* of total deaths is plotted versus percentage of popular vote share for Trump in counties, a negative relationship is observed instead.
@@ -41,7 +43,7 @@ Miami-Dade county highlights the danger of succumbing to ecological fallacies th
 
 Some of the other claims by the media, like about how Trump's handling of the virus hurt his reelection chances, can begin to be examined using polling data which gives more insight into what voters are actually thinking. 
 
-In many ways the virus has also been highly politicized this year, making it a partisan issue. 
+In many ways the virus has also been highly politicized this year, making it a partisan issue. Understanding how a virus that impacts everyone has become a partisan issue *** 
 
 ![](../figures/narrative/partisan_concern.png)
 
