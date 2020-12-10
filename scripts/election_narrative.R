@@ -130,6 +130,8 @@ corona %>%
        x = "Concern",
        caption = "'How concerned are you about coronavirus here in the United States?'")
 
+ggsave("figures/narrative/partisan_concern.png")
+
 # independent identification vs coronavirus concern 
 corona %>%
   filter(pid3 == 3) %>%
@@ -145,7 +147,15 @@ corona %>%
   mutate(vote_2020 = ifelse(vote_2020 == 1, "Donald Trump", "Biden")) %>%
   filter(! is.na(extra_corona_concern)) %>%
   ggplot(aes(x = extra_corona_concern,  y = vote_2020)) + geom_jitter(alpha = 0.5) +
-  theme_minimal()
+  theme_minimal() + 
+  labs(title = "Anticipated Vote vs. Concern About COVID-19",
+       subtitle = "June Nationscape Survey",
+       y = "'If the election for president were going to be held now...
+        who would you vote for?'",
+       x = "Concern",
+       caption = "'How concerned are you about coronavirus here in the United States?'")
+
+ggsave("figures/narrative/vote-2020_concern.png")
 
 # switchers between 2016 and 2020 concern about coronavirus 
 
@@ -168,6 +178,8 @@ ggplot(switchers, aes(x = extra_corona_concern, y = switcher)) +
        caption = "'How concerned are you about coronavirus here in the United States?'",
        y = "Voted for Trump in 2016 and Biden in 2020",
        x = "Indicated COVID-19 Concern")
+
+ggsave("figures/narrative/switchers.png")
 
 # visualize Trump coronavirus handling and coronavirus concern
 corona %>%
@@ -199,6 +211,8 @@ rep_approval_concern$extra_trump_corona <- factor(rep_approval_concern$extra_tru
          y = "'Do you approve or disapprove of Donald Trump’s 
          handling of the coronavirus outbreak?'",
          x = "'How concerned are you about coronavirus here in the United States?'")
+  
+ggsave("figures/narrative/concern_approval.png")
 
 # fewest somewhat disapprove, signal of partisanship? 
 corona %>%
@@ -303,6 +317,8 @@ ggplot(all_county2, aes(x = log_percap, y = change_in_D, alpha = 0.1)) +
        x = "Log Per Capita Deaths - 10/21/20",
        y = "Change In Democratic Win Margin") + theme(legend.position = "none")
 
+ggsave("figures/narrative/percap_change.png")
+
 ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) + 
   geom_point(aes(color = trump_win)) + 
   geom_smooth(method = "glm") + 
@@ -313,6 +329,8 @@ ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) +
        subtitle = "Change in Democratic Win Margin from 2016-2020 in 1,172 U.S. Counties", 
        x = "Log Total Deaths - (10/21/20)",
        y = "Change In Democratic Win Margin") + theme(legend.position = "none")
+
+ggsave("figures/narrative/total_change.png")
 
 # linear models
 change_lm_percap <- lm(change_in_D ~ log_percap, data = all_county2)
@@ -332,6 +350,8 @@ ggplot(all_county2, aes(x = log_deaths, y = trump_pct, alpha = 0.1)) +
        x = "Log Total Deaths - (10/21/20)",
        y = "Trump Popular Vote %") + theme(legend.position = "none")
 
+ggsave("figures/narrative/deaths_trumppct.png")
+
 #trump pct vs. log deaths
 ggplot(all_county2, aes(x = log_percap, y = trump_pct, alpha = 0.1)) + 
   geom_point(aes(color = trump_win)) + 
@@ -344,6 +364,8 @@ ggplot(all_county2, aes(x = log_percap, y = trump_pct, alpha = 0.1)) +
        subtitle = "For 1,172 U.S. Counties", 
        x = "Log Per Capita Deaths - 10/21/20",
        y ="Trump Popular Vote %") + theme(legend.position = "none")
+
+ggsave("figures/narrative/percap_trumppct.png")
 
 # linear models
 pct_lm_percap <- lm(trump_pct ~ log_percap, data = all_county2)
