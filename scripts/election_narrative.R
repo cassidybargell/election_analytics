@@ -367,7 +367,7 @@ ggplot(all_county2, aes(x = log_deaths, y = trump_pct, alpha = 0.1)) +
                      labels = c("", "")) + 
   theme_minimal() + 
   labs(title = "County COVID-19 Deaths vs. Trump Popular Vote Share", 
-       subtitle = "For each U.S. County", 
+       subtitle = "For 1,172 U.S. Counties", 
        x = "Log Total Deaths - (10/21/20)",
        y = "Trump Popular Vote %") + theme(legend.position = "none")
 
