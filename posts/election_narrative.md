@@ -55,7 +55,5 @@ If Trump's handling of COVID-19 hurt his reelection chances, one would expect to
 
 ![](../figures/narrative/switcher_approve.png)
 
-
-
 <hr>
 **Using the log of deaths and per capita deaths in order to make data more visible despite skew of outliers. The transformation to the data does not change the relationships.*
