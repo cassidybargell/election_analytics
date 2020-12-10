@@ -225,6 +225,8 @@ baldwin <-  all_county %>%
 # share from 2016 to 2020
 
 # Starr county, Maverick County, Webb County, Hidalgo County, Miami Dade
+
+# model change in Democratic win margin vs. log deaths or log deaths per capita
 ggplot(all_county2, aes(x = log_percap, y = change_in_D, alpha = 0.1)) + 
   geom_point(aes(color = trump_win)) + 
   geom_smooth(method = "glm") + 
@@ -233,14 +235,27 @@ ggplot(all_county2, aes(x = log_percap, y = change_in_D, alpha = 0.1)) +
   theme_minimal() + 
   labs(title = "", 
        subtitle = "", 
-       x = "",
-       y = "") + theme(legend.position = "none")
-
-glm_percap <- glm(change_in_D ~ log_percap, data = all_county2)
-
-glm_general <- glm(change_in_D ~ log_percap + trump_pct, data = all_county2)
+       x = "Log Per Capita Deaths - 10/21/20",
+       y = "Change In Democratic Win Margin") + theme(legend.position = "none")
 
 ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) + 
+  geom_point(aes(color = trump_win)) + 
+  geom_smooth(method = "glm") + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("", "")) + 
+  theme_minimal() + 
+  labs(title = "", 
+       subtitle = "", 
+       x = "Log Total Deaths - (10/21/20)",
+       y = "Change In Democratic Win Margin") + theme(legend.position = "none")
+
+# linear models
+change_lm_percap <- lm(change_in_D ~ log_percap, data = all_county2)
+
+change_lm_percap_trumppct <- lm(change_in_D ~ log_percap + trump_pct, data = all_county2)
+
+# change in democratic win margin vs. log deaths
+ggplot(all_county2, aes(x = log_deaths, y = trump_pct, alpha = 0.1)) + 
   geom_point(aes(color = trump_win)) + 
   geom_smooth(method = "glm") + 
   geom_smooth(method = "glm") + 
@@ -249,6 +264,24 @@ ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) +
   theme_minimal() + 
   labs(title = "", 
        subtitle = "", 
-       x = "",
-       y = "") + theme(legend.position = "none")
+       x = "Log Total Deaths - (10/21/20)",
+       y = "Trump Popular Vote %") + theme(legend.position = "none")
+
+#trump pct vs. log deaths
+ggplot(all_county2, aes(x = log_percap, y = trump_pct, alpha = 0.1)) + 
+  geom_point(aes(color = trump_win)) + 
+  geom_smooth(method = "glm") + 
+  geom_smooth(method = "glm") + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("", "")) + 
+  theme_minimal() + 
+  labs(title = "", 
+       subtitle = "", 
+       x = "Log Per Capita Deaths - 10/21/20",
+       y ="Trump Popular Vote %") + theme(legend.position = "none")
+
+# linear models
+pct_lm_percap <- lm(trump_pct ~ log_percap, data = all_county2)
+
+pct_lm_percap_trumppct <- lm(trump_pct ~ log_percap + change_in_D, data = all_county2)
   
