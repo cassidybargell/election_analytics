@@ -76,7 +76,7 @@ county_pop <- read_xls("data/post-election/PopulationEstimates.xls") %>%
   rename(pop = "...20") %>%
   select(county, pop, state)
 
-# Explore Latino Voting Block with Nationscape data
+#### Explore Latino Voting Block with Nationscape data
 
 # two by two table, is the proportion of Latinos voting for Trump different than
 # from non-latinos according to nationscape survey
@@ -110,13 +110,25 @@ ggplot(not_latino_you, aes(x = vote_2020_lean)) + geom_histogram()
 corona <- nationscape %>%
   select(extra_corona_concern, extra_sick_you, extra_sick_family, 
          extra_sick_other, extra_sick_work, extra_trump_corona,
-         vote_2020_lean, pid3, pid7, ideo5, state, vote_2020)
+         vote_2020_lean, pid3, pid7, ideo5, state, vote_2020, vote_2016)
 
 # visualize party identification vs. coronavirus concern
 # pid3: 1 = Dem, 2 = Rep
 corona %>%
   filter(pid3 == 1 | pid3 == 2) %>% 
-  ggplot(aes(x = extra_corona_concern,  y = pid3)) + geom_jitter(alpha = 0.5) + geom_smooth(method = "glm")
+  mutate(pid3 = ifelse(pid3 == 1, "Democrat", "Republican")) %>%
+  mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
+                                       ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
+                                       ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
+  filter(! is.na(extra_corona_concern)) %>%
+  ggplot(aes(x = extra_corona_concern,  y = pid3)) + geom_jitter(alpha = 0.5) + 
+  # geom_smooth(method = "lm") +
+  theme_minimal() + 
+  labs(title = "Partisanship vs. Concern About COVID-19",
+       subtitle = "June Nationscape Survey",
+       y = "Self Identified Partisanship",
+       x = "Concern",
+       caption = "'How concerned are you about coronavirus here in the United States?'")
 
 # independent identification vs coronavirus concern 
 corona %>%
@@ -127,13 +139,66 @@ corona %>%
 corona %>%
   filter(vote_2020 != 999) %>%
   filter(vote_2020 == 1 | vote_2020 == 2) %>%
-  ggplot(aes(x = extra_corona_concern,  y = vote_2020)) + geom_jitter(alpha = 0.5) + geom_smooth(method = "glm")
+  mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
+                                       ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
+                                              ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
+  mutate(vote_2020 = ifelse(vote_2020 == 1, "Donald Trump", "Biden")) %>%
+  filter(! is.na(extra_corona_concern)) %>%
+  ggplot(aes(x = extra_corona_concern,  y = vote_2020)) + geom_jitter(alpha = 0.5) +
+  theme_minimal()
+
+# switchers between 2016 and 2020 concern about coronavirus 
+
+switchers <- corona %>%
+  filter(vote_2016 == 1) %>%
+  mutate(switcher = ifelse(vote_2016 == 1 & vote_2020 == 2, T, F)) %>%
+  filter(vote_2020 != 999) %>%
+  filter(vote_2020 == 1 | vote_2020 == 2) %>%
+  mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
+                                 ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
+                                 ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
+  mutate(vote_2020 = ifelse(vote_2020 == 1, "Donald Trump", "Biden")) %>%
+  filter(! is.na(extra_corona_concern))
+
+ggplot(switchers, aes(x = extra_corona_concern, y = switcher)) + 
+  geom_jitter(alpha = 0.5) + 
+  theme_minimal() + 
+  labs(title = "Voters for Trump in 2016 and Biden in 2020",
+       subtitle = "Coronavirus Concern",
+       caption = "'How concerned are you about coronavirus here in the United States?'",
+       y = "Voted for Trump in 2016 and Biden in 2020",
+       x = "Indicated COVID-19 Concern")
 
 # visualize Trump coronavirus handling and coronavirus concern
 corona %>%
   filter(extra_trump_corona != 999) %>% 
-  ggplot(aes(x = extra_corona_concern, y = extra_trump_corona)) + geom_jitter(alpha = 0.5) + 
-  geom_smooth(method = "glm")
+  mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
+                                       ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
+                                              ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
+  ggplot(aes(x = extra_corona_concern, y = extra_trump_corona)) + geom_jitter(alpha = 0.5) 
+
+# Do same visualization for people who indicated they would vote for Trump in 2020
+rep_approval_concern <- corona %>%
+  filter(extra_trump_corona != 999) %>% 
+  filter(vote_2020 == 1) %>%
+  filter(! is.na(extra_corona_concern)) %>%
+  mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
+                                       ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
+                                              ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
+  mutate(extra_trump_corona = ifelse(extra_trump_corona == 1, "Strongly Approve", 
+                                       ifelse(extra_trump_corona == 2, "Somewhat Approve", 
+                                              ifelse(extra_trump_corona == 3, "Somewhat Disapprove", "Strongly Disapprove"))))
+
+rep_approval_concern$extra_trump_corona <- factor(rep_approval_concern$extra_trump_corona,levels = c("Strongly Approve", "Somewhat Approve", "Somewhat Disapprove", "Strongly Disapprove"))
+  
+  ggplot(rep_approval_concern, aes(x = extra_corona_concern, y = extra_trump_corona)) + geom_jitter(alpha = 0.5) +
+    theme_minimal() + 
+    labs(title = "Trump Voters COVID-19 Concern & Approval",
+         subtitle = "Among individuals who reported they would vote for Trump.",
+         caption = "June Nationscape Survey",
+         y = "'Do you approve or disapprove of Donald Trump’s 
+         handling of the coronavirus outbreak?'",
+         x = "'How concerned are you about coronavirus here in the United States?'")
 
 # fewest somewhat disapprove, signal of partisanship? 
 corona %>%
@@ -154,7 +219,7 @@ ggplot(corona_concern_prop, aes(state = state, fill = extra_corona_concern_prop)
   geom_statebins() + 
   theme_statebins()
 
-# How well does partisanship and voting for Trump align?
+# How well does partisanship and voting for Trump align? very well.
 corona %>%
   filter(pid3 == 1 | pid3 == 2) %>%
   filter(vote_2020 == 1 | vote_2020 == 2) %>%
@@ -233,8 +298,8 @@ ggplot(all_county2, aes(x = log_percap, y = change_in_D, alpha = 0.1)) +
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("", "")) + 
   theme_minimal() + 
-  labs(title = "", 
-       subtitle = "", 
+  labs(title = "County COVID-19 Per Capita Deaths vs. Change in Democratic Win Margin", 
+       subtitle = "Change in Democratic Win Margin from 2016-2020 in 1,172 U.S. Counties", 
        x = "Log Per Capita Deaths - 10/21/20",
        y = "Change In Democratic Win Margin") + theme(legend.position = "none")
 
@@ -244,8 +309,8 @@ ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) +
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("", "")) + 
   theme_minimal() + 
-  labs(title = "", 
-       subtitle = "", 
+  labs(title = "County COVID-19 Deaths vs. Change in Democratic Win Margin", 
+       subtitle = "Change in Democratic Win Margin from 2016-2020 in 1,172 U.S. Counties", 
        x = "Log Total Deaths - (10/21/20)",
        y = "Change In Democratic Win Margin") + theme(legend.position = "none")
 
@@ -262,8 +327,8 @@ ggplot(all_county2, aes(x = log_deaths, y = trump_pct, alpha = 0.1)) +
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("", "")) + 
   theme_minimal() + 
-  labs(title = "", 
-       subtitle = "", 
+  labs(title = "County COVID-19 Deaths vs. Trump Popular Vote Share", 
+       subtitle = "For each U.S. County", 
        x = "Log Total Deaths - (10/21/20)",
        y = "Trump Popular Vote %") + theme(legend.position = "none")
 
@@ -275,8 +340,8 @@ ggplot(all_county2, aes(x = log_percap, y = trump_pct, alpha = 0.1)) +
   scale_color_manual(values = c("blue", "red"), name = "", 
                      labels = c("", "")) + 
   theme_minimal() + 
-  labs(title = "", 
-       subtitle = "", 
+  labs(title = "County COVID-19 Per Capita Deaths vs. Trump Popular Vote Share", 
+       subtitle = "For 1,172 U.S. Counties", 
        x = "Log Per Capita Deaths - 10/21/20",
        y ="Trump Popular Vote %") + theme(legend.position = "none")
 
