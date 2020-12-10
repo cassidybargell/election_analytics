@@ -181,6 +181,27 @@ ggplot(switchers, aes(x = extra_corona_concern, y = switcher)) +
 
 ggsave("figures/narrative/switchers.png")
 
+# switchers approval of coronavirus handling
+switchers2 <- switchers %>%
+  filter(extra_trump_corona != 999) %>%
+  mutate(extra_trump_corona = ifelse(extra_trump_corona == 1, "Strongly Approve", 
+                                       ifelse(extra_trump_corona == 2, "Somewhat Approve", 
+                                              ifelse(extra_trump_corona== 3, "Somewhat Disapprove", "Strongly Disapprove"))))
+
+switchers2$extra_trump_corona <- factor(switchers2$extra_trump_corona,levels = c("Strongly Approve", "Somewhat Approve", "Somewhat Disapprove", "Strongly Disapprove"))
+
+  ggplot(switchers2, aes(x = extra_trump_corona, y = switcher)) + 
+  geom_jitter(alpha = 0.5) + 
+  theme_minimal() + 
+  labs(title = "Voters for Trump in 2016 and Biden in 2020",
+       subtitle = "Coronavirus Handling Approval",
+       caption = "'Do you approve or disapprove of Donald Trump’s 
+       handling of the coronavirus outbreak?'",
+       y = "Voted for Trump in 2016 and Biden in 2020",
+       x = "Indicated COVID-19 Handling Approval")
+  
+  ggsave("figures/narrative/switcher_approve.png")
+
 # visualize Trump coronavirus handling and coronavirus concern
 corona %>%
   filter(extra_trump_corona != 999) %>% 
