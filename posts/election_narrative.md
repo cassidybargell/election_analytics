@@ -14,7 +14,7 @@ Now that the election has concluded and Biden has been declared President-Elect,
 
 Several media narratives have begun to speculate on the causal effect of COVID-19 on the outcome of the election. A [USA Today](https://www.usatoday.com/story/news/politics/elections/2020/11/09/covid-19-shaped-2020-election-amid-split-biden-trump-response/3729201001/) headline claimed COVID-19 "[swung] some voters to Biden but [bolstered] Trump with his base". [The Washington Post](https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/elections/interactive/2020/trump-pandemic-coronavirus-election/ions/interactive/2020/trump-pandemic-coronavirus-election/) has published an article on why "Trump's erratic behavior and failure on coronavirus doomed his reelection". [The Guardian](https://www.theguardian.com/world/2020/nov/04/exit-polls-economy-covid-lockdown-trump) noted that "Fears about the economy under lockdown helped Trump outperform [the] polls", and [Time Magazine](https://time.com/5910256/covid-19-presidential-election-outcome/) pointed out a potential paradox, that "Where the virus was the worst, voters supported Trump the most".
 
-Understanding the true causal impact the virus had voter decision making is beyond the scope of this blog post, there are some testable implications of the claims being made by the media about the effect COVID-19 had on the election outcome. *If the virus was worst where Trump had the most support, then we would expect to see a positive correlation between deaths (either in total or per capita) and popular vote share for Trump*. This claim can begin to be examined using county level data about voting outcomes and COVID-19 death totals (as of 10/21/20) for 1,172 U.S. counties. 
+Understanding the true causal impact the virus had voter decision making is beyond the scope of this blog post, there are some testable implications of the claims being made by the media about the effect COVID-19 had on the election outcome. **If the virus was worst where Trump had the most support, then we would expect to see a positive correlation between deaths (either in total or per capita) and popular vote share for Trump**. This claim can begin to be examined using county level data about voting outcomes and COVID-19 death totals (as of 10/21/20) for 1,172 U.S. counties. 
 
 When the log* of total deaths is plotted versus percentage of popular vote share for Trump in counties, a negative relationship is observed instead.
 ![](../figures/narrative/deaths_trumppct.png)
@@ -23,10 +23,23 @@ When per capita death tolls are examined rather than total death tolls, the nega
 ![](../figures/narrative/percap_trumppct.png)
 I believe the difference in these graphs is reflective of the urban-rural partisan divide. Although there are more total deaths in larger, urban, Democratic-leaning areas, per capita death rates take into account population sizes, and therefore are more useful when comparing between populations. 
 
+The change in vote share from 2016 to 2020 in counties can also be examined in order to understand how Trump either made or lost ground this election. If the virus was worst where Trump had the most support, you might expect to see higher the death rates in an areas that had a larger shift towards Trump in 2020.
+
+Examining change from 2016 is also useful in potentially evaluating any claims that the severity of a virus in an area either hurt or helped a candidate. 2016 county popular vote outcomes were generally highly predictive of 2020 county popular votes. A relationship between large changes in popular vote share and coronavirus deaths might indicate that the severity of COVID-19 in an area had an impact on support for a candidate. 
 
 ![](../figures/narrative/total_change.png)
 
 ![](../figures/narrative/percap_change.png)
+
+Instead what we see is that there does not seem to be a strong relationship between change in Democrat win margin from 2016 to 2020 and death rates. In fact the relationship seems slightly positive when examined using total deaths, and slightly negative when examined using per capita deaths.
+
+From this preliminary examination it does not appear that in counties where there was a high death toll there was a strong shift either left or right this election. 
+
+The outliers (at the bottom of the above graph) had the largest swing *towards* Trump this election (a large decrease in Democratic win margin, although many of the counties were still won by Biden). The top four counties with largest swings right were in Texas -- in or around the Rio Grande Valley (Starr County, Maverick County, Webb County and Hidalgo County). The fifth largest swing right came from Miami-Dade in Florida.
+
+Miami-Dade county highlights the danger of succumbing to ecological fallacies through this broad type of analysis. One could incorrectly draw the conclusion that a high coronavirus death rates in this county caused a large swing right this election by looking at broad ecological data. In reality we cannot draw sweeping conclusions like that from this type of data. Rather, examining ecological data like I have done above is useful in providing a starting point to understand if some of the large claims that are being made hold much weight to begin with. 
+
+** Texas counties, danger of ecological fallacy. Transition to polling. 
 
 ![](../figures/narrative/partisan_concern.png)
 ![](../figures/narrative/vote-2020_concern.png)
