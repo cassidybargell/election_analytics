@@ -39,6 +39,7 @@ map_theme = function() {
 states_list <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming")
 
 #### Read in Data
+# all covid data as of 10/21/20
 my_predictions <- readRDS("data/post-election/my_predictions.RDS")
 poll_avg_1948_2020 <- read_csv("data/post-election/pollavg_1948-2020.csv")
 pop_vote_actual <- read_csv("data/post-election/popvote_bystate_1948-2020.csv")
@@ -70,9 +71,10 @@ census_data <- read_csv("data/nst-est2019-alldata.csv") %>%
   select(State, pop_2019) %>%
   left_join(states)
 county_pop <- read_xls("data/post-election/PopulationEstimates.xls") %>%
+  rename(state = "...2") %>%
   rename(county = "...3") %>%
   rename(pop = "...20") %>%
-  select(county, pop)
+  select(county, pop, state)
 
 # Explore Latino Voting Block with Nationscape data
 
@@ -176,9 +178,77 @@ all_corona_vote <- county_covid %>%
   filter(! is.na(pop)) %>%
   mutate(pop = as.double(pop)) %>%
   mutate(per_cap = (deaths / pop)) 
-  
 
-ggplot(all_corona_vote, aes(x = deaths, y = trump_pct)) + geom_point() + geom_smooth(method = "glm")
+# visualize if there is any relationship between COVID deaths and vote share
+all_corona_vote %>%
+  mutate(log_deaths = log(deaths)) %>%
+  ggplot(aes(x = log_deaths, y = trump_pct)) + geom_point(alpha = 0.5) + geom_smooth(method = "glm")
   
-  
+all_corona_vote %>%
+  mutate(log_percap = log(per_cap)) %>%
+  ggplot(aes(x = log_percap, y = trump_pct)) + geom_point(alpha = 0.5) + geom_smooth(method = "glm")
+
+#### Compare to historical trends
+
+# create tibble with current and historical vote shares as well as COVID deaths
+all_county <- all_corona_vote %>%
+  mutate(year = 2020) %>%
+  rename(state_abb = "state") %>%
+  rename(biden = "Joseph R. Biden Jr.") %>%
+  mutate(biden = as.double(biden)) %>%
+  mutate(biden_pct = ((biden / total) * 100)) %>%
+  mutate(D_win_margin = (biden_pct - trump_pct)) %>%
+  select(year, state_abb, fips, D_win_margin, per_cap, deaths, trump_pct) %>%
+  full_join(pop_vote_county_historical) %>%
+  select(! state & ! county)
+
+# created column for change in democratic vote share, negative value in
+# change_in_D indicates Trump performed better than 2016
+all_county2 <- all_county %>%
+  group_by(fips) %>%
+  arrange(desc(year)) %>%
+  mutate(change_in_D = (D_win_margin - lead(D_win_margin, n = 1))) %>%
+  filter(year == 2020) %>%
+  mutate(log_percap = log(per_cap)) %>%
+  mutate(log_deaths = log(deaths)) %>%
+  mutate(trump_win = ifelse(D_win_margin >= 0, F, T))
+
+# test with county to make sure it's working the way I want it to 
+baldwin <-  all_county %>%
+  filter(fips == 1003) %>%
+  group_by(fips) %>%
+  arrange(desc(year)) %>%
+  mutate(change_in_D = (D_win_margin - lead(D_win_margin, n = 1))) %>%
+  distinct()
+
+# Plot log deaths and log_percapita death rate vs. change in democratic vote
+# share from 2016 to 2020
+
+# Starr county, Maverick County, Webb County, Hidalgo County, Miami Dade
+ggplot(all_county2, aes(x = log_percap, y = change_in_D, alpha = 0.1)) + 
+  geom_point(aes(color = trump_win)) + 
+  geom_smooth(method = "glm") + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("", "")) + 
+  theme_minimal() + 
+  labs(title = "", 
+       subtitle = "", 
+       x = "",
+       y = "") + theme(legend.position = "none")
+
+glm_percap <- glm(change_in_D ~ log_percap, data = all_county2)
+
+glm_general <- glm(change_in_D ~ log_percap + trump_pct, data = all_county2)
+
+ggplot(all_county2, aes(x = log_deaths, y = change_in_D, alpha = 0.1)) + 
+  geom_point(aes(color = trump_win)) + 
+  geom_smooth(method = "glm") + 
+  geom_smooth(method = "glm") + 
+  scale_color_manual(values = c("blue", "red"), name = "", 
+                     labels = c("", "")) + 
+  theme_minimal() + 
+  labs(title = "", 
+       subtitle = "", 
+       x = "",
+       y = "") + theme(legend.position = "none")
   
