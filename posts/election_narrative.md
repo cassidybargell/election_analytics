@@ -57,7 +57,7 @@ Concern over the virus does not necessarily indicate low approval of Donald Trum
 
 ![](../figures/narrative/dem_approval.png)
 
-If Trump's handling of the virus hurt his reelection chances, I would expect to see that people who switched from voting for Trump in 2016 to Biden in 2020 disapproved of his handling of the pandemic, and were highly concerned about the virus. 
+If Trump's handling of the virus hurt his reelection chances, I would expect that people who switched from voting for Trump in 2016 to Biden in 2020 disapproved of his handling of the pandemic, and were highly concerned about the virus. The "TRUE" in the graphs below row represents these switchers, people who voted for Trump in 2016 and Biden in 2020. For this media claim to be true, among the switchers I would expect there to be greater concern about the virus, and stronger disapproval of Trump's handling of it.
 
 ![](../figures/narrative/switchers.png)
 
