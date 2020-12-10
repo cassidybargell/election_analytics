@@ -33,30 +33,29 @@ Examining change from 2016 is also useful in potentially evaluating any claims t
 
 Instead what we see is that there does not seem to be a strong relationship between change in Democrat win margin from 2016 to 2020 and death rates. In fact the relationship seems slightly positive when examined using total deaths, and slightly negative when examined using per capita deaths.
 
-From this preliminary examination it does not appear that in counties where there was a high death toll there was a strong shift either left or right this election. 
+From this very preliminary examination it does not appear that in counties where there was a high death toll there was a strong shift either left or right this election. 
 
 The outliers (at the bottom of the above graph) had the largest swing *towards* Trump this election (a large decrease in Democratic win margin, although many of the counties were still won by Biden). The top four counties with largest swings right were in Texas -- in or around the Rio Grande Valley (Starr County, Maverick County, Webb County and Hidalgo County). The fifth largest swing right came from Miami-Dade in Florida.
 
 Miami-Dade county highlights the danger of succumbing to ecological fallacies through this broad type of analysis. One could incorrectly draw the conclusion that a high coronavirus death rates in this county caused a large swing right this election by looking at broad ecological data. In reality we cannot draw sweeping conclusions like that from this type of data. Rather, examining ecological data like I have done above is useful in providing a starting point to understand if some of the large claims that are being made hold much weight to begin with. 
 
-** Texas counties, danger of ecological fallacy. Transition to polling. 
+Some of the other claims by the media, like about how Trump's handling of the virus hurt his reelection chances, can begin to be examined using polling data which gives more insight into what voters are actually thinking. 
+
+In many ways the virus has also been highly politicized this year, making it a partisan issue. 
 
 ![](../figures/narrative/partisan_concern.png)
+
 ![](../figures/narrative/vote-2020_concern.png)
+
 ![](../figures/narrative/concern_approval.png)
+
+If Trump's handling of COVID-19 hurt his reelection chances, one would expect to see that voters who switched from voting for Trump in 2016 to Biden in 2020 were concerned about coronavirus and disapproved of his handling of it. These questions are not all encompassing, so individuals might also be concerned about other facets of the Trump presidency, however this is the trend that would be expected if this claim was true. 
+
 ![](../figures/narrative/switchers.png)
+
 ![](../figures/narrative/switcher_approve.png)
 
-if Trump gained in places where there were more coronavirus cases, we would expect the places with the largest shifts towards trump to have the highest number of deaths/per capita. If not might be better to frame as more of a partisan issue. 
-
-https://www.usatoday.com/story/news/politics/elections/2020/11/09/covid-19-shaped-2020-election-amid-split-biden-trump-response/3729201001/
-
-https://www-washingtonpost-com.ezp-prod1.hul.harvard.edu/elections/interactive/2020/trump-pandemic-coronavirus-election/ions/interactive/2020/trump-pandemic-coronavirus-election/
-
-https://www.theguardian.com/world/2020/nov/04/exit-polls-economy-covid-lockdown-trump
-
-https://time.com/5910256/covid-19-presidential-election-outcome/
 
 
 <hr>
-* Using the log of deaths and per capita deaths in order to make data more visible despite skew of outliers.
+**Using the log of deaths and per capita deaths in order to make data more visible despite skew of outliers. The transformation to the data does not change the relationships.*
