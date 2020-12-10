@@ -51,9 +51,12 @@ In many ways the virus has been highly politicized this year, making it a partis
 
 ![](../figures/narrative/vote-2020_concern.png)
 
-
+Concern over the virus does not necessarily indicate low approval of Donald Trump's handling of the pandemic. Approval of the handling of the virus is where a larger partisan divide can be observed.
 
 ![](../figures/narrative/concern_approval.png)
+
+![](../figures/narrative/dem_approval.png)
+
 
 If Trump's handling of the virus hurt his reelection chances, I would expect to see that people who switched from voting for Trump in 2016 to Biden in 2020 disapproved of his handling of the pandemic, and were highly concerned about the virus.
 

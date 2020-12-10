@@ -203,12 +203,29 @@ switchers2$extra_trump_corona <- factor(switchers2$extra_trump_corona,levels = c
   ggsave("figures/narrative/switcher_approve.png")
 
 # visualize Trump coronavirus handling and coronavirus concern
-corona %>%
+dem_concern <- corona %>%
   filter(extra_trump_corona != 999) %>% 
+  filter(vote_2020 == 2) %>%
   mutate(extra_corona_concern = ifelse(extra_corona_concern == 1, "Very Concerned", 
                                        ifelse(extra_corona_concern == 2, "Somewhat Concerned", 
                                               ifelse(extra_corona_concern == 3, "Not Very Concerned", "Not At All Concerned")))) %>%
-  ggplot(aes(x = extra_corona_concern, y = extra_trump_corona)) + geom_jitter(alpha = 0.5) 
+  mutate(extra_trump_corona = ifelse(extra_trump_corona == 1, "Strongly Approve", 
+                                     ifelse(extra_trump_corona == 2, "Somewhat Approve", 
+                                            ifelse(extra_trump_corona== 3, "Somewhat Disapprove", "Strongly Disapprove")))) %>%
+  filter(! is.na(extra_corona_concern))
+
+dem_concern$extra_trump_corona <- factor(dem_concern$extra_trump_corona,levels = c("Strongly Approve", "Somewhat Approve", "Somewhat Disapprove", "Strongly Disapprove"))
+
+  ggplot(dem_concern, aes(x = extra_corona_concern, y = extra_trump_corona)) + geom_jitter(alpha = 0.5) +
+    theme_minimal() + 
+    labs(title = "Biden Voters COVID-19 Concern & Approval",
+         subtitle = "Among individuals who reported they would vote for Biden.",
+         caption = "June Nationscape Survey",
+         y = "'Do you approve or disapprove of Donald Trump’s 
+         handling of the coronavirus outbreak?'",
+         x = "'How concerned are you about coronavirus here in the United States?'")
+  
+  ggsave("figures/narrative/dem_approval.png")
 
 # Do same visualization for people who indicated they would vote for Trump in 2020
 rep_approval_concern <- corona %>%
