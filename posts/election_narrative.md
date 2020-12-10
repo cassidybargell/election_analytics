@@ -25,7 +25,7 @@ When per capita death tolls, however, are examined rather than total death tolls
 ![](../figures/narrative/percap_trumppct.png)
 I believe the difference in these graphs is reflective of the urban-rural partisan divide. Although there are more total deaths in larger, urban, Democratic-leaning areas, per capita death rates take into account population sizes, and therefore are more useful when comparing between populations. Either way, these graphs do not show initial support for the media claim that Trump had more support where coronavirus was the worst.
 
-The change in vote share from 2016 to 2020 in counties can also be examined in order to understand how Trump either made or lost ground this election. If the virus was worst where Trump had the most support, you might expect to see higher the death rates in an areas that had a larger shift towards Trump in 2020.
+The change in vote share from 2016 to 2020 in counties can also be examined in order to understand how Trump either made or lost ground this election. If the virus was worse where Trump had the most support, you might expect to see higher death rates in areas that had a larger shift towards Trump in 2020.
 
 Examining change from 2016 is also useful in potentially evaluating any claims that the severity of a virus in an area either hurt or helped a candidate. 2016 county popular vote outcomes were generally highly predictive of 2020 county popular votes. A relationship between large changes in popular vote share and coronavirus deaths might indicate that the severity of COVID-19 in an area had an impact on support for a candidate. 
 
